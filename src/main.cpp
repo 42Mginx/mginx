@@ -4,13 +4,11 @@ int		main(int argc, char **argv)
 {
 	if (argc == 2)
 	{
-		Mginx	_mginx;
-
 		try {
             // parsing 추가
-			if (_mginx.setup() == -1) // listen까지 진행
+			if (setup() == -1) // listen까지 진행
 				return (1);
-			_mginx.run();
+			run();
 			// _mginx.clean();
 		}
 		catch (...) {

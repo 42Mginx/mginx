@@ -15,6 +15,9 @@
 #define YELLOW "\033[33m"
 #define RESET "\033[0m"
 
+# define BUF_SIZE 4096
+
+
 int		choose_port(void)
 {
 	std::string		choice;
@@ -96,7 +99,7 @@ void	send(int port)
 {
 	int					sock;
 	struct sockaddr_in	serv_addr;
-	char				buffer[4096] = {0, };
+	char				buffer[BUF_SIZE] = {0, };
 	// std::fstream		file;
 	std::string			content;
 
@@ -111,28 +114,24 @@ void	send(int port)
 	serv_addr.sin_addr.s_addr = htonl(INADDR_ANY);
 	serv_addr.sin_port = htons(port);
 
-	connect(sock, (struct sockaddr *)&serv_addr, sizeof(serv_addr));
+	connect(sock, (struct sockaddr *)&serv_addr, sizeof(serv_addr)); // 내부에서 2번 악수
 
-	send(sock, "hello world", 10, 0);
-	read(sock, buffer, 4095);
+	send(sock, "hi this is client", 16, 0);
+
+	int ret = 0;
+	// blocking mode => 기다렸다가 read하기 때문에 while문이 필요없음
+	std::cout << ret << std::endl;
+	ret = read(sock, buffer, BUF_SIZE - 1);
 
 	std::cout << std::endl << "Response :" << std::endl;
-	std::cout << "[" << GREEN << std::string(buffer) << RESET << "]" << std::endl << std::endl;
+	std::cout << "[" << std::string(buffer) << "]" << std::endl << std::endl;
 
 	close(sock);
-
 	return ;
 }
 
 int		main(void)
 {
-	int				port;
-
-	// while (true)
-	// {
-		port = 8000;
-		send(port);
-	// }
-
+		send(8000);
 	return (0);
 }
