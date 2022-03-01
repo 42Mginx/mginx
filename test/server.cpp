@@ -40,6 +40,8 @@
 # include <arpa/inet.h>
 # include <netinet/in.h>
 
+# define BUF_SIZE 4096
+
 typedef struct	s_listen {
 	unsigned int	host;
 	int			port;
@@ -95,20 +97,31 @@ int main(){
     fd_set _writing_set; // 
     struct timeval	timeout;
     timeout.tv_sec  = 1;
-	timeout.tv_usec = 0;
+	  timeout.tv_usec = 0;
 
     // fd_set => _reding_set, _writing_set 초기화
-    memcpy(&_reading_set, &_fd_set, sizeof(_fd_set));
-    FD_ZERO(&_writing_set);
+    while(1){
+    
     int ret = 0;
+    FD_ZERO(&_writing_set); 
+ 
+    while(ret == 0){
+        memcpy(&_reading_set, &_fd_set, sizeof(_fd_set));
+        ret = select(max_fd + 1, &_reading_set, NULL, NULL, &timeout); // WRITING SET 설정필요함
+        std::cout << "기다리는 중입니다." << ret << std::endl; // -1이면 에러임
+    }
+    
+    std::cout << ret << std::endl; // -1이면 에러임 // 에러처리 필요
 
-    // while(ret == 0){
-    //     ret = select(max_fd + 1, &_reading_set, &_writing_set, NULL, &timeout);
-    //     std::cout << "기다리는 중입니다." << ret << std::endl; // -1이면 에러임
-    // }
-    // std::cout << ret << std::endl; // -1이면 에러임
+    char				buffer[BUF_SIZE] = {0, };
+    long connected_fd = accept(socket_fd, NULL, NULL); // 이제 데이터를 주고 받을 준비가 됨
 
-    long connected_fd = accept(socket_fd, NULL, NULL);
+    recv(connected_fd, buffer, BUF_SIZE - 1, 0); // 사실상 read랑 같음
+    std::cout << buffer << std::endl;
+    send(connected_fd, "hello world form server", 30, 0);
+    std::cout << "??" << std::endl;
+    }
 
-    std::cout << connected_fd << std::endl;
+    // =================
+
 }
