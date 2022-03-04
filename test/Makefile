@@ -1,13 +1,13 @@
 PWD = $(shell pwd)
 
 
-all: client.cpp server.cpp
+all: client.cpp server_file.cpp
 	clang++ -o client client.cpp
-	clang++ -o server server.cpp
+	clang++ -o server_file server_file.cpp
 
 clean:
 	rm -rf client
-	rm -rf server
+	rm -rf server_file
 
 
 fclean: clean
@@ -16,9 +16,9 @@ fclean: clean
 re: fclean all
 
 test:
-	# ./server
+	# ./server_file
 	# ./client
-	@osascript -e 'tell application "Terminal" to do script "cd $(PWD) && clear && ./server"'
+	@osascript -e 'tell application "Terminal" to do script "cd $(PWD) && clear && ./server_file"'
 
 
 .PHONY: all clean fclean re test
