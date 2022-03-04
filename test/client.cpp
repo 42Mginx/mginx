@@ -132,6 +132,6 @@ void	send(int port)
 
 int		main(void)
 {
-		send(8000);
+		send(8001);
 	return (0);
 }
