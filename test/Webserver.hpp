@@ -55,13 +55,14 @@ class Webserver {
   private:
     // util
     std::vector<t_listen> getListens();
-    // long max_fd;
-    // fd_set _fd_set;
+    long max_fd;
+    fd_set _fd_set;
 
-    // std::vector<int> socket_fd_v;
-    // std::vector<int> connected_fd_v;
-    // std::vector<WebserverProcess> process_v;
-    // std::vector<t_listen> listens_v;
+    std::vector<int> socket_fd_v;
+    std::vector<int> connected_fd_v;
+    std::vector<WebserverProcess> process_v;
+    std::vector<t_listen> listens_v;
+    fd_set _reading_set;
 
   public:
     Webserver(void);
@@ -70,6 +71,7 @@ class Webserver {
     Webserver &operator=(const Webserver &src);
 
     // action
+    int setup();
     void run();
 };
 
