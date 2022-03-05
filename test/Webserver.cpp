@@ -1,24 +1,9 @@
 #include "Webserver.hpp"
 #include "WebserverProcess.hpp"
 
-void Webserver::run() {
-    long max_fd = 0;
-
-    // fd_set 생성, 초기화
-    fd_set _fd_set;
-    FD_ZERO(&_fd_set);
-
-    // 파싱된 info에서 받아와야함. 아마도 config?
-    std::vector<t_listen> listens_v = getListens();
-
-    std::vector<int> socket_fd_v;
-    std::vector<int> connected_fd_v;
-    std::vector<WebserverProcess> process_v;
-
-    // socket 생성 => 반환값: socket fd
+int Webserver::setup(void) {
     std::vector<t_listen>::const_iterator listen_i = listens_v.begin();
     for (; listen_i != listens_v.end(); listen_i++) {
-
         WebserverProcess process(*listen_i);
 
         process.setup();
@@ -34,17 +19,12 @@ void Webserver::run() {
             max_fd = socket_fd;
     }
     std::cout << "setting 완료" << std::endl;
+    return 0;
+};
 
-    // ============================ [run] ===========================
-    fd_set _reading_set;
-    fd_set _writing_set;
-
+void Webserver::run() {
     while (1) {
-
         int ret = 0;
-
-        // FD_ZERO(&_writing_set);
-        // = > 아직 필요없음(res 보낼 때 필요)
 
         while (ret == 0) {
             struct timeval timeout;
@@ -52,17 +32,16 @@ void Webserver::run() {
             timeout.tv_usec = 0;
 
             memcpy(&_reading_set, &_fd_set, sizeof(_fd_set));
-            ret = select(max_fd + 1, &_reading_set, NULL, NULL,
-                         &timeout); // WRITING SET 설정필요함
-            std::cout << "기다리는 중입니다." << ret
-                      << std::endl; // -1이면 에러임
+            ret = select(max_fd + 1, &_reading_set, NULL, NULL, &timeout);
+            std::cout << "기다리는 중입니다." << ret << std::endl;
         }
 
-        std::cout << ret << std::endl; // -1이면 에러임 => 에러처리 필요
+        std::cout << ret << std::endl;
         if (ret == -1) {
             std::cout << "===> error!!" << std::endl;
         }
 
+        // accept
         std::vector<WebserverProcess>::iterator process_it = process_v.begin();
         for (; process_it != process_v.end(); process_it++) {
             int socket_fd = process_it->getFd();
@@ -74,25 +53,27 @@ void Webserver::run() {
             }
         };
 
-        std::vector<WebserverProcess>::iterator process_it2 = process_v.begin();
-        for (; process_it2 != process_v.end(); process_it2++) {
-            int connected_fd = process_it2->getConnectedFd();
+        // read
+        process_it = process_v.begin();
+        for (; process_it != process_v.end(); process_it++) {
+            int connected_fd = process_it->getConnectedFd();
             if (connected_fd != -1) {
                 std::cout << "read" << std::endl;
-                if (process_it2->readRequest() == -1) {
+                if (process_it->readRequest() == -1) {
                     std::cout << "read 에러" << std::endl;
                 }
-                process_it2->readyToResponse();
+                process_it->readyToResponse();
                 break;
             }
         };
 
-        std::vector<WebserverProcess>::iterator process_it3 = process_v.begin();
-        for (; process_it3 != process_v.end(); process_it3++) {
-            bool ready_to_response = process_it3->getReadyToResponse();
+        // write
+        process_it = process_v.begin();
+        for (; process_it != process_v.end(); process_it++) {
+            bool ready_to_response = process_it->getReadyToResponse();
             std::cout << "write" << std::endl;
             if (ready_to_response == true) {
-                if (process_it3->writeResponse() == -1) {
+                if (process_it->writeResponse() == -1) {
                     std::cout << "write 에러" << std::endl;
                 }
                 break;
@@ -123,7 +104,9 @@ std::vector<t_listen> Webserver::getListens() {
 
 // occf
 Webserver::Webserver(void) {
-    // Wait, that's illegal !
+    max_fd = 0;
+    FD_ZERO(&_fd_set);
+    listens_v = getListens();
 }
 Webserver::Webserver(const Webserver &src) { *this = src; }
 Webserver::~Webserver(void) {}
