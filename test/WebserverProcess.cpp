@@ -1,14 +1,18 @@
 #include "WebserverProcess.hpp"
 
 // action
-void WebserverProcess::setup(void) {
+int WebserverProcess::setup(void) {
 
     // 생성
     _socket_fd = socket(AF_INET, SOCK_STREAM, 0);
-    // 구조체 bind
-    ::bind(_socket_fd, (struct sockaddr *)&_addr, sizeof(_addr));
-    // listen
-    ::listen(_socket_fd, 1000);
+    if (_socket_fd != -1) {
+        fcntl(_socket_fd, F_SETFL, O_NONBLOCK);
+        // 구조체 bind
+        ::bind(_socket_fd, (struct sockaddr *)&_addr, sizeof(_addr));
+        // listen
+        ::listen(_socket_fd, 1000);
+    }
+    return _socket_fd;
 };
 
 int WebserverProcess::accept(void) {

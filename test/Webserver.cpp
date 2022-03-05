@@ -6,7 +6,10 @@ int Webserver::setup(void) {
     for (; listen_i != listens_v.end(); listen_i++) {
         WebserverProcess process(*listen_i);
 
-        process.setup();
+        if (process.setup() == -1) {
+            std::cout << "process setup error" << std::endl;
+            break;
+        }
         process_v.push_back(process);
 
         int socket_fd = process.getFd();
