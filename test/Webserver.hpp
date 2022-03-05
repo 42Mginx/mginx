@@ -55,9 +55,10 @@ class Webserver {
   private:
     // util
     std::vector<t_listen> getListens();
+
+    // 멤버변수
     long max_fd;
     fd_set _fd_set;
-
     std::vector<int> socket_fd_v;
     std::vector<int> connected_fd_v;
     std::vector<WebserverProcess> process_v;
@@ -65,6 +66,7 @@ class Webserver {
     fd_set _reading_set;
 
   public:
+    // occf
     Webserver(void);
     Webserver(const Webserver &src);
     ~Webserver(void);

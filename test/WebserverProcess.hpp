@@ -20,7 +20,7 @@ class WebserverProcess {
     WebserverProcess &operator=(WebserverProcess const &src);
 
     // action
-    void setup(void);
+    int setup(void);
     int accept(void);
     int readRequest(void);
     int readyToResponse(void);
