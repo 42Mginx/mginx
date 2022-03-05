@@ -20,14 +20,31 @@ class Request {
 			Request();
 			Request(std::string request_value);
 			~Request();
+			Request(const Request& _Request);
+			Request&	operator=(const Request&);
+
+
 			void	initHeaders();
 			void	initValidMethod();
 			void	parseProcess(std::string request_value);
 			void	parseStartLine(const std::string& str);
-			void	parseMethod(const std::string& line, size_t i);
-			void	parsePath(const std::string& line, size_t i);
-			void	parseVersion(const std::string& line, size_t i);
+			void	parseMethod(const std::string& line, size_t &i);
+			void	parsePath(const std::string& line, size_t &i);
+			void	parseVersion(const std::string& line, size_t &i);
 			void	checkMethod();
+			void	parseBody(const std::string& str);
+			void	parseQuery();
+
+
+			//getter
+			const std::string&									getMethod() const;
+			const std::string&									getTargetPath() const;
+			const std::string&									getQuery() const;
+			const std::string&									getVersion() const;
+			const std::map<std::string, std::string>&			getHeaders() const;
+			const std::string&									getBody() const;
+			const int											getStatus() const;
+
 };
 
 #endif

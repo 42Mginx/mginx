@@ -45,13 +45,13 @@ std::string&					pop(std::string& str)
 }
 
 // key 파싱
-std::string						readKey(char *line)
+std::string						readKey(const std::string& line)
 {
 	std::string	ret;
 
-	// 문자열 나오거나 ':' 나올때까지 파싱
-	for (int i = 0; line[i] && line[i] != ':'; i++)
-		ret.push_back(line[i]);
+	// ':' 전까지 붙여넣기
+	size_t	i = line.find_first_of(':');
+	ret.append(line, 0 , i);
 	// ret 첫글자 대문자화
 	capitalize(ret);
 	// 띄어쓰기 앞뒤로 잘라서 리턴
@@ -76,39 +76,46 @@ std::string&					capitalize(std::string& str)
 	return str;
 }
 
-std::string&					capitalize(std::string& str)
+// Value 파싱
+std::string						readValue(const std::string& line)
 {
-	size_t	i = 0;
+	size_t i;
+	std::string	ret;
 
-	// str 전부 소문자로 바꿈
-	to_lower(str);
-	// str[0] 대문자로 변경
-	str[i] = std::toupper(str[i]);
-	// '-' 위치 찾아서 그 다음문자 대문자로 변경해줌 (글자 범위 안에서)
-	while((i = str.find_first_of('-', i + 1)) != std::string::npos)
-	{
-		if (i + 1 < str.size())
-		str[i + 1] = std::toupper(str[i + 1]);
-	}
-	// 리턴
+	// ':' 위치 찾기
+	i = line.find_first_of(':');
+	// i+1부터 ' '가 아닌 게 나올때 위치(':' 이후 첫 문자열 위치 찾기)
+	i = line.find_first_not_of(' ', i + 1);
+	// 문자열이 있으면 끝까지 전부 ret에 넣어줌
+	if (i != std::string::npos)
+		ret.append(line, i, std::string::npos);
+	// 앞뒤로 빈칸 잘라줌
+	return (strip(ret, ' '));
+}
+
+std::string&					strip(std::string& str, char c)
+{
+	size_t	i;
+
+	if (!str.size())
+		return str;
+	i = str.size();
+	while (i && str[i - 1] == c)
+		i--;
+	str.resize(i);
+	for (i = 0; str[i] == c; i++);
+	str = str.substr(i, std::string::npos);
 	return str;
 }
 
-// Value 파싱
-std::string						readValue(char *line)
+std::string&					to_upper(std::string& str)
 {
-	int i;
-	std::string	ret;
+	std::transform(str.begin(), str.end(),str.begin(), ::toupper);
+	return str;
+}
 
-	// ':'가 나올때 까지 i++
-	for (i = 0; line[i] && line[i] != ':'; i++);
-	// line[i]가 빈칸이면 i++
-	while (line[++i] && line[i] == ' ');
-	// 코드 줄이려고 열심히 하셨네요. 가독성 떨어져서 맘에 안드니까 저는 0점 드릴게요.
-	i--;
-	// 빈칸 뒤에 것들 전부 ret에 넣어줌
-	while (line[++i])
-		ret.push_back(line[i]);
-	// 앞뒤로 빈칸 잘라줌
-	return (strip(ret, ' '));
+std::string&					to_lower(std::string& str)
+{
+	std::transform(str.begin(), str.end(),str.begin(), ::tolower);
+	return str;
 }
