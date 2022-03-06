@@ -2,11 +2,11 @@ PWD = $(shell pwd)
 
 all: client.cpp mginx.cpp Webserver.cpp WebserverProcess.cpp Request.cpp Request_util.cpp
 	clang++ -o client client.cpp
-	clang++ -o server_file Webserver.cpp WebserverProcess.cpp mginx.cpp Request.cpp Request_util.cpp
+	clang++ -o server Webserver.cpp WebserverProcess.cpp mginx.cpp Request.cpp Request_util.cpp
 
 clean:
 	rm -rf client
-	rm -rf server_file
+	rm -rf server
 
 
 fclean: clean
@@ -15,9 +15,9 @@ fclean: clean
 re: fclean all
 
 test:
-	# ./server_file
+	# ./server
 	# ./client
-	@osascript -e 'tell application "Terminal" to do script "cd $(PWD) && clear && ./server_file"'
+	@osascript -e 'tell application "Terminal" to do script "cd $(PWD) && clear && ./server"'
 
 
 .PHONY: all clean fclean re test

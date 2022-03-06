@@ -21,28 +21,44 @@ int WebserverProcess::readRequest(void) {
     char buffer[BUF_SIZE] = {
         0,
     };
+    usleep(300); //메모리부족
     int ret = read(_connected_fd, buffer, BUF_SIZE - 1);
-    std::cout << "===> read(WebserverProcess)" << std::endl;
+    std::cout << "===> read(WebserverProcess) " << ret << std::endl;
+    std::cout << "errno " << errno << std::endl;
     if (ret > 0) {
+        std::cout << "buffer" << buffer << std::endl;
+        std::cout << "===> ready to response(WebserverProcess)" << std::endl;
+        // request, response 객체 생성
+        Request request(buffer);
+        // Response response;
 
-        std::cout << buffer << std::endl;
+        // response.run(request, config);
+        // _response = response.getResponse();
+        _response = "HTTP/1.1 200 OK\r\n\
+Content-Length: 30\r\n\
+Content-Location: /index.html\r\n\
+Content-Type: text/html\r\n\
+Date: Fri, 04 Mar 2022 09:28:09 GMT\r\n\
+Last-Modified: Sun, 13 Feb 2022 09:27:39 GMT\r\n\
+Server: Weebserv/1.0.0 (Unix)\r\n\
+Transfer-Encoding: identity\r\n\
+            This is the default index yo !";
+        if (_response.empty()) {
+            std::cout << "response가 비어있습니다." << std::endl;
+            _ready_to_response = false;
+            return -1;
+        }
+        _ready_to_response = true;
     }
     return ret; // success: 양수, fail: -1
 };
 
 int WebserverProcess::readyToResponse(void) {
-    std::cout << "===> ready to response(WebserverProcess)" << std::endl;
-    Request request;
-    // process()
-    _ready_to_response = true;
     return 0; // fail: -1;
 }
 int WebserverProcess::writeResponse(void) {
     std::cout << "===> write" << std::endl;
-    // Response response;
-    // std::string res = response.getResponse();
-    std::string res = "res";
-    int ret = write(_connected_fd, res.c_str(), 30);
+    int ret = write(_connected_fd, _response.c_str(), 30);
     _connected_fd = -1;
     _ready_to_response = false;
     return ret; // success: 양수, fail: -1
@@ -79,6 +95,7 @@ WebserverProcess &WebserverProcess::operator=(WebserverProcess const &src) {
     _listen_info = src._listen_info;
     _socket_fd = src._socket_fd;
     _connected_fd = src._connected_fd;
+    _ready_to_response = src._ready_to_response;
     _addr = src._addr;
     return (*this);
 }

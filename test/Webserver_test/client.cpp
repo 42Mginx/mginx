@@ -113,8 +113,11 @@ void send(int port) {
 
     connect(sock, (struct sockaddr *)&serv_addr,
             sizeof(serv_addr)); // 내부에서 2번 악수
+    std::string request_string = "invalid request";
 
-    std::string request_string = "POST /directory?id=3&hi=2 HTTP/1.1 \r\n\
+    if (port == 8000) {
+
+        request_string = "POST /directory?id=3&hi=2 HTTP/1.1 \r\n\
 Host: localhost:8000 \r\n\
 User-Agent: Go-http-client/1.1\r\n\
 Transfer-Encoding: chunked\r\n\
@@ -124,7 +127,19 @@ Accept-Encoding: gzip\r\n\
 ddd\r\n\
 ssdsdsd\r\n\
 sdsdsdsd";
+    } else if (port == 8001) {
 
+        request_string = "POST /directory?id=3&hi=2 HTTP/1.1 \r\n\
+Host: localhost:8001 \r\n\
+User-Agent: Go-http-client/1.1\r\n\
+Transfer-Encoding: chunked\r\n\
+Content-Type: test/file\r\n\
+Accept-Encoding: gzip\r\n\
+\r\n\
+ddd\r\n\
+ssdsdsd\r\n\
+sdsdsdsd";
+    }
     send(sock, request_string.c_str(), request_string.length(), 0);
 
     int ret = 0;
