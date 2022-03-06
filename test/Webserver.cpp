@@ -11,7 +11,6 @@ int Webserver::setup(void) {
             break;
         }
         process_v.push_back(process);
-
         int socket_fd = process.getFd();
         // socket fd를 fd_set에서 켜줌
         FD_SET(socket_fd, &_fd_set);
@@ -25,7 +24,7 @@ int Webserver::setup(void) {
     return 0;
 };
 
-void Webserver::run() {
+int Webserver::run() {
     while (1) {
         int ret = 0;
 
@@ -42,6 +41,7 @@ void Webserver::run() {
         std::cout << ret << std::endl;
         if (ret == -1) {
             std::cout << "===> error!!" << std::endl;
+            return -1;
         }
 
         // accept
@@ -51,6 +51,7 @@ void Webserver::run() {
             if (FD_ISSET(socket_fd, &_reading_set)) {
                 if (process_it->accept() == -1) {
                     std::cout << "accept 에러" << std::endl;
+                    return -1;
                 }
                 break;
             }
@@ -64,6 +65,7 @@ void Webserver::run() {
                 std::cout << "read" << std::endl;
                 if (process_it->readRequest() == -1) {
                     std::cout << "read 에러" << std::endl;
+                    return -1;
                 }
                 process_it->readyToResponse();
                 break;
@@ -78,11 +80,13 @@ void Webserver::run() {
             if (ready_to_response == true) {
                 if (process_it->writeResponse() == -1) {
                     std::cout << "write 에러" << std::endl;
+                    return -1;
                 }
                 break;
             }
         };
     }
+    return 0;
 }
 
 // util
