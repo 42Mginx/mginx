@@ -12,11 +12,8 @@ int Webserver::setup(void) {
         }
         process_v.push_back(process);
         int socket_fd = process.getFd();
-        // socket fd를 fd_set에서 켜줌
         FD_SET(socket_fd, &_fd_set);
         std::cout << socket_fd << std::endl;
-
-        // max fd 갱신
         if (socket_fd > max_fd)
             max_fd = socket_fd;
     }
@@ -62,7 +59,6 @@ int Webserver::run() {
         for (; process_it != process_v.end(); process_it++) {
             int connected_fd = process_it->getConnectedFd();
             if (connected_fd != -1) {
-                std::cout << "read" << std::endl;
                 if (process_it->readRequest() == -1) {
                     std::cout << "read 에러" << std::endl;
                     return -1;
@@ -76,7 +72,6 @@ int Webserver::run() {
         process_it = process_v.begin();
         for (; process_it != process_v.end(); process_it++) {
             bool ready_to_response = process_it->getReadyToResponse();
-            std::cout << "write" << std::endl;
             if (ready_to_response == true) {
                 if (process_it->writeResponse() == -1) {
                     std::cout << "write 에러" << std::endl;
@@ -113,7 +108,7 @@ std::vector<t_listen> Webserver::getListens() {
 Webserver::Webserver(void) {
     max_fd = 0;
     FD_ZERO(&_fd_set);
-    listens_v = getListens();
+    listens_v = getListens(); // config.getAllListens();
 }
 Webserver::Webserver(const Webserver &src) { *this = src; }
 Webserver::~Webserver(void) {}

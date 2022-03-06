@@ -41,7 +41,6 @@
 #include <sys/select.h>
 #include <sys/socket.h>
 
-// util
 #define BUF_SIZE 4096
 
 class WebserverProcess;

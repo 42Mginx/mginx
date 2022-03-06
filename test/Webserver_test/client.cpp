@@ -23,15 +23,15 @@ int choose_port(void) {
     std::cout << YELLOW << "Choose PORT :" << std::endl;
     std::cout << "(a) 8000" << std::endl;
     std::cout << "(b) 8001" << std::endl;
-    std::cout << "(c) 8002" << RESET << std::endl;
+    // std::cout << "(c) 8002" << RESET << std::endl;
     getline(std::cin, choice);
 
     if (choice == "a")
         return (8000);
     else if (choice == "b")
         return (8001);
-    else if (choice == "c")
-        return (8002);
+    // else if (choice == "c")
+    //     return (8002);
     return (8000);
 }
 
@@ -114,7 +114,18 @@ void send(int port) {
     connect(sock, (struct sockaddr *)&serv_addr,
             sizeof(serv_addr)); // 내부에서 2번 악수
 
-    send(sock, "hi this is client", 16, 0);
+    std::string request_string = "POST /directory?id=3&hi=2 HTTP/1.1 \r\n\
+Host: localhost:8000 \r\n\
+User-Agent: Go-http-client/1.1\r\n\
+Transfer-Encoding: chunked\r\n\
+Content-Type: test/file\r\n\
+Accept-Encoding: gzip\r\n\
+\r\n\
+ddd\r\n\
+ssdsdsd\r\n\
+sdsdsdsd";
+
+    send(sock, request_string.c_str(), request_string.length(), 0);
 
     int ret = 0;
     // blocking mode => 기다렸다가 read하기 때문에 while문이 필요없음
@@ -129,7 +140,9 @@ void send(int port) {
 }
 
 int main(void) {
-    send(8001);
+    int port = choose_port();
+    std::cout << "port: " << port << std::endl;
+    send(port);
     // send(8000);
     return (0);
 }

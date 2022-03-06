@@ -2,14 +2,10 @@
 
 // action
 int WebserverProcess::setup(void) {
-
-    // 생성
     _socket_fd = socket(AF_INET, SOCK_STREAM, 0);
     if (_socket_fd != -1) {
         fcntl(_socket_fd, F_SETFL, O_NONBLOCK);
-        // 구조체 bind
         ::bind(_socket_fd, (struct sockaddr *)&_addr, sizeof(_addr));
-        // listen
         ::listen(_socket_fd, 1000);
     }
     return _socket_fd;
@@ -17,7 +13,7 @@ int WebserverProcess::setup(void) {
 
 int WebserverProcess::accept(void) {
     _connected_fd = ::accept(_socket_fd, NULL, NULL);
-    std::cout << "===> accept" << _connected_fd << std::endl;
+    std::cout << "===> accept(WebserverProcess) " << _connected_fd << std::endl;
     return _connected_fd; // success: fd, fail: -1
 };
 
@@ -26,18 +22,27 @@ int WebserverProcess::readRequest(void) {
         0,
     };
     int ret = read(_connected_fd, buffer, BUF_SIZE - 1);
-    std::cout << "===> read" << std::endl;
+    std::cout << "===> read(WebserverProcess)" << std::endl;
+    if (ret > 0) {
 
+        std::cout << buffer << std::endl;
+    }
     return ret; // success: 양수, fail: -1
 };
 
 int WebserverProcess::readyToResponse(void) {
+    std::cout << "===> ready to response(WebserverProcess)" << std::endl;
+    Request request;
+    // process()
     _ready_to_response = true;
     return 0; // fail: -1;
 }
 int WebserverProcess::writeResponse(void) {
-    int ret = write(_connected_fd, "hello world form server", 30);
     std::cout << "===> write" << std::endl;
+    // Response response;
+    // std::string res = response.getResponse();
+    std::string res = "res";
+    int ret = write(_connected_fd, res.c_str(), 30);
     _connected_fd = -1;
     _ready_to_response = false;
     return ret; // success: 양수, fail: -1
@@ -55,16 +60,12 @@ void WebserverProcess::setAddr(void) {
 // setter
 
 // getter
-
 int WebserverProcess::getFd(void) { return _socket_fd; };
 int WebserverProcess::getConnectedFd(void) { return _connected_fd; };
 bool WebserverProcess::getReadyToResponse(void) { return _ready_to_response; };
 
-// Constructors and destructors
-WebserverProcess::WebserverProcess(void) {
-    // wait, that's illegal !
-}
-
+// occf
+WebserverProcess::WebserverProcess(void) {}
 WebserverProcess::WebserverProcess(t_listen const &listen) {
     _listen_info = listen;
     _socket_fd = -1;
@@ -72,13 +73,8 @@ WebserverProcess::WebserverProcess(t_listen const &listen) {
     _ready_to_response = false;
     this->setAddr();
 }
-
 WebserverProcess::WebserverProcess(WebserverProcess const &src) { *this = src; }
-
 WebserverProcess::~WebserverProcess(void) {}
-
-// overloaders
-
 WebserverProcess &WebserverProcess::operator=(WebserverProcess const &src) {
     _listen_info = src._listen_info;
     _socket_fd = src._socket_fd;

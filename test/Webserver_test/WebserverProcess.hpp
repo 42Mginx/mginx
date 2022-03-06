@@ -1,6 +1,7 @@
 #ifndef WEBSERVERPROCESS_HPP
 #define WEBSERVERPROCESS_HPP
 
+#include "Request.hpp"
 #include "Webserver.hpp"
 
 class WebserverProcess {

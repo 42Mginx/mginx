@@ -1,8 +1,8 @@
 PWD = $(shell pwd)
 
-all: client.cpp mginx.cpp Webserver.cpp WebserverProcess.cpp
+all: client.cpp mginx.cpp Webserver.cpp WebserverProcess.cpp Request.cpp Request_util.cpp
 	clang++ -o client client.cpp
-	clang++ -o server_file Webserver.cpp WebserverProcess.cpp mginx.cpp
+	clang++ -o server_file Webserver.cpp WebserverProcess.cpp mginx.cpp Request.cpp Request_util.cpp
 
 clean:
 	rm -rf client
