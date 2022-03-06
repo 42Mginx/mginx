@@ -74,7 +74,7 @@ class Webserver {
 
     // action
     int setup();
-    void run();
+    int run();
 };
 
 #endif

@@ -8,5 +8,7 @@ int main() {
     if (ret == -1) {
         std::cout << "webserver setup error" << std::endl;
     }
-    webserver.run();
+    if (webserver.run() == -1) {
+        std::cout << "webserver setup error" << std::endl;
+    }
 }
