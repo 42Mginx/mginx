@@ -1,10 +1,9 @@
 #include "Request.hpp"
-#include "Request_util.hpp"
 
 Request::Request() {}
 
 Request::Request(std::string request_value) :
-	_method (""), _target_path(""), _query(""), _version(""), _body(""), _status(200)
+	_method (""), _target_path(""), _query(""), _version(""), _body(""), _status_code(200)
 {
 	initHeaders();
 	initValidMethod();
@@ -26,7 +25,7 @@ Request&	Request::operator=(const Request& _Request)
 	_version = _Request.getVersion();
 	_headers = _Request.getHeaders();
 	_body = _Request.getBody();
-	_status = _Request.getStatus();
+	_status_code = _Request.getStatus();
 
 	return *this;
 }
@@ -69,7 +68,7 @@ void	Request::parseProcess(std::string request_value)
 	std::cout << _version << std::endl;
 
 	//헤더 파싱(에러, \r, 빈문자열시 break)
-	while ((line = readLine(request_value, i)) != "\r" && line != "" && _status != 400)
+	while ((line = readLine(request_value, i)) != "\r" && line != "" && _status_code != 400)
 	{
 		// key 읽어줌
 		key = readKey(line);
@@ -106,15 +105,15 @@ void	Request::parseStartLine(const std::string& str)
 	// i = str.find_first_of('\n');
 	// line = str.substr(0, i);
 	
-	if (_status == 200)
+	if (_status_code == 200)
 		parseMethod(str, i);
-	if (_status == 200)
+	if (_status_code == 200)
 		checkMethod();
-	if (_status == 200)
+	if (_status_code == 200)
 		parsePath(str, i);
-	if (_status == 200)
+	if (_status_code == 200)
 		parseQuery();
-	if (_status == 200)
+	if (_status_code == 200)
 		parseVersion(str, i);
 }
 
@@ -124,7 +123,7 @@ void	Request::parseMethod(const std::string& line, size_t &i)
 	// line에서 띄어쓰기 위치 찾고 띄어쓰기 없으면 400 에러(버전이 없다는 뜻이니까)
 	if ((i = line.find_first_of(' ')) == std::string::npos)
 	{
-		_status = 400;
+		_status_code = 400;
 		std::cerr << "Request ERR:: No PATH / HTTP version" << std::endl;
 		return ;
 	}
@@ -139,14 +138,14 @@ void	Request::parsePath(const std::string& line, size_t &i)
 	// i가 띄어쓰기가 아니면 PATH나 HTTP 버전 없는거니까 에러, 띄어쓰기 여러개일 경우 제거
 	if ((start = line.find_first_not_of(' ', i)) == std::string::npos)
 	{
-		_status = 400;
+		_status_code = 400;
 		std::cerr << "Request ERR:: No PATH / HTTP version" << std::endl;
 		return ;
 	}
 	// 그 뒤에 띄어쓰기 없으면 HTTP 버전 없으니까 에러
 	if ((i = line.find_first_of(' ', start)) == std::string::npos)
 	{
-		_status = 400;
+		_status_code = 400;
 		std::cerr << "Request ERR:: No HTTP version" << std::endl;
 		return ;
 	}
@@ -176,7 +175,7 @@ void		Request::parseVersion(const std::string& line, size_t &i)
 	// 띄어쓰기 제거 후 뒤에 아무것도 없으면 에러
 	if ((i = line.find_first_not_of(' ', i)) == std::string::npos)
 	{
-		_status = 400;
+		_status_code = 400;
 		std::cerr << "Request ERR:: No HTTP version" << std::endl;
 		return ;
 	}
@@ -187,7 +186,7 @@ void		Request::parseVersion(const std::string& line, size_t &i)
 	// _version이 1.0이나 1.1아니면 에러
 	if (_version != "1.0" && _version != "1.1")
 	{
-		_status = 400;
+		_status_code = 400;
 		std::cerr << "Request ERR:: UNSUPPORTED HTTP VERSION (" << _version << ")" << std::endl;
 		return ;
 	}
@@ -201,7 +200,7 @@ void	Request::checkMethod()
 			return ;
 	// 없는 메소드면 에러띄우고 status 변경
 	std::cerr << "Request ERR:: Invalid method requested" << std::endl;
-	_status = 400;
+	_status_code = 400;
 }
 
 // body 할당
@@ -254,5 +253,5 @@ const std::string&	Request::getBody() const
 
 const int	Request::getStatus() const
 {
-	return this->_status;
+	return this->_status_code;
 }
