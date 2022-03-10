@@ -27,6 +27,7 @@ class WebserverProcess {
     int readRequest(void);
     int readyToResponse(void);
     int writeResponse(void);
+    void clear(void);
 
     // util
     void setAddr(void);

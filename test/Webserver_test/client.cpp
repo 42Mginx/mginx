@@ -111,8 +111,9 @@ void send(int port) {
     serv_addr.sin_addr.s_addr = htonl(INADDR_ANY);
     serv_addr.sin_port = htons(port);
 
-    connect(sock, (struct sockaddr *)&serv_addr,
-            sizeof(serv_addr)); // 내부에서 2번 악수
+    int ret = connect(sock, (struct sockaddr *)&serv_addr,
+                      sizeof(serv_addr)); // 내부에서 2번 악수
+    std::cout << "connect " << ret << std::endl;
     std::string request_string = "invalid request";
 
     if (port == 8000) {
@@ -141,11 +142,10 @@ ssdsdsd\r\n\
 sdsdsdsd";
     }
     send(sock, request_string.c_str(), request_string.length(), 0);
+    std::cout << "send" << std::endl;
 
-    int ret = 0;
-    // blocking mode => 기다렸다가 read하기 때문에 while문이 필요없음
-    std::cout << ret << std::endl;
     ret = read(sock, buffer, BUF_SIZE - 1);
+    std::cout << ret << std::endl;
 
     std::cout << std::endl << "Response :" << std::endl;
     std::cout << "[" << std::string(buffer) << "]" << std::endl << std::endl;

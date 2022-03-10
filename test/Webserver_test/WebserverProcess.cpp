@@ -21,18 +21,16 @@ int WebserverProcess::readRequest(void) {
     char buffer[BUF_SIZE] = {
         0,
     };
-    usleep(300); //메모리부족
     int ret = read(_connected_fd, buffer, BUF_SIZE - 1);
     std::cout << "===> read(WebserverProcess) " << ret << std::endl;
-    std::cout << "errno " << errno << std::endl;
     if (ret > 0) {
-        std::cout << "buffer" << buffer << std::endl;
+        std::cout << "buffer : " << buffer << std::endl;
         std::cout << "===> ready to response(WebserverProcess)" << std::endl;
         // request, response 객체 생성
         Request request(buffer);
         // Response response;
-
-        // response.run(request, config);
+        // config 에서 맞는 server block 찾아서 넘기기(host, port맞는 걸로)
+        // response.run(request, serverBlock);
         // _response = response.getResponse();
         _response = "HTTP/1.1 200 OK\r\n\
 Content-Length: 30\r\n\
@@ -63,6 +61,10 @@ int WebserverProcess::writeResponse(void) {
     _ready_to_response = false;
     return ret; // success: 양수, fail: -1
 };
+
+void WebserverProcess::clear(void) {
+    std::cout << "webserver process clear" << std::endl;
+}
 
 // util
 void WebserverProcess::setAddr(void) {

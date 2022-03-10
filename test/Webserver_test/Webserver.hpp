@@ -63,6 +63,8 @@ class Webserver {
     std::vector<WebserverProcess> process_v;
     std::vector<t_listen> listens_v;
     fd_set _reading_set;
+    fd_set _writing_set;
+    void init();
 
   public:
     // occf
@@ -74,6 +76,7 @@ class Webserver {
     // action
     int setup();
     int run();
+    void handle_error(std::string const &error_message);
 };
 
 #endif
