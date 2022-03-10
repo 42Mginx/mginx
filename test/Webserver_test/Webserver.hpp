@@ -41,7 +41,6 @@
 #include <sys/select.h>
 #include <sys/socket.h>
 
-// util
 #define BUF_SIZE 4096
 
 class WebserverProcess;
@@ -57,13 +56,15 @@ class Webserver {
     std::vector<t_listen> getListens();
 
     // 멤버변수
-    long max_fd;
+    long _max_fd;
     fd_set _fd_set;
-    std::vector<int> socket_fd_v;
-    std::vector<int> connected_fd_v;
-    std::vector<WebserverProcess> process_v;
-    std::vector<t_listen> listens_v;
+    std::vector<int> _socket_fd_v;
+    std::vector<int> _connected_fd_v;
+    std::vector<WebserverProcess> _process_v;
+    std::vector<t_listen> _listens_v;
     fd_set _reading_set;
+    fd_set _writing_set;
+    void init();
 
   public:
     // occf
@@ -75,6 +76,7 @@ class Webserver {
     // action
     int setup();
     int run();
+    void handle_error(std::string const &error_message);
 };
 
 #endif

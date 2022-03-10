@@ -1,6 +1,7 @@
 #ifndef WEBSERVERPROCESS_HPP
 #define WEBSERVERPROCESS_HPP
 
+#include "Request.hpp"
 #include "Webserver.hpp"
 
 class WebserverProcess {
@@ -11,7 +12,13 @@ class WebserverProcess {
     struct sockaddr_in _addr;
     bool _ready_to_response;
 
+    std::string _request;
+    std::string _response;
+
     WebserverProcess(void);
+    bool isChunked(void);
+    bool isFinalChunked(void);
+    bool hasContentLen(void);
 
   public:
     WebserverProcess(t_listen const &listen);
@@ -23,8 +30,8 @@ class WebserverProcess {
     int setup(void);
     int accept(void);
     int readRequest(void);
-    int readyToResponse(void);
     int writeResponse(void);
+    void clear(void);
 
     // util
     void setAddr(void);

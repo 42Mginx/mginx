@@ -23,15 +23,15 @@ int choose_port(void) {
     std::cout << YELLOW << "Choose PORT :" << std::endl;
     std::cout << "(a) 8000" << std::endl;
     std::cout << "(b) 8001" << std::endl;
-    std::cout << "(c) 8002" << RESET << std::endl;
+    // std::cout << "(c) 8002" << RESET << std::endl;
     getline(std::cin, choice);
 
     if (choice == "a")
         return (8000);
     else if (choice == "b")
         return (8001);
-    else if (choice == "c")
-        return (8002);
+    // else if (choice == "c")
+    //     return (8002);
     return (8000);
 }
 
@@ -111,15 +111,41 @@ void send(int port) {
     serv_addr.sin_addr.s_addr = htonl(INADDR_ANY);
     serv_addr.sin_port = htons(port);
 
-    connect(sock, (struct sockaddr *)&serv_addr,
-            sizeof(serv_addr)); // 내부에서 2번 악수
+    int ret = connect(sock, (struct sockaddr *)&serv_addr,
+                      sizeof(serv_addr)); // 내부에서 2번 악수
+    std::cout << "connect " << ret << std::endl;
+    std::string request_string = "invalid request";
 
-    send(sock, "hi this is client", 16, 0);
+    if (port == 8000) {
 
-    int ret = 0;
-    // blocking mode => 기다렸다가 read하기 때문에 while문이 필요없음
-    std::cout << ret << std::endl;
+        request_string = "POST /directory?id=3&hi=2 HTTP/1.1 \r\n\r\n\
+Host: localhost:8000 \r\n\
+User-Agent: Go-http-client/1.1\r\n\
+Transfer-Encoding: chunked\r\n\
+Content-Type: test/file\r\n\
+Accept-Encoding: gzip\r\n\
+\r\n\
+ddd\r\n\
+ssdsdsd\r\n\
+sdsdsdsd";
+    } else if (port == 8001) {
+
+        request_string = "POST /directory?id=3&hi=2 HTTP/1.1 \r\n\r\n\
+Host: localhost:8001 \r\n\
+User-Agent: Go-http-client/1.1\r\n\
+Transfer-Encoding: chunked\r\n\
+Content-Type: test/file\r\n\
+Accept-Encoding: gzip\r\n\
+\r\n\
+4\r\n\
+onit\r\n\
+";
+    }
+    send(sock, request_string.c_str(), request_string.length(), 0);
+    std::cout << "send" << std::endl;
+
     ret = read(sock, buffer, BUF_SIZE - 1);
+    std::cout << ret << std::endl;
 
     std::cout << std::endl << "Response :" << std::endl;
     std::cout << "[" << std::string(buffer) << "]" << std::endl << std::endl;
@@ -129,7 +155,9 @@ void send(int port) {
 }
 
 int main(void) {
-    send(8001);
+    int port = choose_port();
+    std::cout << "port: " << port << std::endl;
+    send(port);
     // send(8000);
     return (0);
 }
