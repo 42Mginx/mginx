@@ -118,7 +118,7 @@ void send(int port) {
 
     if (port == 8000) {
 
-        request_string = "POST /directory?id=3&hi=2 HTTP/1.1 \r\n\
+        request_string = "POST /directory?id=3&hi=2 HTTP/1.1 \r\n\r\n\
 Host: localhost:8000 \r\n\
 User-Agent: Go-http-client/1.1\r\n\
 Transfer-Encoding: chunked\r\n\
@@ -130,16 +130,16 @@ ssdsdsd\r\n\
 sdsdsdsd";
     } else if (port == 8001) {
 
-        request_string = "POST /directory?id=3&hi=2 HTTP/1.1 \r\n\
+        request_string = "POST /directory?id=3&hi=2 HTTP/1.1 \r\n\r\n\
 Host: localhost:8001 \r\n\
 User-Agent: Go-http-client/1.1\r\n\
 Transfer-Encoding: chunked\r\n\
 Content-Type: test/file\r\n\
 Accept-Encoding: gzip\r\n\
 \r\n\
-ddd\r\n\
-ssdsdsd\r\n\
-sdsdsdsd";
+4\r\n\
+onit\r\n\
+";
     }
     send(sock, request_string.c_str(), request_string.length(), 0);
     std::cout << "send" << std::endl;
