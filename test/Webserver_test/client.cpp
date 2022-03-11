@@ -99,12 +99,6 @@ void send(int port) {
     char buffer[BUF_SIZE] = {
         0,
     };
-    // std::fstream		file;
-    std::string content;
-
-    // file.open(filename);
-    // content.assign(std::istreambuf_iterator<char>(file),
-    // std::istreambuf_iterator<char>()); file.close();
 
     sock = socket(AF_INET, SOCK_STREAM, 0);
 
@@ -120,7 +114,7 @@ void send(int port) {
 
     if (port == 8000) {
         request_string =
-            "GET /directory/youpi.bla HTTP/1.1\r\n\r\n\
+            "GET /directory/youpi.bla HTTP/1.1 \r\n\r\n\
 Host: localhost:8000\r\n\
 User-Agent: Go-http-client/1.1\r\n\
 Accept-Encoding: gzip\r\n\
@@ -134,8 +128,8 @@ Transfer-Encoding: chunked\r\n\
 Content-Type: test/file\r\n\
 Accept-Encoding: gzip\r\n\
 \r\n\
-4\r\n\
-onit\r\n\
+0\r\n\
+\r\n\
 ";
     }
     send(sock, request_string.c_str(), request_string.length(), 0);

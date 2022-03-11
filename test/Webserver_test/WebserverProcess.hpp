@@ -5,22 +5,25 @@
 #include "Webserver.hpp"
 
 class WebserverProcess {
-  private:
+   private:
     int _socket_fd;
     int _connected_fd;
     t_listen _listen_info;
     struct sockaddr_in _addr;
     bool _ready_to_response;
 
-    std::string _request;
-    std::string _response;
+    std::string _req;
+    // Request * _request_obj;
+
+    std::string _res;
+    // Response * _res_obj;
 
     WebserverProcess(void);
     bool isChunked(void);
     bool isFinalChunked(void);
-    bool hasContentLen(void);
+    int getKeyLocation(std::string key);
 
-  public:
+   public:
     WebserverProcess(t_listen const &listen);
     WebserverProcess(WebserverProcess const &src);
     ~WebserverProcess(void);
@@ -35,6 +38,7 @@ class WebserverProcess {
 
     // util
     void setAddr(void);
+    std::string getRes(void);
 
     // setter
 

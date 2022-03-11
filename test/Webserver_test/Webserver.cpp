@@ -53,7 +53,9 @@ int Webserver::run() {
             for (; process_it != _process_v.end(); process_it++) {
                 bool ready_to_response = process_it->getReadyToResponse();
                 if (ready_to_response == true) {
+                    std::cout << "make writing set" << std::endl;
                     int connected_fd = process_it->getConnectedFd();
+                    std::cout << connected_fd << std::endl;
                     FD_SET(connected_fd, &_writing_set);
                     if (_max_fd < connected_fd)
                         _max_fd = connected_fd;
@@ -98,7 +100,7 @@ int Webserver::run() {
             int connected_fd = process_it->getConnectedFd();
             std::cout << "=> 3" << std::endl;
             if (connected_fd > 0 && FD_ISSET(connected_fd, &_reading_set)) {
-                std::cout << "read" << std::endl;
+                std::cout << "read 실행" << std::endl;
                 FD_CLR(connected_fd, &_fd_set);
                 if (process_it->readRequest() == -1) {
                     std::cout << "read 에러" << std::endl;
