@@ -38,7 +38,8 @@ int choose_port(void) {
 std::string choose_method(void) {
     std::string choice;
 
-    std::cout << std::endl << YELLOW << "Choose METHOD :" << std::endl;
+    std::cout << std::endl
+              << YELLOW << "Choose METHOD :" << std::endl;
     std::cout << "(a) GET" << std::endl;
     std::cout << "(b) HEAD" << std::endl;
     std::cout << "(c) POST" << std::endl;
@@ -68,7 +69,8 @@ std::string choose_method(void) {
 std::string choose_target(int cgi) {
     std::string choice;
 
-    std::cout << std::endl << YELLOW << "Choose TARGET FILE :" << std::endl;
+    std::cout << std::endl
+              << YELLOW << "Choose TARGET FILE :" << std::endl;
     std::cout << "(a) Exists" << std::endl;
     std::cout << "(b) Doesn't exist" << std::endl;
     std::cout << "(c) Wrong permissions" << std::endl;
@@ -112,25 +114,20 @@ void send(int port) {
     serv_addr.sin_port = htons(port);
 
     int ret = connect(sock, (struct sockaddr *)&serv_addr,
-                      sizeof(serv_addr)); // 내부에서 2번 악수
+                      sizeof(serv_addr));  // 내부에서 2번 악수
     std::cout << "connect " << ret << std::endl;
     std::string request_string = "invalid request";
 
     if (port == 8000) {
-
-        request_string = "POST /directory?id=3&hi=2 HTTP/1.1 \r\n\r\n\
-Host: localhost:8000 \r\n\
+        request_string =
+            "GET /directory/youpi.bla HTTP/1.1\r\n\r\n\
+Host: localhost:8000\r\n\
 User-Agent: Go-http-client/1.1\r\n\
-Transfer-Encoding: chunked\r\n\
-Content-Type: test/file\r\n\
 Accept-Encoding: gzip\r\n\
-\r\n\
-ddd\r\n\
-ssdsdsd\r\n\
-sdsdsdsd";
+";
     } else if (port == 8001) {
-
-        request_string = "POST /directory?id=3&hi=2 HTTP/1.1 \r\n\r\n\
+        request_string =
+            "POST /directory?id=3&hi=2 HTTP/1.1 \r\n\r\n\
 Host: localhost:8001 \r\n\
 User-Agent: Go-http-client/1.1\r\n\
 Transfer-Encoding: chunked\r\n\
@@ -147,8 +144,10 @@ onit\r\n\
     ret = read(sock, buffer, BUF_SIZE - 1);
     std::cout << ret << std::endl;
 
-    std::cout << std::endl << "Response :" << std::endl;
-    std::cout << "[" << std::string(buffer) << "]" << std::endl << std::endl;
+    std::cout << std::endl
+              << "Response :" << std::endl;
+    std::cout << "[" << std::string(buffer) << "]" << std::endl
+              << std::endl;
 
     close(sock);
     return;

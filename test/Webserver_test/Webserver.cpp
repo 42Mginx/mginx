@@ -1,4 +1,5 @@
 #include "Webserver.hpp"
+
 #include "WebserverProcess.hpp"
 void Webserver::init() {
     _max_fd = 0;
@@ -14,7 +15,7 @@ void Webserver::init() {
         _process_v.clear();
     if (!_listens_v.empty())
         _listens_v.clear();
-    _listens_v = getListens(); // config.getAllListens();
+    _listens_v = getListens();  // config.getAllListens();
 }
 
 int Webserver::setup(void) {
@@ -63,19 +64,22 @@ int Webserver::run() {
             std::cout << "기다리는 중입니다." << ret << std::endl;
         }
 
-        std::cout << ret << std::endl;
+        std::cout << "while문 탈출" << std::endl;
         if (ret == -1) {
             std::cout << "===> select error!!" << std::endl;
             return -1;
         }
 
         // write
+        std::cout << "write 진입전" << std::endl;
         process_it = _process_v.begin();
         for (; process_it != _process_v.end(); process_it++) {
             bool ready_to_response = process_it->getReadyToResponse();
             int connected_fd = process_it->getConnectedFd();
             if (ready_to_response == true &&
+                connected_fd > 0 &&
                 FD_ISSET(connected_fd, &_writing_set)) {
+                std::cout << "write" << std::endl;
                 if (process_it->writeResponse() == -1) {
                     handle_error("write");
                     return -1;
@@ -85,10 +89,16 @@ int Webserver::run() {
         };
 
         // read
+        std::cout << "read 진입전" << std::endl;
+
         process_it = _process_v.begin();
+        std::cout << "=> 1" << std::endl;
         for (; process_it != _process_v.end(); process_it++) {
+            std::cout << "=> 2" << std::endl;
             int connected_fd = process_it->getConnectedFd();
-            if (FD_ISSET(connected_fd, &_reading_set)) {
+            std::cout << "=> 3" << std::endl;
+            if (connected_fd > 0 && FD_ISSET(connected_fd, &_reading_set)) {
+                std::cout << "read" << std::endl;
                 FD_CLR(connected_fd, &_fd_set);
                 if (process_it->readRequest() == -1) {
                     std::cout << "read 에러" << std::endl;
@@ -96,13 +106,17 @@ int Webserver::run() {
                 }
                 break;
             }
+            std::cout << "=> 4" << std::endl;
         };
 
         // accept
+        std::cout << "accept 진입전" << std::endl;
+
         process_it = _process_v.begin();
         for (; process_it != _process_v.end(); process_it++) {
             int socket_fd = process_it->getFd();
             if (FD_ISSET(socket_fd, &_reading_set)) {
+                std::cout << "accept" << std::endl;
                 if (process_it->accept() == -1) {
                     std::cout << "accept 에러" << std::endl;
                     return -1;
@@ -136,7 +150,6 @@ void Webserver::handle_error(std::string const &error_message) {
 // util
 
 std::vector<t_listen> Webserver::getListens() {
-
     std::vector<t_listen> _listens_v;
 
     t_listen listen_info;
