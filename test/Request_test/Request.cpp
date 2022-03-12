@@ -72,6 +72,12 @@ void	Request::parseProcess(std::string request_value)
 	std::cout << _query << std::endl;
 	std::cout << _version << std::endl;
 
+	if (request_value[i] != '\r' || request_value[i + 1] != '\n')
+	{
+		// 첫째 줄 이후에 \r\n안나오면 400
+		_status_code = 400;
+		return ;
+	}
 	i += 2;
 	//헤더 파싱(에러, \r, 빈문자열시 break)
 	while ((line = readLine(request_value, i)) != "\r" && line != "" && _status_code != 400)
