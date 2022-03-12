@@ -1,6 +1,11 @@
 #include "Request.hpp"
 
-Request::Request() {}
+Request::Request() : 
+	_method (""), _target_path(""), _query(""), _version(""), _body(""), _status_code(200)
+{
+	initHeaders();
+	initValidMethod();
+}
 
 Request::Request(std::string request_value) :
 	_method (""), _target_path(""), _query(""), _version(""), _body(""), _status_code(200)
@@ -67,6 +72,7 @@ void	Request::parseProcess(std::string request_value)
 	std::cout << _query << std::endl;
 	std::cout << _version << std::endl;
 
+	i += 2;
 	//헤더 파싱(에러, \r, 빈문자열시 break)
 	while ((line = readLine(request_value, i)) != "\r" && line != "" && _status_code != 400)
 	{
@@ -99,11 +105,6 @@ void	Request::parseProcess(std::string request_value)
 void	Request::parseStartLine(const std::string& str)
 {
 	size_t	i(0);
-	// string에서 ‘\n’ 위치 찾아서 한 줄 잘라서 line에 넣음.
-	// 이거 없어도 될 것 같은 게 어짜피 들어오는 str에 \n이 제거 되어서 들어오기 때문에
-	// i = npos가 되고, substr이 한 줄 그대로를 읽음. 그럴거면 그냥 str을 쓰면 됨. 
-	// i = str.find_first_of('\n');
-	// line = str.substr(0, i);
 	
 	if (_status_code == 200)
 		parseMethod(str, i);

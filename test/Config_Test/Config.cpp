@@ -1,34 +1,37 @@
 #include "Config.hpp"
 
-Config::Config() {}
+Config::Config()
+{
+	// _defaultConf.parseServerBlock(DEFAULT_CONFIG_PATH);	
+}
 
 Config::Config(std::string config_path)
 {
-	_default_conf = parseServerBlock(DEFAULT_CONFIG_PATH);	
+	// _defaultConf.parseServerBlock(DEFAULT_CONFIG_PATH);	
 	parseProcess(config_path);
 }
 
 int			Config::parseProcess(std::string config_path)
 {
-	fileVector				   file;
-	unsigned int               fileSize;
+	ServerBlock					tmpServerBlock;
+	fileVector					file;
+	unsigned int				fileSize;
 
 	file = readFile(config_path);
 	fileSize = file.size();
 	for (unsigned int i = 0 ; i < fileSize; i++) {
 		if (file[i] == "server") {
-			ServerBlock  server;
 			++i;
 			if (file[i] != "{") {
 				std::cerr << "Error: expected '{' after server directive." << std::endl;
 				return 1;
 			}
 			++i;
-			if (!server.parseServerBlock(i, file)) {
+			if (!tmpServerBlock.parseServerBlock(i, file)) {
 				std::cerr << "Error: error in config file [" << config_path << "]" <<  std::endl;
 				return 1;
 			}
-			this->_servers.push_back(server);
+			this->_serverBlock.insert(std::make_pair(tmpServerBlock.get_server_name() , tmpServerBlock));
 		}
 		else {
 			std::cerr << "Error: unknown directive [" << file[i] << "]" << std::endl;
@@ -74,8 +77,9 @@ fileVector	Config::readFile(std::string config_path_str) {
  	return file;
 }
 
-// charset안의 char(한 단어단어)와 일치하는 부분 단위로 string으로 쪼개서 fileVector에 넣어 리턴해줌
-fileVector		Config::split(std::string str, std::string charset) {
+//charset안의 char(한 단어단어)와 일치하는 부분 단위로 string으로 쪼개서 fileVector에 넣어 리턴해줌
+
+fileVector				Config::split(std::string str, std::string charset) {
 	fileVector	tokens;
 
 	// str에 charset[0] 추가
@@ -106,4 +110,3 @@ fileVector		Config::split(std::string str, std::string charset) {
 	}
 	// 토큰 리턴
 	return tokens;
-}

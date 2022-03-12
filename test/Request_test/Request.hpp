@@ -22,7 +22,6 @@ class Request {
 			Request(const Request& _Request);
 			Request&	operator=(const Request&);
 
-
 			void	initHeaders();
 			void	initValidMethod();
 			void	parseProcess(std::string request_value);

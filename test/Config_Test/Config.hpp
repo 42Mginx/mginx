@@ -4,14 +4,14 @@
 # define DEFAULT_CONFIG_PATH "./default.conf"
 
 #include "ServerBlock.hpp"
-#include "../Webserver.hpp"
+#include "../Webserver_test/Webserver.hpp"
 #include <iostream>
 #include <string>
 #include <map>
 #include <vector>
 
 # define READER_BUFFER_SIZE 1024
-typedef std::vector<std::string> fileVector;
+typedef std::map<std::string> fileVector;
 
 class Config {
 	private:
@@ -19,10 +19,10 @@ class Config {
 		Config(std::string config_path);
 		virtual ~Config(void);
 
-		ServerBlock _default_conf;
+		ServerBlock _defaultConf;
 		// server_name으로 ServerBlock 가져갈 수 있도록 함.
-		std::map<std::string, ServerBlock> _server_block;
-		std::vector<t_listen> _all_listens;
+		std::map<std::string, ServerBlock> _serverBlock;
+		std::vector<t_listen> _allListens;
 
 	public:
 		int			parseProcess(std::string config_path);
