@@ -1,8 +1,14 @@
 #ifndef WEBSERVERPROCESS_HPP
 #define WEBSERVERPROCESS_HPP
 
+#include "Config.hpp"
 #include "Request.hpp"
+#include "Response.hpp"
 #include "Webserver.hpp"
+
+#define RETURN_PROCEED 0
+#define RETURN_WAIT 1
+#define RETURN_ERROR -1
 
 class WebserverProcess {
    private:
@@ -10,21 +16,19 @@ class WebserverProcess {
     int _connected_fd;
     t_listen _listen_info;
     struct sockaddr_in _addr;
-    bool _ready_to_response;
+    bool _ready_to_response;  // flag to indicate ready state
 
     std::string _req;
-    // Request * _request_obj;
-
+    Request _request;
     std::string _res;
-    // Response * _res_obj;
+    Response _response;
+
+    Config *_config;
 
     WebserverProcess(void);
-    bool isChunked(void);
-    bool isFinalChunked(void);
-    int getKeyLocation(std::string key);
 
    public:
-    WebserverProcess(t_listen const &listen);
+    WebserverProcess(t_listen const &listen, Config &config);
     WebserverProcess(WebserverProcess const &src);
     ~WebserverProcess(void);
     WebserverProcess &operator=(WebserverProcess const &src);
@@ -33,14 +37,17 @@ class WebserverProcess {
     int setup(void);
     int accept(void);
     int readRequest(void);
+    int process(void);
     int writeResponse(void);
     void clear(void);
 
     // util
     void setAddr(void);
-    std::string getRes(void);
-
-    // setter
+    bool isChunked(void);
+    bool isFinalChunked(void);
+    int getKeyLocation(std::string key);
+    ServerBlock getServerBlock();
+    void combineChunk();
 
     // getter
     int getFd(void);

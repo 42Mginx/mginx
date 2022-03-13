@@ -1,7 +1,7 @@
 #ifndef REQUEST_HPP
 # define REQUEST_HPP
 
-# include "Request_util.hpp"
+# include "RequestUtil.hpp"
 
 class Request {
 		private:
@@ -12,8 +12,7 @@ class Request {
 			std::string									_version;
 			std::map<std::string, std::string>			_headers;
 			std::string									_body;
-			// std::map<std::string, std::string>			env_for_cgi;
-			int											_status;
+			int											_status_code;
 			std::vector<std::string>					_valid_methods;
 
 		public:
@@ -22,7 +21,6 @@ class Request {
 			~Request();
 			Request(const Request& _Request);
 			Request&	operator=(const Request&);
-
 
 			void	initHeaders();
 			void	initValidMethod();

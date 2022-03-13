@@ -1,6 +1,11 @@
 #include "Webserver.hpp"
 
 #include "WebserverProcess.hpp"
+
+void Webserver::parseConfig(std::string config_path) {
+    _config.parseProcess(config_path);
+}
+
 void Webserver::init() {
     _max_fd = 0;
     FD_ZERO(&_fd_set);
@@ -15,13 +20,13 @@ void Webserver::init() {
         _process_v.clear();
     if (!_listens_v.empty())
         _listens_v.clear();
-    _listens_v = getListens();  // config.getAllListens();
+    _listens_v = _config.getAllListens();
 }
 
 int Webserver::setup(void) {
     std::vector<t_listen>::const_iterator listen_i = _listens_v.begin();
     for (; listen_i != _listens_v.end(); listen_i++) {
-        WebserverProcess process(*listen_i);
+        WebserverProcess process(*listen_i, _config);
 
         if (process.setup() == -1) {
             std::cout << "process setup error" << std::endl;
@@ -149,24 +154,24 @@ void Webserver::handle_error(std::string const &error_message) {
     setup();
 }
 
-// util
+// tmp
 
-std::vector<t_listen> Webserver::getListens() {
-    std::vector<t_listen> _listens_v;
+// std::vector<t_listen> Webserver::getListens() {
+//     std::vector<t_listen> _listens_v;
 
-    t_listen listen_info;
-    listen_info.port = 8000;
-    listen_info.host = 0;
+//     t_listen listen_info;
+//     listen_info.port = 8000;
+//     listen_info.host = 0;
 
-    t_listen listen_info2;
-    listen_info2.port = 8001;
-    listen_info2.host = 0;
+//     t_listen listen_info2;
+//     listen_info2.port = 8001;
+//     listen_info2.host = 0;
 
-    _listens_v.push_back(listen_info);
-    _listens_v.push_back(listen_info2);
+//     _listens_v.push_back(listen_info);
+//     _listens_v.push_back(listen_info2);
 
-    return _listens_v;
-};
+//     return _listens_v;
+// };
 
 // occf
 Webserver::Webserver(void) { init(); }
