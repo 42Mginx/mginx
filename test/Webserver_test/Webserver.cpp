@@ -99,11 +99,11 @@ int Webserver::run() {
         std::cout << "read 진입전" << std::endl;
 
         process_it = _process_v.begin();
-        std::cout << "=> 1" << std::endl;
+        // std::cout << "=> 1" << std::endl;
         for (; process_it != _process_v.end(); process_it++) {
-            std::cout << "=> 2" << std::endl;
+            // std::cout << "=> 2" << std::endl;
             int connected_fd = process_it->getConnectedFd();
-            std::cout << "=> 3" << std::endl;
+            // std::cout << "=> 3" << std::endl;
             if (connected_fd > 0 && FD_ISSET(connected_fd, &_reading_set)) {
                 std::cout << "read 실행" << std::endl;
                 FD_CLR(connected_fd, &_fd_set);
@@ -113,7 +113,7 @@ int Webserver::run() {
                 }
                 break;
             }
-            std::cout << "=> 4" << std::endl;
+            // std::cout << "=> 4" << std::endl;
         };
 
         // accept

@@ -77,10 +77,21 @@ int WebserverProcess::readRequest(void) {
 };
 
 int WebserverProcess::process(void) {
-    _request.parseProcess(_req);
-    // 1. 요청 사항 파싱
+    // 0. chuncked 뒤에 chundked가 온 경우
+    int chunked_location = _req.find("Transfer-Encoding: chunked");
+    if (chunked_location != std::string::npos) {
+        decodeChunk();
 
-    // 3. config 에서 맞는 server block 찾아서 넘기기
+        // if (chunked_body != "") {
+        std::cout << "request: " << _req << std::endl;
+        std::cout << "이모 여기 chunked 하나 추가요~" << std::endl;
+        // }
+    }
+
+    // 1. 요청 사항 파싱
+    _request.parseProcess(_req);
+
+    // 2. config 에서 맞는 server block 찾아서 넘기기
     ServerBlock server_block = getServerBlock();
     _response.run(_request, server_block);
     // 3. make response
@@ -119,6 +130,10 @@ void WebserverProcess::setAddr(void) {
     _addr.sin_port = htons(_listen_info.port);
 };
 
+std::string WebserverProcess::getSubStr(std::string origin, std::string word) {
+    return origin;
+}
+
 int WebserverProcess::getKeyLocation(std::string key) {
     int location = _req.find(key);
     if (location == std::string::npos)
@@ -148,21 +163,44 @@ bool WebserverProcess::isFinalChunked(void) {
 };
 
 // TODO: 청크 파일 모아주는 함수
-void WebserverProcess::combineChunk() {
-    std::string head = _req.substr(0, _req.find("\r\n\r\n"));                      // head분리
-    std::string chunks = _req.substr(_req.find("\r\n\r\n") + 4, _req.size() - 1);  // head이후(data)
-    std::string subchunk = chunks.substr(0, 100);                                  // 100개 자름
+void WebserverProcess::decodeChunk() {
+    std::string chunk = _req;
+    std::string state = chunk.substr(0, chunk.find("\r\n\r\n"));  // state분리
+    std::cout << "~~~> state: " << state << std::endl;
+    chunk = chunk.substr(state.length() + 4);
+    std::string head = chunk.substr(0, chunk.find("\r\n\r\n"));  // head분리
+    std::cout << "~~~> head: " << head << std::endl;
+    chunk = chunk.substr(head.length() + 4);
+    std::cout << "~~~> chunks: " << chunk << std::endl;
+
+    //subChunk loop
     std::string body = "";
-    int chunksize = strtol(subchunk.c_str(), NULL, 16);
+    size_t read_size = 1;
+    size_t subChunk_size = 0;
     size_t i = 0;
-    while (chunksize) {
-        i = chunks.find("\r\n", i) + 2;
-        body += chunks.substr(i, chunksize);
-        i += chunksize + 2;
-        subchunk = chunks.substr(i, 100);
-        chunksize = strtol(subchunk.c_str(), NULL, 16);
+    while (read_size != 0) {
+        // get subChunk size
+        std::string substr = chunk.substr(i, chunk.find("\r\n", i));
+        subChunk_size = strtol(substr.c_str(), NULL, 10);
+        std::cout << "size? =>" << subChunk_size << std::endl;
+        // size에 기초하여 subChunk 읽어들이기
+        if (subChunk_size == 0)
+            break;
     }
-    _req = head + "\r\n\r\n" + body + "\r\n\r\n";
+    // std::string chunks = _req.substr(head.find("\r\n\r\n") + 4, _req.size() - 1);  // head이후(data)
+    // std::string subchunk = chunks.substr(0, 100);  // 100개 자름
+    // std::cout << "~~~> subchunk: " << subchunk << std::endl;
+    // std::string body = "";
+    // int chunksize = strtol(subchunk.c_str(), NULL, 16);
+    // size_t i = 0;
+    // while (chunksize) {
+    //     i = chunks.find("\r\n", i) + 2;
+    //     body += chunks.substr(i, chunksize);
+    //     i += chunksize + 2;
+    //     subchunk = chunks.substr(i, 100);
+    //     chunksize = strtol(subchunk.c_str(), NULL, 16);
+    // }
+    _req = state + "\r\n\r\n" + head + "\r\n\r\n" + body + "\r\n\r\n";
 };
 
 // [ nginx 설명 ]

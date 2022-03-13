@@ -46,8 +46,9 @@ class WebserverProcess {
     bool isChunked(void);
     bool isFinalChunked(void);
     int getKeyLocation(std::string key);
+    std::string getSubStr(std::string origin, std::string word);
     ServerBlock getServerBlock();
-    void combineChunk();
+    void decodeChunk();
 
     // getter
     int getFd(void);
