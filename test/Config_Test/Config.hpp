@@ -1,17 +1,7 @@
 #ifndef Config_HPP
 # define Config_HPP
 
-# define DEFAULT_CONFIG_PATH "./default.conf"
-
-#include "ServerBlock.hpp"
-#include "../Webserver_test/Webserver.hpp"
-#include <iostream>
-#include <string>
-#include <map>
-#include <vector>
-
-# define READER_BUFFER_SIZE 1024
-typedef std::map<std::string> fileVector;
+#include "ConfigUtil.hpp"
 
 class Config {
 	private:

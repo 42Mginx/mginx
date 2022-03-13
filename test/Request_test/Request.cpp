@@ -98,6 +98,8 @@ void	Request::parseProcess(std::string request_value)
 	std::cout << _headers["Transfer-Encoding"] << std::endl;
 	std::cout << _headers["Content-Type"] << std::endl;
 	std::cout << _headers["Accept-Encoding"] << std::endl;
+	std::cout << _headers["dongslee"] << std::endl;
+
 
 	// 헤더 읽은 후 이후 값 모두 넘기고 \r\n 제거 후 _body에 값 추가
 	if ((i = request_value.find_first_not_of("\r \n", i)) != std::string::npos)

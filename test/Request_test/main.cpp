@@ -9,6 +9,7 @@ int main(void)
 	request_value = "POST /directory?id=3&hi=2 HTTP/1.1 \r\n\
 \r\n\
 Host: localhost:8000 \r\n\
+dongslee: baboo\r\n\
 User-Agent: Go-http-client/1.1\r\n\
 Transfer-Encoding: chunked\r\n\
 Content-Type: test/file\r\n\
