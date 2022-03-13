@@ -41,19 +41,16 @@
 #include <sys/select.h>
 #include <sys/socket.h>
 
+#include "Config.hpp"
 #define BUF_SIZE 4096
+#include "listen.hpp"
 
 class WebserverProcess;
 
-typedef struct s_listen {
-    unsigned int host;
-    int port;
-} t_listen;
-
 class Webserver {
-  private:
-    // util
-    std::vector<t_listen> getListens();
+   private:
+    // tmp
+    // std::vector<t_listen> getListens();
 
     // 멤버변수
     long _max_fd;
@@ -64,9 +61,12 @@ class Webserver {
     std::vector<t_listen> _listens_v;
     fd_set _reading_set;
     fd_set _writing_set;
+    Config _config;
+
+    // private method
     void init();
 
-  public:
+   public:
     // occf
     Webserver(void);
     Webserver(const Webserver &src);
@@ -74,6 +74,7 @@ class Webserver {
     Webserver &operator=(const Webserver &src);
 
     // action
+    void parseConfig(std::string config_path);
     int setup();
     int run();
     void handle_error(std::string const &error_message);

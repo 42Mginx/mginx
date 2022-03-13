@@ -23,15 +23,13 @@ int choose_port(void) {
     std::cout << YELLOW << "Choose PORT :" << std::endl;
     std::cout << "(a) 8000" << std::endl;
     std::cout << "(b) 8001" << std::endl;
-    // std::cout << "(c) 8002" << RESET << std::endl;
+    std::cout << "(c) 8001(chunked test)" << std::endl;
     getline(std::cin, choice);
 
     if (choice == "a")
         return (8000);
     else if (choice == "b")
         return (8001);
-    // else if (choice == "c")
-    //     return (8002);
     return (8000);
 }
 
@@ -114,11 +112,12 @@ void send(int port) {
 
     if (port == 8000) {
         request_string =
-            "GET /directory/youpi.bla HTTP/1.1 \r\n\r\n\
+            "GET / HTTP/1.1\r\n\r\n\
 Host: localhost:8000\r\n\
 User-Agent: Go-http-client/1.1\r\n\
 Accept-Encoding: gzip\r\n\
 ";
+
     } else if (port == 8001) {
         request_string =
             "POST /directory?id=3&hi=2 HTTP/1.1 \r\n\r\n\
@@ -128,10 +127,15 @@ Transfer-Encoding: chunked\r\n\
 Content-Type: test/file\r\n\
 Accept-Encoding: gzip\r\n\
 \r\n\
+4\r\n\
+abcd\r\n\
+4\r\n\
+abcd\r\n\
 0\r\n\
 \r\n\
 ";
     }
+
     send(sock, request_string.c_str(), request_string.length(), 0);
     std::cout << "send" << std::endl;
 
@@ -151,6 +155,5 @@ int main(void) {
     int port = choose_port();
     std::cout << "port: " << port << std::endl;
     send(port);
-    // send(8000);
     return (0);
 }
