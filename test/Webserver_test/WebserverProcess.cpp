@@ -84,7 +84,6 @@ int WebserverProcess::process(void) {
 
         // if (chunked_body != "") {
         std::cout << "request: " << _req << std::endl;
-        std::cout << "이모 여기 chunked 하나 추가요~" << std::endl;
         // }
     }
 
@@ -157,6 +156,7 @@ bool WebserverProcess::isFinalChunked(void) {
     if (request_size != endOfFile + 5)
         return false;
     std::string substr = _req.substr(request_size - 5, 5);
+    std::cout << "substr:: " << substr << std::endl;
     if (substr != "0\r\n\r\n")
         return false;
     return true;
@@ -173,33 +173,46 @@ void WebserverProcess::decodeChunk() {
     chunk = chunk.substr(head.length() + 4);
     std::cout << "~~~> chunks: " << chunk << std::endl;
 
-    //subChunk loop
+    // subChunk loop
     std::string body = "";
-    size_t read_size = 1;
-    size_t subChunk_size = 0;
-    size_t i = 0;
+    size_t chunk_size = 0;  // chunk 낱개의 사이즈
+    size_t read_size = 1;   //
+
+    // [ chunk ]
+    // 3\r\n => chunk_size: 3 is subChunk size
+    // abc\r\n => chunk_body: abc is need to added into body, read size is 3
+
+    // 3\r\n
+    // ab\r\n => sub_chunk_body
+    // c\r\n => sub_chunk_body
+
     while (read_size != 0) {
-        // get subChunk size
-        std::string substr = chunk.substr(i, chunk.find("\r\n", i));
-        subChunk_size = strtol(substr.c_str(), NULL, 10);
-        std::cout << "size? =>" << subChunk_size << std::endl;
-        // size에 기초하여 subChunk 읽어들이기
-        if (subChunk_size == 0)
+        std::string chunk_size_str = chunk.substr(0, chunk.find("\r\n"));  // state분리
+        std::cout << "~~~> chunk_size: " << chunk_size << std::endl;
+        chunk = chunk.substr(chunk_size_str.length() + 2);
+        chunk_size = strtol(chunk_size_str.c_str(), NULL, 10);
+        if (chunk_size == 0)
             break;
+
+        std::string chunk_body = "";
+        size_t sub_read_size = 0;
+        while (chunk_size > chunk_body.length()) {
+            std::string sub_chunk_body = chunk.substr(0, chunk.find("\r\n"));
+            std::cout << "~~~> sub_chunk_body: " << sub_chunk_body << std::endl;
+            chunk = chunk.substr(sub_chunk_body.length() + 2);
+            std::cout << "~~~> 남은 chunks: " << chunk << std::endl;
+            chunk_body += sub_chunk_body;
+        }
+        std::cout << "~~~> chunk_body: " << chunk_body << std::endl;
+        read_size = chunk_body.length();
+        body += chunk_body;
     }
-    // std::string chunks = _req.substr(head.find("\r\n\r\n") + 4, _req.size() - 1);  // head이후(data)
-    // std::string subchunk = chunks.substr(0, 100);  // 100개 자름
-    // std::cout << "~~~> subchunk: " << subchunk << std::endl;
-    // std::string body = "";
-    // int chunksize = strtol(subchunk.c_str(), NULL, 16);
-    // size_t i = 0;
-    // while (chunksize) {
-    //     i = chunks.find("\r\n", i) + 2;
-    //     body += chunks.substr(i, chunksize);
-    //     i += chunksize + 2;
-    //     subchunk = chunks.substr(i, 100);
-    //     chunksize = strtol(subchunk.c_str(), NULL, 16);
-    // }
+    std::cout << "==========>decoded body: " << body << std::endl;
+    //만약에 끝까지 왔는데 그 뒤가 \r\n\r\n이 아니면 에러
+    if (chunk_size == 0 && chunk != "\r\n\r\n") {
+        std::cerr << "There is still body to read" << std::endl;
+    }
+    // 사이즈를 따로 주는지 체크하기
     _req = state + "\r\n\r\n" + head + "\r\n\r\n" + body + "\r\n\r\n";
 };
 
@@ -229,7 +242,7 @@ ServerBlock WebserverProcess::getServerBlock() {
             std::cout << "=> find by servername" << std::endl;
         }
     } else {
-        //2. 없으면 listen으로 찾아봄(가장 첫번째 일치하는 것으로 결정함-default)
+        // 2. 없으면 listen으로 찾아봄(가장 첫번째 일치하는 것으로 결정함-default)
         it = server_blocks.begin();
         for (; it != server_blocks.end(); it++) {
             std::cout << it->second.getListen() << std::endl;

@@ -23,7 +23,6 @@ int choose_port(void) {
     std::cout << YELLOW << "Choose PORT :" << std::endl;
     std::cout << "(a) 8000" << std::endl;
     std::cout << "(b) 8001" << std::endl;
-    std::cout << "(c) 8001(chunked test)" << std::endl;
     getline(std::cin, choice);
 
     if (choice == "a")
@@ -91,7 +90,7 @@ std::string choose_target(int cgi) {
     return ("_example");
 }
 
-void send(int port) {
+void send(int port, std::string mode) {
     int sock;
     struct sockaddr_in serv_addr;
     char buffer[BUF_SIZE] = {
@@ -105,12 +104,12 @@ void send(int port) {
     serv_addr.sin_addr.s_addr = htonl(INADDR_ANY);
     serv_addr.sin_port = htons(port);
 
-    int ret = connect(sock, (struct sockaddr *)&serv_addr,
+    int ret = connect(sock, (struct sockaddr*)&serv_addr,
                       sizeof(serv_addr));  // 내부에서 2번 악수
     std::cout << "connect " << ret << std::endl;
     std::string request_string = "invalid request";
 
-    if (port == 8000) {
+    if (port == 8000 && mode == "normal") {
         request_string =
             "GET / HTTP/1.1\r\n\r\n\
 Host: localhost:8000\r\n\
@@ -118,7 +117,14 @@ User-Agent: Go-http-client/1.1\r\n\
 Accept-Encoding: gzip\r\n\
 ";
 
-    } else if (port == 8001) {
+    } else if (port == 8001 && mode == "normal") {
+        request_string =
+            "GET / HTTP/1.1\r\n\r\n\
+Host: localhost:8001\r\n\
+User-Agent: Go-http-client/1.1\r\n\
+Accept-Encoding: gzip\r\n\
+";
+    } else if (port == 8001 && mode == "chunked") {
         request_string =
             "POST /directory?id=3&hi=2 HTTP/1.1 \r\n\r\n\
 Host: localhost:8001 \r\n\
@@ -129,8 +135,19 @@ Accept-Encoding: gzip\r\n\
 \r\n\
 4\r\n\
 abcd\r\n\
-4\r\n\
-abcd\r\n\
+3\r\n\
+abc\r\n\
+0\r\n\
+\r\n\
+";
+    } else if (port == 8000 && mode == "chunked") {
+        request_string =
+            "POST /directory?id=3&hi=2 HTTP/1.1 \r\n\r\n\
+Host: localhost:8000 \r\n\
+User-Agent: Go-http-client/1.1\r\n\
+Transfer-Encoding: chunked\r\n\
+Content-Type: test/file\r\n\
+Accept-Encoding: gzip\r\n\
 0\r\n\
 \r\n\
 ";
@@ -151,9 +168,14 @@ abcd\r\n\
     return;
 }
 
-int main(void) {
-    int port = choose_port();
-    std::cout << "port: " << port << std::endl;
-    send(port);
+int main(int argc, char** argv) {
+    if (argc == 1) {
+        int port = choose_port();
+        std::cout << "port: " << port << std::endl;
+        send(port, "normal");
+    } else {
+        send(8001, "chunked");
+        // send(8000, "chunked");
+    }
     return (0);
 }
