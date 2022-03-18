@@ -2,7 +2,7 @@
 
 /*------------- 캐노니컬  --------------------------------------------------*/
 
-ServerBlock::ServerBlock(): _root(""), _client_body_buffer_size(0), _auto_index(false)
+ServerBlock::ServerBlock(): _root(""), _client_body_buffer_size(0), _auto_index(false), _aliasSet(false)
 {
 	_initDirectivesMap();
 };
@@ -21,19 +21,52 @@ ServerBlock	&ServerBlock::operator=(ServerBlock const &src) {
 	return *this;
 }
 
+// EXCEPTION HANDLING
+const char		*ServerBlock::ExceptionInvalidArguments::what()
+ const throw() {
+	return "Exception: invalid arguments in configuration file";
+}
+
+
 /*------------- 지시어 파싱 맵과 함수들  --------------------------------------------------*/
 
-void ServerBlock::_initDirectivesMap()
+directivesMap		ServerBlock::_initDirectivesMap()
 {
-	directivesParseFunc["server_name"] = &ServerBlock::addServerName;
-	directivesParseFunc["listen"] = &ServerBlock::addListen;
-	directivesParseFunc["root"] = &ServerBlock::addRoot;
-	directivesParseFunc["error_page"] = &ServerBlock::addErrorPage;
-	directivesParseFunc["client_body_buffer_size"] = &ServerBlock::addClientBodyBufferSize;
-	directivesParseFunc["autoindex"] = &ServerBlock::addAutoIndex;
-	directivesParseFunc["allow_methods"] = &ServerBlock::addAllowedMethods;
-	directivesParseFunc["location"] = &ServerBlock::addLocation;
+	directivesMap		tmpMap;
+
+	tmpMap["server_name"] = &ServerBlock::addServerName;
+	tmpMap["listen"] = &ServerBlock::addListen;
+	tmpMap["root"] = &ServerBlock::addRoot;
+	tmpMap["error_page"] = &ServerBlock::addErrorPage;
+	tmpMap["client_body_buffer_size"] = &ServerBlock::addClientBodyBufferSize;
+	tmpMap["autoindex"] = &ServerBlock::addAutoIndex;
+	tmpMap["allow_methods"] = &ServerBlock::addAllowedMethods;
+
+	return (tmpMap);
 }
+
+directivesMap ServerBlock::directivesParseFunc = ServerBlock::_initDirectivesMap();
+
+directivesMap		ServerBlock::_initLocationDirectivesMap()
+{
+	directivesMap		tmpMap;
+
+	tmpMap["_root"] = &ServerBlock::addRoot;
+	tmpMap["_auto_index"] = &ServerBlock::addAutoIndex;
+	tmpMap["_allowed_methods"] = &ServerBlock::addAllowedMethods;
+	tmpMap["_error_page"] = &ServerBlock::addErrorPage;
+	tmpMap["client_body_buffer_size"] = &ServerBlock::addClientBodyBufferSize;
+	tmpMap["_cgi_param"] = &ServerBlock::addCgiParam;
+	tmpMap["_cgi_pass"] = &ServerBlock::addCgiPass;
+	tmpMap["_index"] = &ServerBlock::addIndex;
+	tmpMap["_alias"] = &ServerBlock::addAlias;
+
+	return (tmpMap);
+}
+
+directivesMap ServerBlock::locationDirectivesParseFunc = ServerBlock::_initLocationDirectivesMap();
+
+// add 함수들
 
 void ServerBlock::addServerName(std::vector<std::string> args)
 {
@@ -138,13 +171,6 @@ void ServerBlock::addErrorPage(std::vector<std::string> args)
 		this->_error_page[*i] = uri;
 }
 
-void ServerBlock::addCgiPass(std::vector<std::string> args)
-{
-	if (args.size() != 1)
-		throw ServerBlock::ExceptionInvalidArguments();
-	this->_cgi_pass = args[0];
-}
-
 void ServerBlock::addClientBodyBufferSize(std::vector<std::string> args)
 {
 	if (args.size() != 1 || !isDigits(args[0]))
@@ -164,18 +190,101 @@ void	ServerBlock::addAutoIndex(std::vector<std::string> args)
 		throw ServerBlock::ExceptionInvalidArguments();
 }
 
+void		ServerBlock::addCgiParam(std::vector<std::string> args) {
+	if (args.size() != 2)
+		throw ServerBlock::ExceptionInvalidArguments();
+
+	this->_cgi_param[args[0]] = args[1];
+}
+
+void ServerBlock::addCgiPass(std::vector<std::string> args)
+{
+	if (args.size() != 1)
+		throw ServerBlock::ExceptionInvalidArguments();
+	this->_cgi_pass = args[0];
+}
+
+void	ServerBlock::addIndex(std::vector<std::string> args) {
+	if (args.empty())
+		throw ServerBlock::ExceptionInvalidArguments();
+	this->_index.insert(this->_index.end(), args.begin(), args.end());
+}
+
+void	ServerBlock::addAlias(std::vector<std::string> args) {
+	if (args.size() > 1)
+		throw ServerBlock::ExceptionInvalidArguments();
+	if (args.size())
+		this->_alias = args[0];
+	this->_aliasSet = true;
+}
+
+// get 함수들
+std::vector<std::string>   			ServerBlock::getServerName() const {
+	return this->_server_name;
+}
+
+std::vector<t_listen>				ServerBlock::getListen() const {
+	return this->_listen;
+}
+
+std::string							ServerBlock::getRoot() const {
+	return this->_root;
+}
+
+std::set<std::string>				ServerBlock::getAllowedMethods() const {
+	return this->_allowed_methods;
+}
+
+std::map<int, std::string>			ServerBlock::getErrorPage() const {
+	return this->_error_page;
+}
+
+int									ServerBlock::getClientBodyBufferSize() const {
+	return this->_client_body_buffer_size;
+}
+
+bool								ServerBlock::getAutoIndex() const {
+	return this->_auto_index;
+}
+
+
+std::map<std::string, std::string>	ServerBlock::getCgiParam() const {
+	return this->_cgi_param;
+}
+
+std::string							ServerBlock::getCgiPass() const {
+	return this->_cgi_pass;
+}
+
+std::map<std::string, ServerBlock>	ServerBlock::getLocation() const {
+	return this->_location;
+}
+
+std::vector<std::string>			ServerBlock::getIndex() const {
+	return this->_index;
+}
+
+std::string							ServerBlock::getAlias() const {
+	return this->_alias;
+}
+
+bool								ServerBlock::getAliasSet() const {
+	return this->_aliasSet;
+}
+
+
 // serverBlock 파싱
 int	 ServerBlock::parseServerBlock(unsigned int &index, fileVector &file)
 {
 	fileVector                  args;
-	parseMap::iterator          iter;
+	directivesMap::iterator          iter;
 	std::string                 directive;
 
 	// arg를 매개 변수로 사용하여 지시어에 해당하는 함수를 호출합니다.
-	//serverParsingMap을 돌면서 관련 명령어가 있는 지 파싱
+	//directivesParseFunc을 돌면서 관련 명령어가 있는 지 파싱
 	for ( ; index < file.size() && file[index] != "}" ; index++) {
-		// serverParsingMap에 file[index]에 해당하는 것이 없을 경우
-		if ((iter = ServerBlock::serverParsingMap.find(file[index])) == ServerBlock::serverParsingMap.end()) {
+		// directivesParseFunc에 file[index]에 해당하는 것이 없을 경우
+		if ((iter = directivesParseFunc.find(file[index])) == directivesParseFunc.end()) {
 			
 			// 1. 만약 location이라면?
 			if (file[index] == "location") {
@@ -185,7 +294,7 @@ int	 ServerBlock::parseServerBlock(unsigned int &index, fileVector &file)
 				// directive가 빈 문자열이 아니라면?
 				if (directive != "") {
 					// 해당 명령어 함수 동작시키고 arg, directive 초기화
-					(*ServerBlock::serverParsingMap[directive])(args);
+					(this->*ServerBlock::directivesParseFunc[directive])(args);
 					args.clear();
 					directive = "";
 				}
@@ -195,9 +304,9 @@ int	 ServerBlock::parseServerBlock(unsigned int &index, fileVector &file)
 					return 0;
 				// 아니라면 다음 인덱스는 locationName임.
 				locationName = file[index];
-				// locationName 다음에 있는 '{' 인덱스부터 parseLocation으로 보내 파싱해줌 -> 잘못되면 리턴 0
+				// locationName 다음에 있는 '{' 인덱스부터 parseLocationBlock 보내 파싱해줌 -> 잘못되면 리턴 0
 				index++;
-				if (!location.parseLocation(index, file))
+				if (!location.parseLocationBlock(index, file))
 					return 0;
 				// 파싱한 값 -> _location에 넣어줌
 				_location[locationName] = location;
@@ -214,12 +323,12 @@ int	 ServerBlock::parseServerBlock(unsigned int &index, fileVector &file)
 			else
 				args.push_back(file[index]);
 		}
-		// 해당하는 명령어가 serverParsingMap에 있을 경우
+		// 해당하는 명령어가 directivesParseFunc에 있을 경우
 		else
 		{
 			// directive에 값이 있을 때 실행함
 			if (directive != "") {
-				(*ServerBlock::serverParsingMap[directive])(args);
+				(this->*ServerBlock::directivesParseFunc[directive])(args);
 				args.clear();
 			}
 			// directive에 해당 명령어를 넣음.
@@ -228,23 +337,23 @@ int	 ServerBlock::parseServerBlock(unsigned int &index, fileVector &file)
 	}
 	// directive가 있으면 해당 명령어 실행
 	if (directive != "")
-		(*ServerBlock::serverParsingMap[directive])(args);
+		(this->*ServerBlock::directivesParseFunc[directive])(args);
 	//  해당 서버 디렉토리스가 파싱이 끝났다면('}'을 만났다면)
 	if (!file[index].compare("}")) {
-		// 혹시나 빈 값 defaultServer conf값으로 채워줌
-		ServerBlock::_defaultServer.passMembers(*this);
-		// location도 돌면서 값 채워줌
-		for (std::map<std::string, ServerBlock>::iterator i = _location.begin() ; i != _location.end(); i++)
-			passMembers(i->second);
+		// // 혹시나 빈 값 defaultServer conf값으로 채워줌
+		// ServerBlock::_defaultServer.passMembers(*this);
+		// // location도 돌면서 값 채워줌
+		// for (std::map<std::string, ServerBlock>::iterator i = _location.begin() ; i != _location.end(); i++)
+		// 	passMembers(i->second);
 		return 1;
 	}
 	return 0;
 };
 
 // Location 파싱
-int     ServerBlock::parseLocation(unsigned int &index, fileVector &file) {
+int     ServerBlock::parseLocationBlock(unsigned int &index, fileVector &file) {
 	fileVector                  args;
-	parseMap::iterator          iter;
+	directivesMap::iterator          iter;
 	std::string                 directive = "";
 
 	if (file[index++] != "{")
@@ -252,14 +361,14 @@ int     ServerBlock::parseLocation(unsigned int &index, fileVector &file) {
 	//	calling the function that corresponds to a directive with its args as parameters
 	for ( ; index < file.size() && file[index] != "}" ; index++) {
 		// locationParsingMap에 해당 명령어 없을 경우
-		if ((iter = ServerBlock::locationParsingMap.find(file[index])) == ServerBlock::locationParsingMap.end()) {
+		if ((iter = ServerBlock::locationDirectivesParseFunc.find(file[index])) == ServerBlock::locationDirectivesParseFunc.end()) {
 			// 해당 명령어가 location일 경우
 			if (file[index] == "location") {
 				ServerBlock	location;
 				std::string		locationName;
 
 				if (directive != "") {
-					(*ServerBlock::locationParsingMap[directive])(args);
+					(this->*ServerBlock::locationDirectivesParseFunc[directive])(args);
 					args.clear();
 					directive = "";
 				}
@@ -268,7 +377,7 @@ int     ServerBlock::parseLocation(unsigned int &index, fileVector &file) {
 					return 0;
 				locationName = file[index];
 				index++;
-				if (!location.parseLocation(index, file))
+				if (!location.parseLocationBlock(index, file))
 					return 0;
 				_location[locationName] = location;
 				if (file[index] == "}")
@@ -286,7 +395,7 @@ int     ServerBlock::parseLocation(unsigned int &index, fileVector &file) {
 		{
 			// directive이 있으면 실행
 			if (directive != "") {
-				(*ServerBlock::locationParsingMap[directive])(args);
+				(this->*ServerBlock::locationDirectivesParseFunc[directive])(args);
 				args.clear();
 			}
 			// directive없으면 해당 명령어 넣기
@@ -294,7 +403,7 @@ int     ServerBlock::parseLocation(unsigned int &index, fileVector &file) {
 		}
 	}
 	if (directive != "")
-		(*ServerBlock::locationParsingMap[directive])(args);
+		(this->*ServerBlock::locationDirectivesParseFunc[directive])(args);
 	//  set up default values if they were not set by the config file
 	if (!file[index].compare("}"))
 		return 1;

@@ -2,18 +2,19 @@
 
 Config::Config()
 {
-	// _defaultConf.parseServerBlock(DEFAULT_CONFIG_PATH);	
+	// _defaultConf = parseProcess(DEFAULT_CONFIG_PATH);
 }
 
 Config::Config(std::string config_path)
 {
-	// _defaultConf.parseServerBlock(DEFAULT_CONFIG_PATH);	
+	// _defaultConf = parseProcess(DEFAULT_CONFIG_PATH);
 	parseProcess(config_path);
 }
 
+Config::~Config() {}
+
 int			Config::parseProcess(std::string config_path)
 {
-	ServerBlock					tmpServerBlock;
 	fileVector					file;
 	unsigned int				fileSize;
 
@@ -21,6 +22,7 @@ int			Config::parseProcess(std::string config_path)
 	fileSize = file.size();
 	for (unsigned int i = 0 ; i < fileSize; i++) {
 		if (file[i] == "server") {
+			ServerBlock					tmpServerBlock;
 			++i;
 			if (file[i] != "{") {
 				std::cerr << "Error: expected '{' after server directive." << std::endl;
@@ -31,7 +33,7 @@ int			Config::parseProcess(std::string config_path)
 				std::cerr << "Error: error in config file [" << config_path << "]" <<  std::endl;
 				return 1;
 			}
-			this->_serverBlock.insert(std::make_pair(tmpServerBlock.get_server_name() , tmpServerBlock));
+			this->_serverBlock.push_back(tmpServerBlock);
 		}
 		else {
 			std::cerr << "Error: unknown directive [" << file[i] << "]" << std::endl;
@@ -110,3 +112,4 @@ fileVector				Config::split(std::string str, std::string charset) {
 	}
 	// 토큰 리턴
 	return tokens;
+}
