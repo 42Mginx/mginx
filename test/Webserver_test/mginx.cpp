@@ -1,6 +1,6 @@
 #include "Webserver.hpp"
 
-int main(int argc, char **argv) {
+int main(int argc, char** argv) {
     Webserver webserver;
     int ret;
 
@@ -14,8 +14,11 @@ int main(int argc, char **argv) {
             if (webserver.run() == -1) {
                 std::cout << "webserver setup error" << std::endl;
             }
+        } catch (std::exception& e) {
+            std::cerr << "[Exception] error occured => " << e.what() << std::endl;
+
         } catch (...) {
-            std::cerr << "error occured in process" << std::endl;
+            std::cerr << "[Exception] error occured in process" << std::endl;
         }
     } else {
         std::cerr << "Please enter the config file path" << std::endl;

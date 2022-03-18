@@ -2,7 +2,6 @@
 #include "Config.hpp"
 Config::Config() {}
 void Config::parseProcess(std::string config_path) {
-    std::cout << "// Config => parse process //" << std::endl;
     ServerBlock a("localhost:8000", "8000");
     ServerBlock b("localhost:8001", "8001");
     _server_block.insert(std::make_pair("localhost:8000", a));

@@ -5,8 +5,10 @@ int WebserverProcess::setup(void) {
     _socket_fd = socket(AF_INET, SOCK_STREAM, 0);
     if (_socket_fd != -1) {
         fcntl(_socket_fd, F_SETFL, O_NONBLOCK);
-        ::bind(_socket_fd, (struct sockaddr *)&_addr, sizeof(_addr));
-        ::listen(_socket_fd, 1000);
+        if (bind(_socket_fd, (struct sockaddr *)&_addr, sizeof(_addr)) == -1) {
+            return -1;
+        }
+        listen(_socket_fd, 1000);
     }
     return _socket_fd;
 };
@@ -30,7 +32,9 @@ int WebserverProcess::readRequest(void) {
     }
 
     _req += std::string(buffer);
-    size_t header_index = _req.find("\r\n\r\n");
+
+    size_t header_index = _req.find("\r\n");
+    std::cout << header_index << std::endl;
     if (header_index != std::string::npos) {
         bool chuncked = isChunked();
         if (!chuncked || (chuncked && isFinalChunked())) {
@@ -63,6 +67,7 @@ int WebserverProcess::readRequest(void) {
     if (ret == RETURN_PROCEED) {
         ret = process();
     }
+    std::cout << "request is [" << _req << "]" << std::endl;
 
     if (ret == RETURN_ERROR) {
         std::cerr << "// empty response error //" << std::endl;
@@ -79,7 +84,7 @@ int WebserverProcess::readRequest(void) {
 int WebserverProcess::process(void) {
     // 0. chuncked 뒤에 chundked가 온 경우
     int chunked_location = _req.find("Transfer-Encoding: chunked");
-    if (chunked_location != std::string::npos) {
+    if (chunked_location != std::string::npos && chunked_location < _req.find("\r\n\r\n")) {
         decodeChunk();
 
         // if (chunked_body != "") {
@@ -107,6 +112,7 @@ int WebserverProcess::writeResponse(void) {
     int ret = write(_connected_fd, _res.c_str(), _res.size());
     _connected_fd = -1;
     _ready_to_response = false;
+    _req = "";
     return ret;  // success: 양수, fail: -1
 };
 
@@ -165,39 +171,33 @@ bool WebserverProcess::isFinalChunked(void) {
 // TODO: 청크 파일 모아주는 함수
 void WebserverProcess::decodeChunk() {
     std::string chunk = _req;
-    std::string state = chunk.substr(0, chunk.find("\r\n\r\n"));  // state분리
-    std::cout << "~~~> state: " << state << std::endl;
-    chunk = chunk.substr(state.length() + 4);
-    std::string head = chunk.substr(0, chunk.find("\r\n\r\n"));  // head분리
+    std::string head = chunk.substr(0, chunk.find("\r\n\r\n"));
     std::cout << "~~~> head: " << head << std::endl;
     chunk = chunk.substr(head.length() + 4);
     std::cout << "~~~> chunks: " << chunk << std::endl;
 
-    // subChunk loop
     std::string body = "";
-    size_t chunk_size = 0;  // chunk 낱개의 사이즈
-    size_t read_size = 1;   //
+    size_t chunk_size = 0;
+    size_t read_size = 1;
 
-    // [ chunk ]
-    // 3\r\n => chunk_size: 3 is subChunk size
-    // abc\r\n => chunk_body: abc is need to added into body, read size is 3
-
-    // 3\r\n
-    // ab\r\n => sub_chunk_body
-    // c\r\n => sub_chunk_body
-
-    while (read_size != 0) {
-        std::string chunk_size_str = chunk.substr(0, chunk.find("\r\n"));  // state분리
+    while (chunk != "" && read_size != 0) {
+        std::string chunk_size_str = chunk.substr(0, chunk.find("\r\n"));
+        chunk_size = strtol(chunk_size_str.c_str(), NULL, 16);
         std::cout << "~~~> chunk_size: " << chunk_size << std::endl;
         chunk = chunk.substr(chunk_size_str.length() + 2);
-        chunk_size = strtol(chunk_size_str.c_str(), NULL, 10);
-        if (chunk_size == 0)
+
+        if (chunk_size == 0) {
+            std::cout << chunk_size_str.length() << std::endl;
             break;
+        }
 
         std::string chunk_body = "";
         size_t sub_read_size = 0;
         while (chunk_size > chunk_body.length()) {
+            std::cout << "chunk_size" << chunk_size << std::endl;
+            std::cout << "chunk_body.length()" << chunk_body.length() << std::endl;
             std::string sub_chunk_body = chunk.substr(0, chunk.find("\r\n"));
+
             std::cout << "~~~> sub_chunk_body: " << sub_chunk_body << std::endl;
             chunk = chunk.substr(sub_chunk_body.length() + 2);
             std::cout << "~~~> 남은 chunks: " << chunk << std::endl;
@@ -207,20 +207,18 @@ void WebserverProcess::decodeChunk() {
         read_size = chunk_body.length();
         body += chunk_body;
     }
-    std::cout << "==========>decoded body: " << body << std::endl;
-    //만약에 끝까지 왔는데 그 뒤가 \r\n\r\n이 아니면 에러
-    if (chunk_size == 0 && chunk != "\r\n\r\n") {
-        std::cerr << "There is still body to read" << std::endl;
-    }
-    // 사이즈를 따로 주는지 체크하기
-    _req = state + "\r\n\r\n" + head + "\r\n\r\n" + body + "\r\n\r\n";
-};
 
-// [ nginx 설명 ]
-// 1. listen 지시어
-// ip 주소와 port를 테스트한다.
-// 2. ip 주소, port와 일치하는 서버 블록의 server_name 항목에 대해서 요청의 host 헤더 필드를 테스트합니다.
-// 3. 서버 이름을 찾을 수 없을 경우, default 서버에서 처리됩니다.
+    std::cout << "==========>decoded body: [" << body << "]" << std::endl;
+    if (chunk_size == 0 && chunk != "\r\n") {
+        std::cerr << "There is body to read => [" << chunk << "]" << std::endl;
+    }
+    if (body == "") {
+        _req = head + "\r\n\r\n";
+
+    } else {
+        _req = head + "\r\n\r\n" + body + "\r\n\r\n";
+    }
+};
 
 ServerBlock WebserverProcess::getServerBlock() {
     ServerBlock *ret = NULL;

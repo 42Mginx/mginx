@@ -90,7 +90,7 @@ std::string choose_target(int cgi) {
     return ("_example");
 }
 
-void send(int port, std::string mode) {
+void send(int port, std::string request_string) {
     int sock;
     struct sockaddr_in serv_addr;
     char buffer[BUF_SIZE] = {
@@ -107,52 +107,69 @@ void send(int port, std::string mode) {
     int ret = connect(sock, (struct sockaddr*)&serv_addr,
                       sizeof(serv_addr));  // 내부에서 2번 악수
     std::cout << "connect " << ret << std::endl;
-    std::string request_string = "invalid request";
+    // std::string request_string = "?";
 
-    if (port == 8000 && mode == "normal") {
-        request_string =
-            "GET / HTTP/1.1\r\n\r\n\
-Host: localhost:8000\r\n\
-User-Agent: Go-http-client/1.1\r\n\
-Accept-Encoding: gzip\r\n\
-";
+    //     if (port == 8000 && mode == "normal") {
+    //         request_string =
+    //             "GET / HTTP/1.1\r\n\
+// Host: localhost:8000\r\n\
+// User-Agent: Go-http-client/1.1\r\n\
+// Accept-Encoding: gzip\r\n\
+// ";
 
-    } else if (port == 8001 && mode == "normal") {
-        request_string =
-            "GET / HTTP/1.1\r\n\r\n\
-Host: localhost:8001\r\n\
-User-Agent: Go-http-client/1.1\r\n\
-Accept-Encoding: gzip\r\n\
-";
-    } else if (port == 8001 && mode == "chunked") {
-        request_string =
-            "POST /directory?id=3&hi=2 HTTP/1.1 \r\n\r\n\
-Host: localhost:8001 \r\n\
-User-Agent: Go-http-client/1.1\r\n\
-Transfer-Encoding: chunked\r\n\
-Content-Type: test/file\r\n\
-Accept-Encoding: gzip\r\n\
-\r\n\
-4\r\n\
-abcd\r\n\
-3\r\n\
-abc\r\n\
-0\r\n\
-\r\n\
-";
-    } else if (port == 8000 && mode == "chunked") {
-        request_string =
-            "POST /directory?id=3&hi=2 HTTP/1.1 \r\n\r\n\
-Host: localhost:8000 \r\n\
-User-Agent: Go-http-client/1.1\r\n\
-Transfer-Encoding: chunked\r\n\
-Content-Type: test/file\r\n\
-Accept-Encoding: gzip\r\n\
-0\r\n\
-\r\n\
-";
-    }
+    //     } else if (port == 8001 && mode == "normal") {
+    //         request_string =
+    //             "GET / HTTP/1.1\r\n\
+// Host: localhost:8001\r\n\
+// User-Agent: Go-http-client/1.1\r\n\
+// Accept-Encoding: gzip\r\n\
+// ";
+    //     } else if (port == 8001 && mode == "chunked") {
+    //         request_string =
+    //             "POST /directory?id=3&hi=2 HTTP/1.1 \r\n\
+// Host: localhost:8001 \r\n\
+// User-Agent: Go-http-client/1.1\r\n\
+// Transfer-Encoding: chunked\r\n\
+// Content-Type: test/file\r\n\
+// Accept-Encoding: gzip\r\n\
+// \r\n\
+// 4\r\n\
+// abcd\r\n\
+// 3\r\n\
+// abc\r\n\
+// 0\r\n\
+// \r\n\
+// ";
+    //     } else if (mode == "cs") {
+    //         request_string =
+    //             "POST /directory?id=3&hi=2 HTTP/1.1 \r\n\
+// Host: localhost:8000 \r\n\
+// User-Agent: Go-http-client/1.1\r\n\
+// Transfer-Encoding: chunked\r\n\
+// Content-Type: test/file\r\n\
+// Accept-Encoding: gzip\r\n\
+// \r\n\
+// 3\r\n\
+// abc\r\n\
+// \r\n\
+// ";
+    //     } else if (mode == "ce") {
+    //         request_string =
+    //             "POST /directory?id=3&hi=2 HTTP/1.1 \r\n\
+// Host: localhost:8000 \r\n\
+// User-Agent: Go-http-client/1.1\r\n\
+// Transfer-Encoding: chunked\r\n\
+// Content-Type: test/file\r\n\
+// Accept-Encoding: gzip\r\n\
+// \r\n\
+// 3\r\n\
+// def\r\n\
+// 0\r\n\
+// \r\n\
+// ";
+    //     }
 
+    std::cout << "req: [" << request_string << "]" << std::endl;
     send(sock, request_string.c_str(), request_string.length(), 0);
     std::cout << "send" << std::endl;
 
@@ -169,13 +186,90 @@ Accept-Encoding: gzip\r\n\
 }
 
 int main(int argc, char** argv) {
-    if (argc == 1) {
-        int port = choose_port();
-        std::cout << "port: " << port << std::endl;
-        send(port, "normal");
-    } else {
-        send(8001, "chunked");
-        // send(8000, "chunked");
-    }
+    // chunk
+    send(8001,
+         "POST /directory?id=3&hi=2 HTTP/1.1 \r\n\
+Host: localhost:8001 \r\n\
+User-Agent: Go-http-client/1.1\r\n\
+Transfer-Encoding: chunked\r\n\
+Content-Type: test/file\r\n\
+Accept-Encoding: gzip\r\n\
+\r\n\
+8\r\n\
+abcdefgh\r\n\
+3\r\n\
+hi\r\n\
+j\r\n\
+0\r\n\
+\r\n\
+");
+    //     send(8001,
+    //          "POST /directory?id=3&hi=2 HTTP/1.1 \r\n\
+// Host: localhost:8001 \r\n\
+// User-Agent: Go-http-client/1.1\r\n\
+// Transfer-Encoding: chunked\r\n\
+// Content-Type: test/file\r\n\
+// Accept-Encoding: gzip\r\n\
+// \r\n\
+// 4\r\n\
+// abcd\r\n\
+// 3\r\n\
+// \r\n\
+// e\r\n\
+// f\r\n\
+// g\r\n\
+// \r\n\
+// \r\n\
+// \r\n\
+// \r\n\
+// \r\n\
+// 0\r\n\
+// \r\n\
+// ");
+
+    //     send(8000,
+    //          "GET / HTTP/1.1\r\n\
+// Host: localhost:8000\r\n\
+// User-Agent: Go-http-client/1.1\r\n\
+// Accept-Encoding: gzip\r\n\
+//         \r\n");
+    //     send(8000,
+    //          "POST / HTTP/1.1\r\n\
+// Host: localhost:8000\r\n\
+// User-Agent: Go-http-client/1.1\r\n\
+// Transfer-Encoding: chunked\r\n\
+// Content-Type: test/file\r\n\
+// Accept-Encoding: gzip\r\n\
+// \r\n");
+    //     test(
+    //         "GET /directory HTTP/1.1\r\n\
+// Host: localhost:8000\r\n\
+// User-Agent: Go-http-client/1.1\r\n\
+// Accept-Encoding: gzip\r\n\
+//             \r\n");
+    //     test(
+    //         "GET /directory/youpi.bad_extension HTTP/1.1\r\n\
+// Host: localhost:8000\r\n\
+// User-Agent: Go-http-client/1.1\r\n\
+// Accept-Encoding: gzip\r\n\
+//             \r\n");
+    //     test(
+    //         "GET /directory/youpi.bla HTTP/1.1\r\n\
+// Host: localhost:8000\r\n\
+// User-Agent: Go-http-client/1.1\r\n\
+// Accept-Encoding: gzip\r\n\
+//             \r\n");
+    //     test(
+    //         "GET /directory/oulalala HTTP/1.1\r\n\
+// Host: localhost:8000\r\n\
+// User-Agent: Go-http-client/1.1\r\n\
+// Accept-Encoding: gzip\r\n\
+//             \r\n");
+    // }
+    //else {
+    //     int port = choose_port();
+    //     std::cout << "port: " << port << std::endl;
+    //     send(port, "normal");
+    // }
     return (0);
 }

@@ -27,19 +27,18 @@ int Webserver::setup(void) {
     std::vector<t_listen>::const_iterator listen_i = _listens_v.begin();
     for (; listen_i != _listens_v.end(); listen_i++) {
         WebserverProcess process(*listen_i, _config);
-
         if (process.setup() == -1) {
-            std::cout << "process setup error" << std::endl;
-            break;
+            std::cerr << RED << "Could not bind [" << listen_i->port << "]" << RESET << std::endl;
+        } else {
+            std::cout << GREEN << "Bind success [" << listen_i->port << "]" << RESET << std::endl;
         }
         _process_v.push_back(process);
         int socket_fd = process.getFd();
         FD_SET(socket_fd, &_fd_set);
-        std::cout << socket_fd << std::endl;
         if (socket_fd > _max_fd)
             _max_fd = socket_fd;
     }
-    std::cout << "setting 완료" << std::endl;
+    std::cout << YELLOW << " ----------------- setting 완료 ---------------- " << RESET << std::endl;
     return 0;
 };
 
@@ -47,6 +46,7 @@ int Webserver::run() {
     while (1) {
         int ret = 0;
         std::vector<WebserverProcess>::iterator process_it;
+        size_t flag = 1;
 
         while (ret == 0) {
             struct timeval timeout;
@@ -60,7 +60,6 @@ int Webserver::run() {
                 if (ready_to_response == true) {
                     std::cout << "make writing set" << std::endl;
                     int connected_fd = process_it->getConnectedFd();
-                    std::cout << connected_fd << std::endl;
                     FD_SET(connected_fd, &_writing_set);
                     if (_max_fd < connected_fd)
                         _max_fd = connected_fd;
@@ -68,10 +67,16 @@ int Webserver::run() {
             }
             ret = select(_max_fd + 1, &_reading_set, &_writing_set, NULL,
                          &timeout);
-            std::cout << "기다리는 중입니다." << ret << std::endl;
+            if (flag == 1) {
+                std::cout << "\r[" << ret << "] ....waiting...." << &std::flush;
+                flag = 0;
+            } else {
+                std::cout << "\r[" << ret << "] ..for change..." << &std::flush;
+                flag = 1;
+            }
         }
 
-        std::cout << "while문 탈출" << std::endl;
+        std::cout << "\r! something changed !" << std::endl;
         if (ret == -1) {
             std::cout << "===> select error!!" << std::endl;
             return -1;
@@ -99,21 +104,18 @@ int Webserver::run() {
         std::cout << "read 진입전" << std::endl;
 
         process_it = _process_v.begin();
-        // std::cout << "=> 1" << std::endl;
         for (; process_it != _process_v.end(); process_it++) {
-            // std::cout << "=> 2" << std::endl;
             int connected_fd = process_it->getConnectedFd();
-            // std::cout << "=> 3" << std::endl;
             if (connected_fd > 0 && FD_ISSET(connected_fd, &_reading_set)) {
                 std::cout << "read 실행" << std::endl;
                 FD_CLR(connected_fd, &_fd_set);
-                if (process_it->readRequest() == -1) {
+                int result = process_it->readRequest();
+                if (result == -1) {
                     std::cout << "read 에러" << std::endl;
                     return -1;
                 }
                 break;
             }
-            // std::cout << "=> 4" << std::endl;
         };
 
         // accept
@@ -153,25 +155,6 @@ void Webserver::handle_error(std::string const &error_message) {
     init();
     setup();
 }
-
-// tmp
-
-// std::vector<t_listen> Webserver::getListens() {
-//     std::vector<t_listen> _listens_v;
-
-//     t_listen listen_info;
-//     listen_info.port = 8000;
-//     listen_info.host = 0;
-
-//     t_listen listen_info2;
-//     listen_info2.port = 8001;
-//     listen_info2.host = 0;
-
-//     _listens_v.push_back(listen_info);
-//     _listens_v.push_back(listen_info2);
-
-//     return _listens_v;
-// };
 
 // occf
 Webserver::Webserver(void) { init(); }

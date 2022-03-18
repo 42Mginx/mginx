@@ -62,7 +62,6 @@ void Request::parseProcess(std::string request_value) {
     // std::cout << _query << std::endl;
     // std::cout << _version << std::endl;
 
-    i += 2;
     //헤더 파싱(에러, \r, 빈문자열시 break)
     while ((line = readLine(request_value, i)) != "\r" && line != "" && _status_code != 400) {
         // key 읽어줌
