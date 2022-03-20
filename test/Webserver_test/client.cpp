@@ -187,22 +187,22 @@ void send(int port, std::string request_string) {
 
 int main(int argc, char** argv) {
     // chunk
-    send(8001,
-         "POST /directory?id=3&hi=2 HTTP/1.1 \r\n\
-Host: localhost:8001 \r\n\
-User-Agent: Go-http-client/1.1\r\n\
-Transfer-Encoding: chunked\r\n\
-Content-Type: test/file\r\n\
-Accept-Encoding: gzip\r\n\
-\r\n\
-8\r\n\
-abcdefgh\r\n\
-3\r\n\
-hi\r\n\
-j\r\n\
-0\r\n\
-\r\n\
-");
+    //     send(8001,
+    //          "POST /directory?id=3&hi=2 HTTP/1.1 \r\n\
+// Host: localhost:8001 \r\n\
+// User-Agent: Go-http-client/1.1\r\n\
+// Transfer-Encoding: chunked\r\n\
+// Content-Type: test/file\r\n\
+// Accept-Encoding: gzip\r\n\
+// \r\n\
+// 8\r\n\
+// abcdefgh\r\n\
+// 3\r\n\
+// hi\r\n\
+// j\r\n\
+// 0\r\n\
+// \r\n\
+// ");
     //     send(8001,
     //          "POST /directory?id=3&hi=2 HTTP/1.1 \r\n\
 // Host: localhost:8001 \r\n\
@@ -240,36 +240,35 @@ j\r\n\
 // Transfer-Encoding: chunked\r\n\
 // Content-Type: test/file\r\n\
 // Accept-Encoding: gzip\r\n\
-// \r\n");
-    //     test(
+// \r\n\
+// 0\r\n\
+// \r\n\
+// ");
+    //     send(
+    //         8000,
     //         "GET /directory HTTP/1.1\r\n\
 // Host: localhost:8000\r\n\
 // User-Agent: Go-http-client/1.1\r\n\
 // Accept-Encoding: gzip\r\n\
 //             \r\n");
-    //     test(
-    //         "GET /directory/youpi.bad_extension HTTP/1.1\r\n\
+    //     send(8000,
+    //          "GET /directory/youpi.bad_extension HTTP/1.1\r\n\
 // Host: localhost:8000\r\n\
 // User-Agent: Go-http-client/1.1\r\n\
 // Accept-Encoding: gzip\r\n\
 //             \r\n");
-    //     test(
-    //         "GET /directory/youpi.bla HTTP/1.1\r\n\
+    //     send(8000,
+    //          "GET /directory/youpi.bla HTTP/1.1\r\n\
 // Host: localhost:8000\r\n\
 // User-Agent: Go-http-client/1.1\r\n\
 // Accept-Encoding: gzip\r\n\
 //             \r\n");
-    //     test(
-    //         "GET /directory/oulalala HTTP/1.1\r\n\
-// Host: localhost:8000\r\n\
-// User-Agent: Go-http-client/1.1\r\n\
-// Accept-Encoding: gzip\r\n\
-//             \r\n");
-    // }
-    //else {
-    //     int port = choose_port();
-    //     std::cout << "port: " << port << std::endl;
-    //     send(port, "normal");
-    // }
+    send(8000,
+         "GET /directory/oulalala HTTP/1.1\r\n\
+Host: localhost:8000\r\n\
+User-Agent: Go-http-client/1.1\r\n\
+Accept-Encoding: gzip\r\n\
+            \r\n");
+
     return (0);
 }
