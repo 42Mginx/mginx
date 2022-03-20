@@ -2,13 +2,14 @@
 
 Config::Config()
 {
-	// _defaultConf = parseProcess(DEFAULT_CONFIG_PATH);
+	_initDefaultServer(DEFAULT_CONFIG_PATH);
 }
 
 Config::Config(std::string config_path)
 {
-	// _defaultConf = parseProcess(DEFAULT_CONFIG_PATH);
+	_initDefaultServer(DEFAULT_CONFIG_PATH);
 	parseProcess(config_path);
+	parseAllListens();
 }
 
 Config::~Config() {}
@@ -33,7 +34,7 @@ int			Config::parseProcess(std::string config_path)
 				std::cerr << "Error: error in config file [" << config_path << "]" <<  std::endl;
 				return 1;
 			}
-			this->_serverBlock.push_back(tmpServerBlock);
+			this->_serverBlocks.push_back(tmpServerBlock);
 		}
 		else {
 			std::cerr << "Error: unknown directive [" << file[i] << "]" << std::endl;
@@ -41,6 +42,29 @@ int			Config::parseProcess(std::string config_path)
 		}
 	}
 	return 0;
+}
+
+// default conf 읽고 파싱해서 ServerBlock클래스 공통 멤버변수 _defaultConf에 넣어줌
+ServerBlock		Config::_initDefaultServer(const char *filename) {
+	ServerBlock	server;
+	fileVector		file;
+
+	// file 읽어줌
+	file = readFile(filename);
+	if (file.empty()) {
+		std::cerr << "Could not open default file at location [" << filename << "]" << std::endl;
+		// throw FileNotFoundException();
+	}
+	fileVector	begin;
+	unsigned int	index = 0;
+	// 파일 내용 파싱하고 잘못되면 에러처리
+	if (!server.parseServerBlock(index, file)) {
+		std::cerr << "Invalid default config file." << std::endl;
+		// throw ServerBlock::ExceptionInvalidArguments();
+	}
+	// ServerBlock class공통(static) _defaultConf에 server(원본 파일 내용이 인자값으로 있는 것) 넣어줌
+	_defaultConf = server;
+	return server;
 }
 
 // file 이름 받아서 읽은 값을 '띄어쓰기 엔터랑 탭' 단위로 쪼개서 vector에 넣어준 후 리턴해줌
@@ -115,17 +139,38 @@ fileVector				Config::split(std::string str, std::string charset)
 	return tokens;
 }
 
-void				Config::getDefaultConf()
+std::vector<t_listen>				Config::parseAllListens() const
+{
+	std::vector<t_listen>	allListens;
+
+	// 서버블록을 순환
+	for (std::vector<ServerBlock>::const_iterator serverBlock = _serverBlocks.begin(); serverBlock != _serverBlocks.end(); serverBlock++) {
+		// listen 백터를 순환
+		std::vector<t_listen>	listenVec = serverBlock->getListen();
+		for (std::vector<t_listen>::iterator listen = listenVec.begin(); listen != listenVec.end(); listen++) {
+			std::vector<t_listen>::iterator i = allListens.begin();
+			for ( ; i != allListens.end(); i++)
+				if (listen->host == i->host && listen->port == i->port)
+					break ;
+			if (i == allListens.end())
+				allListens.push_back(*listen);
+		}
+	}
+	return allListens;
+}
+
+
+ServerBlock				Config::getDefaultConf()
 {
 	return this->_defaultConf;
 }
 
-void				Config::getServerBlock()
+std::vector<ServerBlock>				Config::getServerBlock()
 {
-	return this->_serverBlock;
+	return this->_serverBlocks;
 }
 
-void				Config::getAllListens()
+std::vector<t_listen>				Config::getAllListens()
 {
 	return this->_allListens;
 }
