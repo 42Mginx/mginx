@@ -1,78 +1,74 @@
 PWD = $(shell pwd)
 
-all: client.cpp mginx.cpp Webserver.cpp WebserverProcess.cpp Request.cpp RequestUtil.cpp Response.cpp Config.cpp ServerBlock.cpp
-	clang++ -o client client.cpp
-	clang++ -o server Webserver.cpp WebserverProcess.cpp mginx.cpp Request.cpp RequestUtil.cpp Response.cpp Config.cpp ServerBlock.cpp
+NAME = webserv
+
+CC = clang++
+
+CFLAGS = -Wall -Wextra -Werror -g -std=c++98
+
+CLASSES = -I config -I request -I response -I webserver -I utils
+
+##############
+### sources ##
+##############
+
+MAIN = mginx
+
+HEADER = mginx.hpp
+
+WEBSERVER = Webserver WebserverProcess
+
+CONFIG = Config ServerBlock
+
+REQUEST = Request RequestUtil
+
+RESPONSE = Response
+
+SRCS = $(addsuffix .cpp, $(MAIN)) \
+	$(addprefix webserver/, $(addsuffix .cpp, $(WEBSERVER))) \
+	$(addprefix config/, $(addsuffix .cpp, $(CONFIG))) \
+	$(addprefix request/, $(addsuffix .cpp, $(REQUEST))) \
+	$(addprefix response/, $(addsuffix .cpp, $(RESPONSE))) \
+
+
+OBJ_DIR = obj
+
+OBJ_SUBDIR = $(addprefix $(OBJ_DIR)/, config request response webserver)
+
+OBJS = $(addprefix $(OBJ_DIR)/, $(SRCS:.cpp=.o))
+
+all: $(NAME) 
+		$(CC) -o client client.cpp
+
+
+$(NAME): $(OBJ_DIR) $(OBJS)
+		$(CC) -I. -o $(NAME) $(OBJS)
+
+$(OBJ_DIR)/%.o: ./%.cpp
+		@printf "\033[0;33mGenerating objects... %-38.38s\r" $@
+		@$(CC) $(CLASSES) -o $@ -c $<
+
+$(OBJ_DIR):
+	echo "make dir"
+	@mkdir -p $(OBJ_DIR)
+	@mkdir -p $(OBJ_SUBDIR)
 
 clean:
-	rm -rf client
-	rm -rf server
+	echo "clean"
+	rm -rf $(OBJ_DIR) $(OBJ_SUBDIR)
 
 
 fclean: clean
+	rm -rf $(NAME)
+	rm -rf client
 	echo "fclean"
 
 re: fclean all
 
-test:
-	# ./server
-	# ./client
-	@osascript -e 'tell application "Terminal" to do script "cd $(PWD) && clear && ./server"'
+
+test: re
+	./webserv abc
+	# @osascript -e 'tell application "Terminal" to do script "cd $(PWD) && clear && ./server"'
 
 
 .PHONY: all clean fclean re test
-
-
-
-
-# NAME = webserv
-
-# CC = clang++
-
-# CFLAGS = -Wall -Wextra -Werror -g -std=c++98# -fsanitize=address
-
-# SRC = client.cpp\
-# 		server.cpp
-
-
-# SRC_DIR =
-
-
-# OBJ_DIR = objs
-
-# OBJ_BUILD = $(addprefix $(OBJ_DIR)/, $(SRC:cpp=o))
-
-# all: $(NAME)
-
-# $(NAME): $(OBJ_DIR) $(OBJ_BUILD)
-# 	@echo "\n"
-# 	@echo "\033[0;32mCompiling webserv..."
-# 	@$(CC) $(CFLAGS) -o $(NAME) $(OBJ_BUILD)
-# 	@echo "\n\033[0mDone !"
-
-# $(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp 
-# 	@printf "\033[0;33mGenerating webserv objects... %-38.38s\r" $@
-# 	@$(CC) $(CFLAGS) -o $@ -c $<
-
-# $(OBJ_DIR):
-# 	@mkdir -p $(OBJ_DIR)
-
-
-
-# clean:
-# 	@echo "\n\033[0;31mDeleting objects..."
-# 	@rm -rf $(OBJ_DIR)
-# 	@echo "\033[0m"
-
-# fclean: clean
-# 	@echo "\033[0;31mDeleting executable..."
-# 	@rm -f $(NAME)
-
-# re: fclean all
-
-
-
-
-
-# test: all
-# 	@asascript -e 'tell application "Termainal" to do script "cd $(PWD) && clear && ./'
