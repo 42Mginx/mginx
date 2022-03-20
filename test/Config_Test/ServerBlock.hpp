@@ -36,13 +36,13 @@ class ServerBlock {
 		std::string					getRoot()						const;
 		std::set<std::string>		getAllowedMethods()				const;
 		std::map<int, std::string>	getErrorPage()					const;
+		std::vector<std::string>	getIndex()						const;
 		int							getClientBodyBufferSize()		const;
 		bool						getAutoIndex()					const;
 
 		std::map<std::string, ServerBlock>	getLocation()			const;
 		std::map<std::string, std::string>	getCgiParam()			const;
 		std::string							getCgiPass()			const;
-		std::vector<std::string>			getIndex()				const;
 		std::string							getAlias()				const;
 		bool								getAliasSet()			const;
 

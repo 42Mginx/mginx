@@ -7,7 +7,6 @@ int main(void)
 	std::string request_value;
 
 	request_value = "POST /directory?id=3&hi=2 HTTP/1.1 \r\n\
-\r\n\
 Host: localhost:8000 \r\n\
 dongslee: baboo\r\n\
 User-Agent: Go-http-client/1.1\r\n\

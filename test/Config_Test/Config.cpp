@@ -81,7 +81,8 @@ fileVector	Config::readFile(std::string config_path_str) {
 
 //charset안의 char(한 단어단어)와 일치하는 부분 단위로 string으로 쪼개서 fileVector에 넣어 리턴해줌
 
-fileVector				Config::split(std::string str, std::string charset) {
+fileVector				Config::split(std::string str, std::string charset)
+{
 	fileVector	tokens;
 
 	// str에 charset[0] 추가
@@ -112,4 +113,19 @@ fileVector				Config::split(std::string str, std::string charset) {
 	}
 	// 토큰 리턴
 	return tokens;
+}
+
+void				Config::getDefaultConf()
+{
+	return this->_defaultConf;
+}
+
+void				Config::getServerBlock()
+{
+	return this->_serverBlock;
+}
+
+void				Config::getAllListens()
+{
+	return this->_allListens;
 }
