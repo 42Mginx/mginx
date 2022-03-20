@@ -305,7 +305,6 @@ int ServerBlock::parseServerBlock(unsigned int &index, fileVector &file)
 	//directivesParseFunc을 돌면서 관련 명령어가 있는 지 파싱
 	for (; index < file.size() && file[index] != "}"; index++)
 	{
-
 		std::cout << index << ": " << file[index] << std::endl;
 		// directivesParseFunc에 file[index]에 해당하는 것이 없을 경우
 		if ((iter = directivesParseFunc.find(file[index])) == directivesParseFunc.end())
