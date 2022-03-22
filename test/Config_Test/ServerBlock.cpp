@@ -305,7 +305,6 @@ int ServerBlock::parseServerBlock(unsigned int &index, fileVector &file)
 	//directivesParseFunc을 돌면서 관련 명령어가 있는 지 파싱
 	for (; index < file.size() && file[index] != "}"; index++)
 	{
-
 		std::cout << index << ": " << file[index] << std::endl;
 		// directivesParseFunc에 file[index]에 해당하는 것이 없을 경우
 		if ((iter = directivesParseFunc.find(file[index])) == directivesParseFunc.end())
@@ -364,14 +363,7 @@ int ServerBlock::parseServerBlock(unsigned int &index, fileVector &file)
 		(this->*ServerBlock::directivesParseFunc[directive])(args);
 	//  해당 서버 디렉토리스가 파싱이 끝났다면('}'을 만났다면)
 	if (!file[index].compare("}"))
-	{
-		// // 혹시나 빈 값 defaultServer conf값으로 채워줌
-		// ServerBlock::_defaultServer.passMembers(*this);
-		// // location도 돌면서 값 채워줌
-		// for (std::map<std::string, ServerBlock>::iterator i = _location.begin() ; i != _location.end(); i++)
-		// 	passMembers(i->second);
 		return 1;
-	}
 	return 0;
 };
 
