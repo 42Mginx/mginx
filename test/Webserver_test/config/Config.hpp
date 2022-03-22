@@ -8,14 +8,16 @@
 #include "listen.hpp"
 
 class Config {
-    std::map<std::string, ServerBlock> _server_block;
+    std::vector<ServerBlock> _server_block;
 
    public:
     Config();
+    Config(std::string config_path);
+    ~Config();
 
     void parseProcess(std::string config_path);
     std::vector<t_listen> getAllListens();
-    std::map<std::string, ServerBlock> getServerBlock();
+    std::vector<ServerBlock> getServerBlock();
 };
 
 #endif

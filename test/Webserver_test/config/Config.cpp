@@ -1,11 +1,24 @@
 
 #include "Config.hpp"
-Config::Config() {}
+
+Config::Config() {
+    // _defaultConf = parseProcess(DEFAULT_CONFIG_PATH);
+}
+
+Config::Config(std::string config_path) {
+    // _defaultConf = parseProcess(DEFAULT_CONFIG_PATH);
+    parseProcess(config_path);
+}
+
 void Config::parseProcess(std::string config_path) {
-    ServerBlock a("localhost:8000", "8000");
-    ServerBlock b("localhost:8001", "8001");
-    _server_block.insert(std::make_pair("localhost:8000", a));
-    _server_block.insert(std::make_pair("localhost:8001", b));
+    std::vector<std::string> name_list;
+    name_list.push_back("a");
+    name_list.push_back("b");
+    name_list.push_back("c");
+    ServerBlock a(name_list, "8000");
+    ServerBlock b(name_list, "8001");
+    _server_block.push_back(a);
+    _server_block.push_back(b);
 }
 
 std::vector<t_listen> Config::getAllListens() {
@@ -25,6 +38,8 @@ std::vector<t_listen> Config::getAllListens() {
     return listens_v;
 };
 
-std::map<std::string, ServerBlock> Config::getServerBlock() {
+std::vector<ServerBlock> Config::getServerBlock() {
     return _server_block;
 }
+
+Config::~Config() {}
