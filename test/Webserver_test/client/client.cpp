@@ -18,49 +18,39 @@
 #define BUF_SIZE 4096
 
 int choose_port(void) {
-    std::string choice;
+    std::string input;
 
     std::cout << YELLOW << "Choose PORT :" << std::endl;
     std::cout << "(a) 8000" << std::endl;
-    std::cout << "(b) 8001" << std::endl;
-    getline(std::cin, choice);
+    std::cout << "(b) 8001" << RESET << std::endl;
+    getline(std::cin, input);
 
-    if (choice == "a")
+    if (input == "a") {
         return (8000);
-    else if (choice == "b")
+    } else if (input == "b") {
         return (8001);
-    return (8000);
+    } else {
+        return (8000);
+    }
 }
 
 std::string choose_method(void) {
-    std::string choice;
+    std::string input;
 
     std::cout << std::endl
               << YELLOW << "Choose METHOD :" << std::endl;
     std::cout << "(a) GET" << std::endl;
-    std::cout << "(b) HEAD" << std::endl;
     std::cout << "(c) POST" << std::endl;
-    std::cout << "(d) PUT" << std::endl;
-    std::cout << "(e) DELETE" << std::endl;
-    std::cout << "(f) OPTIONS" << std::endl;
-    std::cout << "(g) TRACE" << RESET << std::endl;
-    getline(std::cin, choice);
+    std::cout << "(e) DELETE" << RESET << std::endl;
+    getline(std::cin, input);
 
-    if (choice == "a")
-        return ("get/GET");
-    else if (choice == "b")
-        return ("head/HEAD");
-    else if (choice == "c")
-        return ("post/POST");
-    else if (choice == "d")
-        return ("put/PUT");
-    else if (choice == "e")
-        return ("delete/DELETE");
-    else if (choice == "f")
-        return ("options/OPTIONS");
-    else if (choice == "g")
-        return ("trace/TRACE");
-    return ("get/GET");
+    if (input == "a")
+        return ("GET");
+    else if (input == "b")
+        return ("POST");
+    else if (input == "c")
+        return ("DELETE");
+    return ("GET");
 }
 
 std::string choose_target(int cgi) {
@@ -186,6 +176,17 @@ void send(int port, std::string request_string) {
 }
 
 int main(int argc, char** argv) {
+    int port;
+    std::string req_string;
+    std::string method;
+
+    while (1) {
+        port = choose_port();
+        std::cout << "=> port : " << port << std::endl;
+        method = choose_method();
+        std::cout << "=> method : " << method << std::endl;
+        // send();
+    }
     // chunk
     //     send(8001,
     //          "POST /directory?id=3&hi=2 HTTP/1.1 \r\n\
@@ -263,12 +264,12 @@ int main(int argc, char** argv) {
 // User-Agent: Go-http-client/1.1\r\n\
 // Accept-Encoding: gzip\r\n\
 //             \r\n");
-    send(8000,
-         "GET /directory/oulalala HTTP/1.1\r\n\
-Host: localhost:8000\r\n\
-User-Agent: Go-http-client/1.1\r\n\
-Accept-Encoding: gzip\r\n\
-            \r\n");
+    //     send(8000,
+    //          "GET /directory/oulalala HTTP/1.1\r\n\
+// Host: localhost:8000\r\n\
+// User-Agent: Go-http-client/1.1\r\n\
+// Accept-Encoding: gzip\r\n\
+//             \r\n");
 
     return (0);
 }

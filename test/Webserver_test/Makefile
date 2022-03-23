@@ -37,38 +37,37 @@ OBJ_SUBDIR = $(addprefix $(OBJ_DIR)/, config request response webserver)
 
 OBJS = $(addprefix $(OBJ_DIR)/, $(SRCS:.cpp=.o))
 
+CLIENT_DIR = client
+
 all: $(NAME) 
-		$(CC) -o client client.cpp
 
-
-$(NAME): $(OBJ_DIR) $(OBJS)
-		$(CC) -I. -o $(NAME) $(OBJS)
+$(NAME): $(CLIENT) $(OBJ_DIR) $(OBJS)
+		@$(MAKE) -C $(CLIENT_DIR) re
+		@$(CC) -I. -o $(NAME) $(OBJS)
 
 $(OBJ_DIR)/%.o: ./%.cpp
 		@printf "\033[0;33mGenerating objects... %-38.38s\r" $@
 		@$(CC) $(CLASSES) -o $@ -c $<
 
 $(OBJ_DIR):
-	echo "make dir"
 	@mkdir -p $(OBJ_DIR)
 	@mkdir -p $(OBJ_SUBDIR)
 
+
 clean:
-	echo "clean"
-	rm -rf $(OBJ_DIR) $(OBJ_SUBDIR)
+	@rm -rf $(OBJ_DIR) $(OBJ_SUBDIR)
+	@$(MAKE) -C $(CLIENT_DIR) clean
 
 
 fclean: clean
-	rm -rf $(NAME)
-	rm -rf client
-	echo "fclean"
+	@rm -rf $(NAME)
+	@$(MAKE) -C $(CLIENT_DIR) fclean
 
 re: fclean all
 
-
 test: re
-	./webserv abc
-	# @osascript -e 'tell application "Terminal" to do script "cd $(PWD) && clear && ./server"'
+	osascript -e 'tell application "Terminal" to do script "cd $(PWD) && clear && ./client/client"'
+	@./webserv default.conf
 
 
 .PHONY: all clean fclean re test
