@@ -48,9 +48,9 @@ int WebserverProcess::readRequest(void) {
             ret = RETURN_WAIT;
         }
         std::string key = "Content-Length: ";
-        int content_len_location = getKeyLocation(key);
-        if (content_len_location != -1) {
-            size_t body_size = std::atoi(_req.substr(content_len_location + key.size(), 10).c_str());
+        int content_len_index = findKeyIndex(key);
+        if (content_len_index != -1) {
+            size_t body_size = std::atoi(_req.substr(content_len_index + key.size(), 10).c_str());
             size_t total_size = body_size + header_index + 4;
             if (_req.size() >= total_size) {
                 std::cout << "prepared to proceed" << std::endl;
@@ -83,8 +83,8 @@ int WebserverProcess::readRequest(void) {
 
 int WebserverProcess::process(void) {
     // 0. chuncked 뒤에 chundked가 온 경우
-    int chunked_location = _req.find("Transfer-Encoding: chunked");
-    if (chunked_location != std::string::npos && chunked_location < _req.find("\r\n\r\n")) {
+    int chunked_index = _req.find("Transfer-Encoding: chunked");
+    if (chunked_index != std::string::npos && chunked_index < _req.find("\r\n\r\n")) {
         decodeChunk();
 
         // if (chunked_body != "") {
@@ -96,8 +96,25 @@ int WebserverProcess::process(void) {
     _request.parseProcess(_req);
 
     // 2. config 에서 맞는 server block 찾아서 넘기기
-    ServerBlock const *server_block = getServerBlock();
-    _response.run(_request, *server_block);
+    ServerBlock server_block = findServerBlock();
+
+    // ========= check ========
+    std::cout << "check server block" << std::endl;
+    std::vector<std::string> server_name = server_block.getServerName();
+    std::vector<std::string>::iterator server_name_it = server_name.begin();
+    if (server_name_it == server_name.end()) {
+        std::cout << "??????" << std::endl;
+    }
+    for (; server_name_it != server_name.end(); server_name_it++) {
+        std::cout << "==> server names: " << *server_name_it << std::endl;
+    }
+    std::vector<t_listen> listens = server_block.getListen();
+    std::vector<t_listen>::iterator listen_it = listens.begin();
+    for (; listen_it != listens.end(); listen_it++) {
+        std::cout << "==> listnes: " << listen_it->host << "," << listen_it->port << std::endl;
+    }
+
+    _response.run(_request, server_block);
     // 3. make response
     _res = _response.getResponse();
     if (_res.empty()) {
@@ -136,15 +153,11 @@ void WebserverProcess::setAddr(void) {
     _addr.sin_port = htons(_listen_info.port);
 };
 
-std::string WebserverProcess::getSubStr(std::string origin, std::string word) {
-    return origin;
-}
-
-int WebserverProcess::getKeyLocation(std::string key) {
-    int location = _req.find(key);
-    if (location == std::string::npos)
+int WebserverProcess::findKeyIndex(std::string key) {
+    int index = _req.find(key);
+    if (index == std::string::npos)
         return -1;
-    return location;
+    return index;
 }
 
 bool WebserverProcess::isChunked(void) {
@@ -169,7 +182,17 @@ bool WebserverProcess::isFinalChunked(void) {
     return true;
 };
 
-// TODO: 청크 파일 모아주는 함수
+bool WebserverProcess::listenMatched(std::vector<t_listen> listens) {
+    std::vector<t_listen>::iterator it = listens.begin();
+    for (; it != listens.end(); it++) {
+        if (it->port == _listen_info.port && it->host == _listen_info.host) {
+            std::cout << "listen matched!!(" << _listen_info.port << "," << _listen_info.host << ")" << std::endl;
+            return true;
+        }
+    }
+    return false;
+}
+
 void WebserverProcess::decodeChunk() {
     std::string chunk = _req;
     std::string head = chunk.substr(0, chunk.find("\r\n\r\n"));
@@ -221,38 +244,40 @@ void WebserverProcess::decodeChunk() {
     }
 };
 
-ServerBlock const *WebserverProcess::getServerBlock() {
+ServerBlock WebserverProcess::findServerBlock() {
     // 1. getHeaders에서 host가져오기(request)
     std::map<std::string, std::string> const &header = _request.getHeaders();
-    std::string host = header.find("Host")->second;
-    host = host.substr(0, host.find(':'));
-    int port = _listen_info.port;
-
+    std::string req_host = header.find("Host")->second;
+    req_host = req_host.substr(0, req_host.find(':'));
     std::vector<ServerBlock> server_blocks = _config->getServerBlock();
+    ServerBlock *ret = NULL;
 
     // 사전조건: port가 일치하는 것만 후보가 될 수 있음
     // 1.이름이랑 포트 넘버로 먼저 찾아봄 request에 있는 host와 server block의 server name을 비교하기(둘다 맞는 걸로 찾음)
+    std::cout
+        << "req_host: "
+        << req_host
+        << std::endl;
     std::vector<ServerBlock>::iterator it = server_blocks.begin();
     for (; it != server_blocks.end(); it++) {
         std::vector<std::string> server_name = it->getServerName();
         std::vector<std::string>::iterator server_name_it = server_name.begin();
         for (; server_name_it != server_name.end(); server_name_it++) {
-            if (*server_name_it == host && it->getListen() == std::to_string(port)) {
-                std::cout << "=> find by servername" << std::endl;
-                return &(*it);
+            if (*server_name_it == req_host && listenMatched(it->getListen())) {
+                std::cout << "=> find by servername " << *server_name_it << std::endl;
+                return *it;
             }
         }
     }
     // 2. 없으면 listen으로 찾아봄(가장 첫번째 일치하는 것으로 결정함-default)
     it = server_blocks.begin();
     for (; it != server_blocks.end(); it++) {
-        std::cout << it->getListen() << std::endl;
-        if (std::to_string(_listen_info.port) == it->getListen()) {
+        if (listenMatched(it->getListen())) {
             std::cout << "=> find by ip address - the first one be a default" << std::endl;
-            return &(*it);
+            ret = &(*it);
         }
     }
-    return NULL;
+    return *ret;
 }
 
 // getter

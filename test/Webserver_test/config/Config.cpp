@@ -12,11 +12,27 @@ Config::Config(std::string config_path) {
 
 void Config::parseProcess(std::string config_path) {
     std::vector<std::string> name_list;
-    name_list.push_back("a");
-    name_list.push_back("b");
-    name_list.push_back("c");
-    ServerBlock a(name_list, "8000");
-    ServerBlock b(name_list, "8001");
+    name_list.push_back("something");
+    name_list.push_back("banana");
+    name_list.push_back("localhost");
+
+    std::vector<t_listen> listen1;
+    t_listen listen;
+    listen.port = 8000;
+    listen.host = 0;
+    listen1.push_back(listen);
+    listen.port = 8001;
+    listen.host = 0;
+    listen1.push_back(listen);
+
+    std::vector<t_listen> listen2;
+    listen.port = 8002;
+    listen.host = 0;
+    listen2.push_back(listen);
+    listen2.push_back(listen);
+
+    ServerBlock a(name_list, listen1);
+    ServerBlock b(name_list, listen2);
     _server_block.push_back(a);
     _server_block.push_back(b);
 }
