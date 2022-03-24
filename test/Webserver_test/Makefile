@@ -18,7 +18,7 @@ HEADER = mginx.hpp
 
 WEBSERVER = Webserver WebserverProcess
 
-CONFIG = Config ServerBlock
+CONFIG = Config ConfigUtil ServerBlock
 
 REQUEST = Request RequestUtil
 
@@ -67,7 +67,7 @@ re: fclean all
 
 test: re
 	osascript -e 'tell application "Terminal" to do script "cd $(PWD) && clear && ./client/client"'
-	@./webserv default.conf
+	@./webserv ./test/conf/mac.conf
 
 
 .PHONY: all clean fclean re test

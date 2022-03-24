@@ -4,6 +4,7 @@
 
 void Webserver::parseConfig(std::string config_path) {
     _config.parseProcess(config_path);
+    std::cout << "testing// after parse conf" << std::endl;
 }
 
 void Webserver::init() {
@@ -25,8 +26,12 @@ void Webserver::init() {
 
 int Webserver::setup(void) {
     std::vector<t_listen>::const_iterator listen_i = _listens_v.begin();
+    if (listen_i == _listens_v.end()) {
+        std::cout << "listens is empty" << std::endl;
+    }
     for (; listen_i != _listens_v.end(); listen_i++) {
         WebserverProcess process(*listen_i, _config);
+        std::cout << listen_i->host << ": " << listen_i->port << std::endl;
         if (process.setup() == -1) {
             std::cerr << RED << "Could not bind [" << listen_i->port << "]" << RESET << std::endl;
         } else {

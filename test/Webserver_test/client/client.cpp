@@ -154,7 +154,7 @@ int main(int argc, char** argv) {
         method = choose_method();
         option = choose_option(method);
         filename += get_filename(method, option);
-        std::cout << filename << std::endl;
+        std::cout << "filename: " << filename << std::endl;
         send(port, filename);
     }
 
