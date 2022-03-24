@@ -15,80 +15,96 @@
 #define YELLOW "\033[33m"
 #define RESET "\033[0m"
 
+#define GET 1
+#define POST 2
+#define DELETE 3
+
 #define BUF_SIZE 4096
 
 int choose_port(void) {
     std::string input;
 
-    std::cout << YELLOW << "Choose PORT :" << std::endl;
-    std::cout << "(a) 8000" << std::endl;
-    std::cout << "(b) 8001" << RESET << std::endl;
+    std::cout << YELLOW << "[ Choose PORT ]" << std::endl;
+    std::cout << "1) 8000" << std::endl;
+    std::cout << "2) 8001" << RESET << std::endl;
     getline(std::cin, input);
 
-    if (input == "a") {
+    if (input == "1") {
         return (8000);
-    } else if (input == "b") {
+    } else if (input == "2") {
         return (8001);
     } else {
         return (8000);
     }
 }
 
-std::string choose_method(void) {
+int choose_method(void) {
     std::string input;
 
     std::cout << std::endl
-              << YELLOW << "Choose METHOD :" << std::endl;
-    std::cout << "(a) GET" << std::endl;
-    std::cout << "(c) POST" << std::endl;
-    std::cout << "(e) DELETE" << RESET << std::endl;
+              << YELLOW << "[ Choose METHOD ]" << std::endl;
+    std::cout << "1) GET" << std::endl;
+    std::cout << "2) POST" << std::endl;
+    std::cout << "3) DELETE" << RESET << std::endl;
     getline(std::cin, input);
 
-    if (input == "a")
-        return ("GET");
-    else if (input == "b")
-        return ("POST");
-    else if (input == "c")
-        return ("DELETE");
-    return ("GET");
+    if (input == "1")
+        return (GET);
+    else if (input == "2")
+        return (POST);
+    else if (input == "3")
+        return (DELETE);
+    return (GET);
 }
 
-std::string choose_target(int cgi) {
-    std::string choice;
+std::string choose_option(int method) {
+    std::string input;
 
     std::cout << std::endl
-              << YELLOW << "Choose TARGET FILE :" << std::endl;
-    std::cout << "(a) Exists" << std::endl;
-    std::cout << "(b) Doesn't exist" << std::endl;
-    std::cout << "(c) Wrong permissions" << std::endl;
-    std::cout << "(d) Bad request" << RESET << std::endl;
-    if (cgi)
-        std::cout << YELLOW << "(e) CGI (on)" << RESET << std::endl;
+              << YELLOW << "[ Choose the OPTION ]" << std::endl;
+    std::cout << "1) Simple" << std::endl;
+    std::cout << "2) Bad request" << RESET << std::endl;
+    if (method != DELETE) {
+        std::cout << YELLOW << "3) CGI" << RESET << std::endl;
+    }
+    if (method == POST) {
+        std::cout << YELLOW << "4) Chunked" << RESET << std::endl;
+    }
 
-    getline(std::cin, choice);
+    getline(std::cin, input);
 
-    if (choice == "a")
-        return ("_example");
-    else if (choice == "b")
-        return ("_nofile");
-    else if (choice == "c")
-        return ("_permission");
-    else if (choice == "d")
+    if (input == "1")
+        return ("_simple");
+    else if (input == "2")
         return ("_bad");
-    else if (cgi && choice == "e")
+    else if (method != DELETE && input == "3")
         return ("_cgi");
-    return ("_example");
+    else if (method == POST && input == "4")
+        return ("_chunked");
+
+    return ("_simple");
 }
 
-void send(int port, std::string request_string) {
+void send(int port, std::string filename) {
     int sock;
     struct sockaddr_in serv_addr;
     char buffer[BUF_SIZE] = {
         0,
     };
+    std::fstream file;
+    std::string request_string;
+
+    // get req string
+    file.open(filename);
+    request_string.assign(std::istreambuf_iterator<char>(file), std::istreambuf_iterator<char>());
+    file.close();
+    request_string += "\r\n";
+    std::cout << "req: [" << request_string << "]" << std::endl;
 
     sock = socket(AF_INET, SOCK_STREAM, 0);
-
+    if (sock < 0) {
+        std::cerr << "// Client socket creation failed //" << std::endl;
+    }
     memset(&serv_addr, 0, sizeof(serv_addr));
     serv_addr.sin_family = AF_INET;
     serv_addr.sin_addr.s_addr = htonl(INADDR_ANY);
@@ -96,72 +112,13 @@ void send(int port, std::string request_string) {
 
     int ret = connect(sock, (struct sockaddr*)&serv_addr,
                       sizeof(serv_addr));  // 내부에서 2번 악수
-    std::cout << "connect " << ret << std::endl;
-    // std::string request_string = "?";
+    if (ret < 0) {
+        std::cerr << "// Connection failed //" << std::endl;
+    }
+    std::cout << "=> connect " << ret << std::endl;
 
-    //     if (port == 8000 && mode == "normal") {
-    //         request_string =
-    //             "GET / HTTP/1.1\r\n\
-// Host: localhost:8000\r\n\
-// User-Agent: Go-http-client/1.1\r\n\
-// Accept-Encoding: gzip\r\n\
-// ";
-
-    //     } else if (port == 8001 && mode == "normal") {
-    //         request_string =
-    //             "GET / HTTP/1.1\r\n\
-// Host: localhost:8001\r\n\
-// User-Agent: Go-http-client/1.1\r\n\
-// Accept-Encoding: gzip\r\n\
-// ";
-    //     } else if (port == 8001 && mode == "chunked") {
-    //         request_string =
-    //             "POST /directory?id=3&hi=2 HTTP/1.1 \r\n\
-// Host: localhost:8001 \r\n\
-// User-Agent: Go-http-client/1.1\r\n\
-// Transfer-Encoding: chunked\r\n\
-// Content-Type: test/file\r\n\
-// Accept-Encoding: gzip\r\n\
-// \r\n\
-// 4\r\n\
-// abcd\r\n\
-// 3\r\n\
-// abc\r\n\
-// 0\r\n\
-// \r\n\
-// ";
-    //     } else if (mode == "cs") {
-    //         request_string =
-    //             "POST /directory?id=3&hi=2 HTTP/1.1 \r\n\
-// Host: localhost:8000 \r\n\
-// User-Agent: Go-http-client/1.1\r\n\
-// Transfer-Encoding: chunked\r\n\
-// Content-Type: test/file\r\n\
-// Accept-Encoding: gzip\r\n\
-// \r\n\
-// 3\r\n\
-// abc\r\n\
-// \r\n\
-// ";
-    //     } else if (mode == "ce") {
-    //         request_string =
-    //             "POST /directory?id=3&hi=2 HTTP/1.1 \r\n\
-// Host: localhost:8000 \r\n\
-// User-Agent: Go-http-client/1.1\r\n\
-// Transfer-Encoding: chunked\r\n\
-// Content-Type: test/file\r\n\
-// Accept-Encoding: gzip\r\n\
-// \r\n\
-// 3\r\n\
-// def\r\n\
-// 0\r\n\
-// \r\n\
-// ";
-    //     }
-
-    std::cout << "req: [" << request_string << "]" << std::endl;
     send(sock, request_string.c_str(), request_string.length(), 0);
-    std::cout << "send" << std::endl;
+    std::cout << "=> send" << std::endl;
 
     ret = read(sock, buffer, BUF_SIZE - 1);
     std::cout << ret << std::endl;
@@ -175,101 +132,31 @@ void send(int port, std::string request_string) {
     return;
 }
 
+std::string get_filename(int method, std::string option) {
+    if (method == GET) {
+        return "get/GET" + option;
+    } else if (method == POST) {
+        return "post/POST" + option;
+    } else if (method == DELETE) {
+        return "delete/DELETE" + option;
+    }
+    return "get/GET_simple";
+}
+
 int main(int argc, char** argv) {
     int port;
-    std::string req_string;
-    std::string method;
+    int method;
+    std::string option;
+    std::string filename = "test/request_examples/";
 
     while (1) {
         port = choose_port();
-        std::cout << "=> port : " << port << std::endl;
         method = choose_method();
-        std::cout << "=> method : " << method << std::endl;
-        // send();
+        option = choose_option(method);
+        filename += get_filename(method, option);
+        std::cout << filename << std::endl;
+        send(port, filename);
     }
-    // chunk
-    //     send(8001,
-    //          "POST /directory?id=3&hi=2 HTTP/1.1 \r\n\
-// Host: localhost:8001 \r\n\
-// User-Agent: Go-http-client/1.1\r\n\
-// Transfer-Encoding: chunked\r\n\
-// Content-Type: test/file\r\n\
-// Accept-Encoding: gzip\r\n\
-// \r\n\
-// 8\r\n\
-// abcdefgh\r\n\
-// 3\r\n\
-// hi\r\n\
-// j\r\n\
-// 0\r\n\
-// \r\n\
-// ");
-    //     send(8001,
-    //          "POST /directory?id=3&hi=2 HTTP/1.1 \r\n\
-// Host: localhost:8001 \r\n\
-// User-Agent: Go-http-client/1.1\r\n\
-// Transfer-Encoding: chunked\r\n\
-// Content-Type: test/file\r\n\
-// Accept-Encoding: gzip\r\n\
-// \r\n\
-// 4\r\n\
-// abcd\r\n\
-// 3\r\n\
-// \r\n\
-// e\r\n\
-// f\r\n\
-// g\r\n\
-// \r\n\
-// \r\n\
-// \r\n\
-// \r\n\
-// \r\n\
-// 0\r\n\
-// \r\n\
-// ");
-
-    //     send(8000,
-    //          "GET / HTTP/1.1\r\n\
-// Host: localhost:8000\r\n\
-// User-Agent: Go-http-client/1.1\r\n\
-// Accept-Encoding: gzip\r\n\
-//         \r\n");
-    //     send(8000,
-    //          "POST / HTTP/1.1\r\n\
-// Host: localhost:8000\r\n\
-// User-Agent: Go-http-client/1.1\r\n\
-// Transfer-Encoding: chunked\r\n\
-// Content-Type: test/file\r\n\
-// Accept-Encoding: gzip\r\n\
-// \r\n\
-// 0\r\n\
-// \r\n\
-// ");
-    //     send(
-    //         8000,
-    //         "GET /directory HTTP/1.1\r\n\
-// Host: localhost:8000\r\n\
-// User-Agent: Go-http-client/1.1\r\n\
-// Accept-Encoding: gzip\r\n\
-//             \r\n");
-    //     send(8000,
-    //          "GET /directory/youpi.bad_extension HTTP/1.1\r\n\
-// Host: localhost:8000\r\n\
-// User-Agent: Go-http-client/1.1\r\n\
-// Accept-Encoding: gzip\r\n\
-//             \r\n");
-    //     send(8000,
-    //          "GET /directory/youpi.bla HTTP/1.1\r\n\
-// Host: localhost:8000\r\n\
-// User-Agent: Go-http-client/1.1\r\n\
-// Accept-Encoding: gzip\r\n\
-//             \r\n");
-    //     send(8000,
-    //          "GET /directory/oulalala HTTP/1.1\r\n\
-// Host: localhost:8000\r\n\
-// User-Agent: Go-http-client/1.1\r\n\
-// Accept-Encoding: gzip\r\n\
-//             \r\n");
 
     return (0);
 }
