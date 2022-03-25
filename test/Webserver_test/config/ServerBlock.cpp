@@ -4,12 +4,15 @@
 
 ServerBlock::ServerBlock()
     : _root(""), _client_body_buffer_size(0), _auto_index(false),
-      _aliasSet(false) {
+      _aliasSet(false)
+{
     _initDirectivesMap();
 };
 ServerBlock::~ServerBlock(void) {}
-ServerBlock &ServerBlock::operator=(ServerBlock const &src) {
-    if (this != &src) {
+ServerBlock &ServerBlock::operator=(ServerBlock const &src)
+{
+    if (this != &src)
+    {
         _server_name = src._server_name;
         _listen = src._listen;
         _root = src._root;
@@ -23,14 +26,16 @@ ServerBlock &ServerBlock::operator=(ServerBlock const &src) {
 }
 
 // EXCEPTION HANDLING
-const char *ServerBlock::ExceptionInvalidArguments::what() const throw() {
+const char *ExceptionInvalidArguments::what() const throw()
+{
     return "Exception: invalid arguments in configuration file";
 }
 
 /*------------- 지시어 파싱 맵과 함수들
  * --------------------------------------------------*/
 
-directivesMap ServerBlock::_initDirectivesMap() {
+directivesMap ServerBlock::_initDirectivesMap()
+{
     directivesMap tmpMap;
 
     tmpMap["server_name"] = &ServerBlock::addServerName;
@@ -48,7 +53,8 @@ directivesMap ServerBlock::_initDirectivesMap() {
 directivesMap ServerBlock::directivesParseFunc =
     ServerBlock::_initDirectivesMap();
 
-directivesMap ServerBlock::_initLocationDirectivesMap() {
+directivesMap ServerBlock::_initLocationDirectivesMap()
+{
     directivesMap tmpMap;
 
     tmpMap["root"] = &ServerBlock::addRoot;
@@ -69,45 +75,51 @@ directivesMap ServerBlock::locationDirectivesParseFunc =
 
 // add 함수들
 
-void ServerBlock::addServerName(std::vector<std::string> args) {
+void ServerBlock::addServerName(std::vector<std::string> args)
+{
     // 에러처리
     if (args.size() == 0)
-        throw ServerBlock::ExceptionInvalidArguments();
+        throw ExceptionInvalidArguments();
     // _server_name 값 넣어줌
     for (unsigned int i = 0; i < args.size(); i++)
         _server_name.push_back(args[i]);
 }
 
-void ServerBlock::addListen(std::vector<std::string> args) {
+void ServerBlock::addListen(std::vector<std::string> args)
+{
     t_listen listen;
     size_t separator;
 
     // are는 무조건 1개 아니면 에러
     if (args.size() != 1)
-        throw ServerBlock::ExceptionInvalidArguments();
+        throw ExceptionInvalidArguments();
     // ':'가 없을 경우, (+ separator에 ":"대입)
-    if ((separator = args[0].find(":")) == std::string::npos) {
+    if ((separator = args[0].find(":")) == std::string::npos)
+    {
         // 첫번째가 숫자면
-        if (isDigits(args[0])) {
+        if (isDigits(args[0]))
+        {
             // 호스트에 0넣고, port에 args[0] 내용9(8000) 복붙
             listen.host = 0;
             listen.port = atoi(args[0].c_str());
             // 자기 자신 _listen과 파싱한 listen의 port를 비교함
             for (std::vector<t_listen>::const_iterator it = _listen.begin();
-                 it != _listen.end(); it++) {
+                 it != _listen.end(); it++)
+            {
                 // _listen(이미 파싱한 값)과 listen(지금 들어온 값)이 같으면
                 // 에러(중복 값)
                 if (it->port == listen.port)
-                    throw ServerBlock::ExceptionInvalidArguments();
+                    throw ExceptionInvalidArguments();
             }
             // _listen에 listen 넣음.
             _listen.push_back(listen);
             return;
         }
-        throw ServerBlock::ExceptionInvalidArguments();
+        throw ExceptionInvalidArguments();
     }
     // ':'가 있을 경우 (ip주소 있을 경우)
-    else {
+    else
+    {
         // separator까지 주소 파싱해서 listen.host에 uint 포인터로 넣기,
         // localhost도 127.0.0.1로 바꿔줌
         listen.host = strToIp(args[0].substr(0, separator));
@@ -115,105 +127,118 @@ void ServerBlock::addListen(std::vector<std::string> args) {
         // portStr에 그 이후 값의 주소 값 넣기
         std::string portStr = args[0].substr(separator);
         // portStr이 숫자이면
-        if (isDigits(portStr)) {
+        if (isDigits(portStr))
+        {
             // portStr을 char포인터로 바꿔서 atoi해서 port에 넣기
             listen.port = atoi(portStr.c_str());
             // listen을 값 넣어주기
             _listen.push_back(listen);
             return;
         }
-        throw ServerBlock::ExceptionInvalidArguments();
+        throw ExceptionInvalidArguments();
     }
 }
 
-void ServerBlock::addRoot(std::vector<std::string> args) {
+void ServerBlock::addRoot(std::vector<std::string> args)
+{
     // _root가 비어있거나 size값이 1개가 아니면 에러
     if (args.size() != 1 || _root != "")
-        throw ServerBlock::ExceptionInvalidArguments();
+        throw ExceptionInvalidArguments();
     // 값 넣어줌
     _root = args[0];
 }
 
-void ServerBlock::addAllowedMethods(std::vector<std::string> args) {
+void ServerBlock::addAllowedMethods(std::vector<std::string> args)
+{
     if (args.empty())
-        throw ServerBlock::ExceptionInvalidArguments();
+        throw ExceptionInvalidArguments();
     _allowed_methods.clear();
     for (std::vector<std::string>::iterator i = args.begin(); i != args.end();
-         i++) {
+         i++)
+    {
         // 중복 값 들어올 시 에러 -> 필요 없다고 판단되면 지워도 됨
         if (_allowed_methods.count(*i))
-            throw ServerBlock::ExceptionInvalidArguments();
+            throw ExceptionInvalidArguments();
         _allowed_methods.insert(*i);
     }
 }
 
-void ServerBlock::addErrorPage(std::vector<std::string> args) {
+void ServerBlock::addErrorPage(std::vector<std::string> args)
+{
     std::vector<int> codes;
     std::string uri = "";
     size_t len = args.size();
 
-    for (size_t i = 0; i < len; i++) {
+    for (size_t i = 0; i < len; i++)
+    {
         if (isDigits(args[i]))
             codes.push_back(atoi(args[i].c_str()));
         else if (codes.empty())
-            throw ServerBlock::ExceptionInvalidArguments();
+            throw ExceptionInvalidArguments();
         else if (i == len - 1)
             uri = args[i];
         else
-            throw ServerBlock::ExceptionInvalidArguments();
+            throw ExceptionInvalidArguments();
     }
     if (uri == "")
-        throw ServerBlock::ExceptionInvalidArguments();
+        throw ExceptionInvalidArguments();
     for (std::vector<int>::iterator i = codes.begin(); i != codes.end(); i++)
         this->_error_page[*i] = uri;
 }
 
-void ServerBlock::addClientBodyBufferSize(std::vector<std::string> args) {
+void ServerBlock::addClientBodyBufferSize(std::vector<std::string> args)
+{
     if (args.size() != 1 || !isDigits(args[0]))
-        throw ServerBlock::ExceptionInvalidArguments();
+        throw ExceptionInvalidArguments();
     this->_client_body_buffer_size = atoi(args[0].c_str());
 }
 
-void ServerBlock::addAutoIndex(std::vector<std::string> args) {
+void ServerBlock::addAutoIndex(std::vector<std::string> args)
+{
     if (args.size() != 1)
-        throw ServerBlock::ExceptionInvalidArguments();
+        throw ExceptionInvalidArguments();
     if (args[0] == "on")
         this->_auto_index = true;
     else if (args[0] == "off")
         this->_auto_index = false;
     else
-        throw ServerBlock::ExceptionInvalidArguments();
+        throw ExceptionInvalidArguments();
 }
 
-void ServerBlock::addCgiParam(std::vector<std::string> args) {
+void ServerBlock::addCgiParam(std::vector<std::string> args)
+{
     if (args.size() != 2)
-        throw ServerBlock::ExceptionInvalidArguments();
+        throw ExceptionInvalidArguments();
 
     this->_cgi_param[args[0]] = args[1];
 }
 
-void ServerBlock::addCgiPass(std::vector<std::string> args) {
+void ServerBlock::addCgiPass(std::vector<std::string> args)
+{
     if (args.size() != 1)
-        throw ServerBlock::ExceptionInvalidArguments();
+        throw ExceptionInvalidArguments();
     this->_cgi_pass = args[0];
 }
 
-void ServerBlock::addIndex(std::vector<std::string> args) {
+void ServerBlock::addIndex(std::vector<std::string> args)
+{
     if (args.empty())
-        throw ServerBlock::ExceptionInvalidArguments();
+        throw ExceptionInvalidArguments();
     this->_index.insert(this->_index.end(), args.begin(), args.end());
 }
 
-void ServerBlock::addAlias(std::vector<std::string> args) {
+void ServerBlock::addAlias(std::vector<std::string> args)
+{
     if (args.size() > 1)
-        throw ServerBlock::ExceptionInvalidArguments();
+        throw ExceptionInvalidArguments();
     if (args.size())
         this->_alias = args[0];
     this->_aliasSet = true;
 }
 
 // get 함수들
-std::vector<std::string> ServerBlock::getServerName() const {
+std::vector<std::string> ServerBlock::getServerName() const
+{
     return this->_server_name;
 }
 
@@ -221,27 +246,32 @@ std::vector<t_listen> ServerBlock::getListen() const { return this->_listen; }
 
 std::string ServerBlock::getRoot() const { return this->_root; }
 
-std::set<std::string> ServerBlock::getAllowedMethods() const {
+std::set<std::string> ServerBlock::getAllowedMethods() const
+{
     return this->_allowed_methods;
 }
 
-std::map<int, std::string> ServerBlock::getErrorPage() const {
+std::map<int, std::string> ServerBlock::getErrorPage() const
+{
     return this->_error_page;
 }
 
-int ServerBlock::getClientBodyBufferSize() const {
+int ServerBlock::getClientBodyBufferSize() const
+{
     return this->_client_body_buffer_size;
 }
 
 bool ServerBlock::getAutoIndex() const { return this->_auto_index; }
 
-std::map<std::string, std::string> ServerBlock::getCgiParam() const {
+std::map<std::string, std::string> ServerBlock::getCgiParam() const
+{
     return this->_cgi_param;
 }
 
 std::string ServerBlock::getCgiPass() const { return this->_cgi_pass; }
 
-std::map<std::string, ServerBlock> ServerBlock::getLocation() const {
+std::map<std::string, ServerBlock> ServerBlock::getLocation() const
+{
     return this->_location;
 }
 
@@ -251,13 +281,15 @@ std::string ServerBlock::getAlias() const { return this->_alias; }
 
 bool ServerBlock::getAliasSet() const { return this->_aliasSet; }
 
-void ServerBlock::setServerName(ServerBlock &_default_conf) {
+void ServerBlock::setServerName(ServerBlock &_default_conf)
+{
     _server_name.insert(this->_server_name.end(),
                         _default_conf.getServerName().begin(),
                         _default_conf.getServerName().end());
 }
 
-void ServerBlock::setListen(ServerBlock &_default_conf) {
+void ServerBlock::setListen(ServerBlock &_default_conf)
+{
     _listen.insert(this->_listen.begin(), _default_conf.getListen().begin(),
                    _default_conf.getListen().end());
 }
@@ -265,54 +297,65 @@ void ServerBlock::setListen(ServerBlock &_default_conf) {
 void ServerBlock::setRoot(std::string _default_root) { _root = _default_root; }
 
 void ServerBlock::setAllowedMethods(
-    std::set<std::string> _default_allowed_methods) {
+    std::set<std::string> _default_allowed_methods)
+{
     _allowed_methods = _default_allowed_methods;
 }
 
-void ServerBlock::setErrorPage(int key, std::string value) {
+void ServerBlock::setErrorPage(int key, std::string value)
+{
     _error_page.insert(std::make_pair(key, value));
 }
 
-void ServerBlock::setIndex(ServerBlock &_default_conf) {
+void ServerBlock::setIndex(ServerBlock &_default_conf)
+{
     _index.insert(_index.begin(), _default_conf.getIndex().begin(),
                   _default_conf.getIndex().end());
 }
 
 void ServerBlock::setClientBodyBufferSize(
-    int _default_client_body_buffer_size) {
+    int _default_client_body_buffer_size)
+{
     _client_body_buffer_size = _default_client_body_buffer_size;
 }
 
 void ServerBlock::setAutoIndex() {}
 
-void ServerBlock::setCgiParam(std::string key, std::string value) {
+void ServerBlock::setCgiParam(std::string key, std::string value)
+{
     _cgi_param.insert(std::make_pair(key, value));
 }
 
-void ServerBlock::setCgiPass(std::string _default_cgi_pass) {
+void ServerBlock::setCgiPass(std::string _default_cgi_pass)
+{
     _cgi_pass = _default_cgi_pass;
 }
 
 // serverBlock 파싱
-int ServerBlock::parseServerBlock(unsigned int &index, fileVector &file) {
+int ServerBlock::parseServerBlock(unsigned int &index, fileVector &file)
+{
     fileVector args;
     directivesMap::iterator iter;
     std::string directive;
 
     // arg를 매개 변수로 사용하여 지시어에 해당하는 함수를 호출합니다.
     // directivesParseFunc을 돌면서 관련 명령어가 있는 지 파싱
-    for (; index < file.size() && file[index] != "}"; index++) {
+    for (; index < file.size() && file[index] != "}"; index++)
+    {
         std::cout << index << ": " << file[index] << std::endl;
         // directivesParseFunc에 file[index]에 해당하는 것이 없을 경우
         if ((iter = directivesParseFunc.find(file[index])) ==
-            directivesParseFunc.end()) {
+            directivesParseFunc.end())
+        {
             // 1. 만약 location이라면?
-            if (file[index] == "location") {
+            if (file[index] == "location")
+            {
                 ServerBlock location;
                 std::string locationName;
 
                 // directive가 빈 문자열이 아니라면?
-                if (directive != "") {
+                if (directive != "")
+                {
                     // 해당 명령어 함수 동작시키고 arg, directive 초기화
                     (this->*ServerBlock::directivesParseFunc[directive])(args);
                     args.clear();
@@ -335,14 +378,19 @@ int ServerBlock::parseServerBlock(unsigned int &index, fileVector &file) {
                 // 다음 index값이 "}"라면 조건문 처음으로
                 if (file[index] == "}")
                     continue;
-            } else if (!directive.compare(""))
+            }
+            else if (!directive.compare(""))
                 return file[index] == "}" ? 1 : 0;
-            else {
+            else
+            {
                 args.push_back(file[index]);
             }
-        } else {
+        }
+        else
+        {
             // directive에 값이 있을 때 실행함
-            if (directive != "") {
+            if (directive != "")
+            {
                 (this->*ServerBlock::directivesParseFunc[directive])(args);
                 args.clear();
             }
@@ -360,7 +408,8 @@ int ServerBlock::parseServerBlock(unsigned int &index, fileVector &file) {
 };
 
 // Location 파싱
-int ServerBlock::parseLocationBlock(unsigned int &index, fileVector &file) {
+int ServerBlock::parseLocationBlock(unsigned int &index, fileVector &file)
+{
     fileVector args;
     directivesMap::iterator iter;
     std::string directive = "";
@@ -369,17 +418,21 @@ int ServerBlock::parseLocationBlock(unsigned int &index, fileVector &file) {
         return 0;
     //	calling the function that corresponds to a directive with its args as
     // parameters
-    for (; index < file.size() && file[index] != "}"; index++) {
+    for (; index < file.size() && file[index] != "}"; index++)
+    {
         // locationParsingMap에 해당 명령어 없을 경우
         if ((iter =
                  ServerBlock::locationDirectivesParseFunc.find(file[index])) ==
-            ServerBlock::locationDirectivesParseFunc.end()) {
+            ServerBlock::locationDirectivesParseFunc.end())
+        {
             // 해당 명령어가 location일 경우
-            if (file[index] == "location") {
+            if (file[index] == "location")
+            {
                 ServerBlock location;
                 std::string locationName;
 
-                if (directive != "") {
+                if (directive != "")
+                {
                     (this->*ServerBlock::locationDirectivesParseFunc
                                 [directive])(args);
                     args.clear();
@@ -405,9 +458,11 @@ int ServerBlock::parseLocationBlock(unsigned int &index, fileVector &file) {
                 args.push_back(file[index]);
         }
         // locationParsingMap애 해당 명령어 있을 경우
-        else {
+        else
+        {
             // directive이 있으면 실행
-            if (directive != "") {
+            if (directive != "")
+            {
                 (this->*ServerBlock::locationDirectivesParseFunc[directive])(
                     args);
                 args.clear();
@@ -422,4 +477,10 @@ int ServerBlock::parseLocationBlock(unsigned int &index, fileVector &file) {
     if (!file[index].compare("}"))
         return 1;
     return 0;
+}
+
+const char *ServerBlock::ExceptionInvalidArguments::what()
+    const throw()
+{
+    return "Exception: invalid arguments in configuration file";
 }

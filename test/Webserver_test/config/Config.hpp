@@ -6,29 +6,40 @@
 
 class Config
 {
-private:
-	ServerBlock _defaultConf;
-	// server_name으로 ServerBlock 가져갈 수 있도록 함.
-	std::vector<ServerBlock> _serverBlocks;
-	std::vector<t_listen> _allListens;
+	private:
+		ServerBlock _defaultConf;
+		std::vector<ServerBlock> _serverBlocks;
+		std::vector<t_listen> _allListens;
 
-public:
-	Config();
-	Config(std::string config_path);
-	~Config();
+	public:
+		Config();
+		Config(std::string config_path);
+		~Config();
 
-	ServerBlock _initDefaultServer(const char *filename);
-	int parseProcess(std::string config_path);
-	fileVector readFile(std::string config_path_str);
-	fileVector split(std::string str, std::string charset);
+		void _initDefaultServer(const char *filename);
+		void parseProcess(std::string config_path);
 
-	void parseListenAndFillBlank();
-	void parseAllListens(std::vector<t_listen> &allListens, std::vector<ServerBlock>::const_iterator serverBlock);
-	void passMembers(ServerBlock &serverBlock);
-	// get 함수
-	ServerBlock					getDefaultConf();
-	std::vector<ServerBlock>	getServerBlock();
-	std::vector<t_listen>		getAllListens();
+		fileVector readFile(std::string config_path_str);
+		fileVector split(std::string str, std::string charset);
+
+		void parseListenAndFillBlank();
+		void parseAllListens(std::vector<t_listen> &allListens, std::vector<ServerBlock>::const_iterator serverBlock);
+		void passMembers(ServerBlock &serverBlock);
+		// get 함수
+		ServerBlock getDefaultConf();
+		std::vector<ServerBlock> getServerBlock();
+		std::vector<t_listen> getAllListens();
+
+		// throw err
+		class FileNotFoundException : public std::exception
+		{
+			virtual const char *what() const throw();
+		};
+		class ConfigException : public std::exception
+		{
+			virtual const char *what() const throw();
+		};
+		
 };
 
 #endif

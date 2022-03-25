@@ -2,81 +2,85 @@
 
 Config::Config() { _initDefaultServer(DEFAULT_CONFIG_PATH); }
 
-Config::Config(std::string config_path) {
+Config::Config(std::string config_path)
+{
     _initDefaultServer(DEFAULT_CONFIG_PATH);
     parseProcess(config_path);
     parseListenAndFillBlank();
-    // std::cout << "---------------------------------" << std::endl;
-    // if (!_serverBlocks[0].getAllowedMethods().empty())
-    // 	std::cout << "NOOOOOO" << std::endl;
-    // std::cout << _serverBlocks[1].getErrorPage()[403] << std::endl;
-    // std::cout << _defaultConf.getErrorPage()[400] << std::endl;
-    // std::cout << _allListens[0].port << std::endl;
 }
 
 Config::~Config() {}
 
-int Config::parseProcess(std::string config_path) {
+void Config::parseProcess(std::string config_path)
+{
     fileVector file;
     unsigned int fileSize;
 
     file = readFile(config_path);
     fileSize = file.size();
-    for (unsigned int i = 0; i < fileSize; i++) {
-        if (file[i] == "server") {
+    for (unsigned int i = 0; i < fileSize; i++)
+    {
+        if (file[i] == "server")
+        {
             ServerBlock tmpServerBlock;
             ++i;
-            if (file[i] != "{") {
+            if (file[i] != "{")
+            {
                 std::cerr << "Error: expected '{' after server directive."
                           << std::endl;
-                return 1;
+                throw ConfigException();
             }
             ++i;
-            if (!tmpServerBlock.parseServerBlock(i, file)) {
+            if (!tmpServerBlock.parseServerBlock(i, file))
+            {
                 std::cerr << "Error: error in config file [" << config_path
                           << "]" << std::endl;
-                return 1;
+                throw ConfigException();
             }
             this->_serverBlocks.push_back(tmpServerBlock);
-        } else {
+        }
+        else
+        {
             std::cerr << "Error: unknown directive [" << file[i] << "]"
                       << std::endl;
-            return 1;
+            throw ConfigException();
         }
     }
     parseListenAndFillBlank();
-    return 0;
 }
 
 // default conf 읽고 파싱해서 ServerBlock클래스 공통 멤버변수 _defaultConf에
 // 넣어줌
-ServerBlock Config::_initDefaultServer(const char *filename) {
+void Config::_initDefaultServer(const char *filename)
+{
     ServerBlock server;
     fileVector file;
 
     // file 읽어줌
     file = readFile(filename);
-    if (file.empty()) {
+    if (file.empty())
+    {
         std::cerr << "Could not open default file at location [" << filename
                   << "]" << std::endl;
-        // throw FileNotFoundException();
+        throw FileNotFoundException();
     }
     fileVector begin;
     unsigned int index = 2;
     // 파일 내용 파싱하고 잘못되면 에러처리
-    if (!server.parseServerBlock(index, file)) {
+    if (!server.parseServerBlock(index, file))
+    {
         std::cerr << "Invalid default config file." << std::endl;
-        // throw ServerBlock::ExceptionInvalidArguments();
+        throw ServerBlock::ConfigException();
     }
     // ServerBlock class공통(static) _defaultConf에 server(원본 파일 내용이
     // 인자값으로 있는 것) 넣어줌
     _defaultConf = server;
-    return server;
 }
 
 // file 이름 받아서 읽은 값을 '띄어쓰기 엔터랑 탭' 단위로 쪼개서 vector에 넣어준
 // 후 리턴해줌
-fileVector Config::readFile(std::string config_path_str) {
+fileVector Config::readFile(std::string config_path_str)
+{
     int ret = READER_BUFFER_SIZE;
     char buffer[READER_BUFFER_SIZE + 1];
     std::string line = "";
@@ -92,17 +96,19 @@ fileVector Config::readFile(std::string config_path_str) {
     config_path = config_path_str.c_str();
     // 파일 오픈 -> 실패시 에러 throw
     if ((fd = open(config_path, O_RDONLY)) <= 0)
-        throw;
+        throw FileNotFoundException();
 
     // line에 read해서 계속해서 값 넣어주기
     for (ret = READER_BUFFER_SIZE; ret > 0;
-         ret = read(fd, buffer, READER_BUFFER_SIZE)) {
+         ret = read(fd, buffer, READER_BUFFER_SIZE))
+    {
         buffer[ret] = '\0';
         line += buffer;
     }
 
     //	read 에러 발생시 => 에러 출력 후 빈 file 리턴 출력
-    if (ret == -1) {
+    if (ret == -1)
+    {
         std::cerr << "Error while reading config file." << std::endl;
         return file;
     }
@@ -116,7 +122,8 @@ fileVector Config::readFile(std::string config_path_str) {
 // charset안의 char(한 단어단어)와 일치하는 부분 단위로 string으로 쪼개서
 // fileVector에 넣어 리턴해줌
 
-fileVector Config::split(std::string str, std::string charset) {
+fileVector Config::split(std::string str, std::string charset)
+{
     fileVector tokens;
 
     // str에 charset[0] 추가
@@ -126,13 +133,15 @@ fileVector Config::split(std::string str, std::string charset) {
     std::string::size_type start = str.find_first_not_of(charset, 0);
     std::string::size_type end = 0;
 
-    while (true) {
+    while (true)
+    {
         // charset과 str 틀린 부분 부터 str과 charset 같은 부분 인덱스 찾기
         end = str.find_first_of(charset, start);
 
         // end == npos 라는 뜻은 같은 부분이 없다는 뜻이고 그 말은 end가 곧
         // str끝이라는 뜻이니 while문 탈출
-        if (end == std::string::npos) {
+        if (end == std::string::npos)
+        {
             break;
         }
 
@@ -152,23 +161,28 @@ fileVector Config::split(std::string str, std::string charset) {
 
 void Config::parseAllListens(
     std::vector<t_listen> &allListens,
-    std::vector<ServerBlock>::const_iterator serverBlock) {
+    std::vector<ServerBlock>::const_iterator serverBlock)
+{
     // listen 백터를 순환
     std::vector<t_listen> listenVec = serverBlock->getListen();
     for (std::vector<t_listen>::iterator listen = listenVec.begin();
-         listen != listenVec.end(); listen++) {
+         listen != listenVec.end(); listen++)
+    {
         std::vector<t_listen>::iterator i = allListens.begin();
         for (; i != allListens.end(); i++)
             if (listen->host == i->host && listen->port == i->port)
                 break;
-        if (i == allListens.end()) {
+        if (i == allListens.end())
+        {
             allListens.push_back(*listen);
         }
     }
 }
 
-void Config::passMembers(ServerBlock &serverBlock) {
-    if (&serverBlock != &_defaultConf) {
+void Config::passMembers(ServerBlock &serverBlock)
+{
+    if (&serverBlock != &_defaultConf)
+    {
         // 서버 _listen이 비었니
         if (serverBlock.getListen().empty())
             // this 클래스의 getListen값으로 채워줌
@@ -185,7 +199,8 @@ void Config::passMembers(ServerBlock &serverBlock) {
         std::map<int, std::string> tmp_error_page = _defaultConf.getErrorPage();
         for (std::map<int, std::string>::const_iterator i =
                  tmp_error_page.begin();
-             i != tmp_error_page.end(); i++) {
+             i != tmp_error_page.end(); i++)
+        {
             std::map<int, std::string> tmp = serverBlock.getErrorPage();
             if (tmp.find(i->first) == tmp.end())
                 serverBlock.setErrorPage(i->first, i->second);
@@ -201,7 +216,8 @@ void Config::passMembers(ServerBlock &serverBlock) {
             _defaultConf.getCgiParam();
         for (std::map<std::string, std::string>::const_iterator i =
                  tmp_default_conf.begin();
-             i != tmp_default_conf.end(); i++) {
+             i != tmp_default_conf.end(); i++)
+        {
             std::map<std::string, std::string> tmp = serverBlock.getCgiParam();
             if (tmp.find(i->first) == tmp.end())
                 serverBlock.setCgiParam(i->first, i->second);
@@ -219,11 +235,13 @@ void Config::passMembers(ServerBlock &serverBlock) {
     }
 }
 
-void Config::parseListenAndFillBlank() {
+void Config::parseListenAndFillBlank()
+{
     std::vector<t_listen> allListens;
     // 서버블록을 순환
     for (std::vector<ServerBlock>::iterator serverBlock = _serverBlocks.begin();
-         serverBlock != _serverBlocks.end(); serverBlock++) {
+         serverBlock != _serverBlocks.end(); serverBlock++)
+    {
         parseAllListens(allListens, serverBlock);
         passMembers((*serverBlock));
     }
@@ -232,8 +250,19 @@ void Config::parseListenAndFillBlank() {
 
 ServerBlock Config::getDefaultConf() { return this->_defaultConf; }
 
-std::vector<ServerBlock> Config::getServerBlock() {
+std::vector<ServerBlock> Config::getServerBlock()
+{
     return this->_serverBlocks;
 }
 
 std::vector<t_listen> Config::getAllListens() { return this->_allListens; }
+
+const char *Config::FileNotFoundException::what() const throw()
+{
+    return "Exception thrown: could not open configuration file";
+}
+
+const char *Config::ConfigException::what() const throw()
+{
+    return "Exception thrown: confile error";
+}

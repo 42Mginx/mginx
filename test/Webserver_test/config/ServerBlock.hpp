@@ -28,10 +28,6 @@ public:
 	ServerBlock();
 	~ServerBlock();
 	ServerBlock &operator=(ServerBlock const &src);
-	class ExceptionInvalidArguments : public std::exception
-	{
-		virtual const char *what() const throw();
-	};
 
 	std::vector<std::string> getServerName() const;
 	std::vector<t_listen> getListen() const;
@@ -80,6 +76,11 @@ public:
 	// 지시어(directives) 모음 맵
 	static directivesMap _initDirectivesMap();
 	static directivesMap _initLocationDirectivesMap();
+
+	class ExceptionInvalidArguments : public std::exception
+	{
+		virtual const char *what() const throw();
+	};
 };
 
 #endif
