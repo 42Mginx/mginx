@@ -1,8 +1,7 @@
 
 #include "Response.hpp"
 
-Response::Response() {
-}
+Response::Response() {}
 
 void Response::run(Request request, ServerBlock serverblock) {
     std::cout << "// response => run //" << std::endl;
@@ -17,6 +16,5 @@ Content-Type: text/html\r\n\
 Date: Fri, 04 Mar 2022 09:28:09 GMT\r\n\
 Last-Modified: Sun, 13 Feb 2022 09:27:39 GMT\r\n\
 Server: mginx/1.0.0 (Unix)\r\n\
-Transfer-Encoding: identity\r\n\
             This is the default index yo !";
 }
