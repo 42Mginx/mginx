@@ -10,6 +10,9 @@ Config::Config(std::string config_path)
 	_initDefaultServer(DEFAULT_CONFIG_PATH);
 	parseProcess(config_path);
 	parseListenAndFillBlank();
+	std::cout << "---------------------------------" << std::endl;
+	std::cout << _serverBlocks[0].getErrorPage()[400] << std::endl;
+	std::cout << _defaultConf.getErrorPage()[400] << std::endl;
 }
 
 Config::~Config() {}
@@ -63,7 +66,7 @@ ServerBlock Config::_initDefaultServer(const char *filename)
 		// throw FileNotFoundException();
 	}
 	fileVector begin;
-	unsigned int index = 0;
+	unsigned int index = 2;
 	// 파일 내용 파싱하고 잘못되면 에러처리
 	if (!server.parseServerBlock(index, file))
 	{
@@ -216,10 +219,10 @@ void Config::parseListenAndFillBlank()
 {
 	std::vector<t_listen> allListens;
 	// 서버블록을 순환
-	for (std::vector<ServerBlock>::const_iterator serverBlock = _serverBlocks.begin(); serverBlock != _serverBlocks.end(); serverBlock++)
+	for (std::vector<ServerBlock>::iterator serverBlock = _serverBlocks.begin(); serverBlock != _serverBlocks.end(); serverBlock++)
 	{
 		parseAllListens(allListens, serverBlock);
-		passMembers(serverBlock);
+		passMembers((*serverBlock));
 	}
 	_allListens = allListens;
 }
@@ -238,3 +241,4 @@ std::vector<t_listen> Config::getAllListens()
 {
 	return this->_allListens;
 }
+
