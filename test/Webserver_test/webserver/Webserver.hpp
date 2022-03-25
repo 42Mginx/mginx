@@ -69,7 +69,6 @@ class Webserver {
     Config _config;
 
     // private method
-    void init();
 
   public:
     // occf
@@ -80,6 +79,7 @@ class Webserver {
 
     // action
     void parseConfig(std::string config_path);
+    void init();
     int setup();
     int run();
     void handle_error(std::string const &error_message);

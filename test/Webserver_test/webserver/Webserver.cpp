@@ -23,9 +23,6 @@ void Webserver::init() {
         _listens_v.clear();
     _listens_v = _config.getAllListens();
     std::cout << "init 완료" << std::endl;
-    if (_listens_v.empty()) {
-        std::cout << "listens is empty" << std::endl;
-    }
 }
 
 int Webserver::setup(void) {
@@ -168,7 +165,7 @@ void Webserver::handle_error(std::string const &error_message) {
 }
 
 // occf
-Webserver::Webserver(void) { init(); }
+Webserver::Webserver(void) {}
 
 Webserver::Webserver(const Webserver &src) { *this = src; }
 Webserver::~Webserver(void) {}
