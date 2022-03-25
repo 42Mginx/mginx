@@ -206,7 +206,8 @@ void Config::passMembers(ServerBlock &serverBlock)
 		std::map<std::string, std::string> tmp_default_conf = _defaultConf.getCgiParam();
 		for (std::map<std::string, std::string>::const_iterator i = tmp_default_conf.begin(); i != tmp_default_conf.end(); i++)
 		{
-			if (serverBlock.getCgiParam().find(i->first) == serverBlock.getCgiParam().end())
+			std::map<std::string, std::string> tmp = serverBlock.getCgiParam()
+			if (tmp.find(i->first) == tmp.end())
 				serverBlock.setCgiParam(i->first , i->second);
 		}
 		// _cgi_pass 넣어줌
