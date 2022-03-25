@@ -18,8 +18,8 @@ HEADER = mginx.hpp
 
 WEBSERVER = Webserver WebserverProcess
 
-# CONFIG = Config ConfigUtil ServerBlock
-CONFIG = Config ServerBlock
+CONFIG = Config ConfigUtil ServerBlock
+# CONFIG = Config ServerBlock
 
 REQUEST = Request RequestUtil
 

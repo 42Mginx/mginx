@@ -22,20 +22,26 @@ void Webserver::init() {
     if (!_listens_v.empty())
         _listens_v.clear();
     _listens_v = _config.getAllListens();
+    std::cout << "init 완료" << std::endl;
+    if (_listens_v.empty()) {
+        std::cout << "listens is empty" << std::endl;
+    }
 }
 
 int Webserver::setup(void) {
     std::vector<t_listen>::const_iterator listen_i = _listens_v.begin();
-    if (listen_i == _listens_v.end()) {
+    if (_listens_v.empty()) {
         std::cout << "listens is empty" << std::endl;
     }
     for (; listen_i != _listens_v.end(); listen_i++) {
         WebserverProcess process(*listen_i, _config);
         std::cout << listen_i->host << ": " << listen_i->port << std::endl;
         if (process.setup() == -1) {
-            std::cerr << RED << "Could not bind [" << listen_i->port << "]" << RESET << std::endl;
+            std::cerr << RED << "Could not bind [" << listen_i->port << "]"
+                      << RESET << std::endl;
         } else {
-            std::cout << GREEN << "Bind success [" << listen_i->port << "]" << RESET << std::endl;
+            std::cout << GREEN << "Bind success [" << listen_i->port << "]"
+                      << RESET << std::endl;
         }
         _process_v.push_back(process);
         int socket_fd = process.getFd();
@@ -43,7 +49,8 @@ int Webserver::setup(void) {
         if (socket_fd > _max_fd)
             _max_fd = socket_fd;
     }
-    std::cout << YELLOW << " ----------------- setting 완료 ---------------- " << RESET << std::endl;
+    std::cout << YELLOW << " ----------------- setting 완료 ---------------- "
+              << RESET << std::endl;
     return 0;
 };
 
@@ -93,8 +100,7 @@ int Webserver::run() {
         for (; process_it != _process_v.end(); process_it++) {
             bool ready_to_response = process_it->getReadyToResponse();
             int connected_fd = process_it->getConnectedFd();
-            if (ready_to_response == true &&
-                connected_fd > 0 &&
+            if (ready_to_response == true && connected_fd > 0 &&
                 FD_ISSET(connected_fd, &_writing_set)) {
                 std::cout << "write" << std::endl;
                 if (process_it->writeResponse() == -1) {
