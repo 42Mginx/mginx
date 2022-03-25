@@ -21,13 +21,14 @@ public:
 	int parseProcess(std::string config_path);
 	fileVector readFile(std::string config_path_str);
 	fileVector split(std::string str, std::string charset);
-	std::vector<t_listen> HIHI();
-	std::vector<t_listen> parseAllListens(std::vector<ServerBlock>::const_iterator serverBlock) const;
+	void parseListenAndFillBlank();
+	void parseAllListens(std::vector<t_listen> &allListens, std::vector<ServerBlock>::const_iterator serverBlock);
 	void passMembers(std::vector<ServerBlock>::const_iterator server);
 	// get 함수
-	ServerBlock getDefaultConf();
-	std::vector<ServerBlock> getServerBlock();
-	std::vector<t_listen> getAllListens();
+	ServerBlock					getDefaultConf();
+	std::vector<ServerBlock>	getServerBlock();
+	std::vector<t_listen>		getAllListens();
+	void						passMembers(ServerBlock &serverBlock);
 };
 
 #endif

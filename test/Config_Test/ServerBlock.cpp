@@ -294,24 +294,53 @@ bool ServerBlock::getAliasSet() const
 	return this->_aliasSet;
 }
 
-void ServerBlock::setServerName(std::string _string)
+void ServerBlock::setServerName(ServerBlock &_default_conf)
 {
-	_server_name.insert(_string);
+	_server_name.insert(this->_server_name.end(), _default_conf.getServerName().begin(), _default_conf.getServerName().end());
 }
 
-void ServerBlock::setListen()
+void ServerBlock::setListen(ServerBlock &_default_conf)
 {
+	_listen.insert(this->_listen.begin(), _default_conf.getListen().begin(), _default_conf.getListen().end());
 }
 
-void ServerBlock::setRoot()
+void ServerBlock::setRoot(std::string _default_root)
 {
+		_root = _default_root;
 }
 
-void ServerBlock::setAllowedMethods();
-void ServerBlock::setErrorPage();
-void ServerBlock::setIndex();
-void ServerBlock::setClientBodyBufferSize();
-void ServerBlock::setAutoIndex();
+void ServerBlock::setAllowedMethods(std::set<std::string> _default_allowed_methods)
+{
+	_allowed_methods = _default_allowed_methods;
+}
+
+void ServerBlock::setErrorPage(int key, std::string value)
+{
+	_error_page.insert(std::make_pair(key, value));
+}
+
+void ServerBlock::setIndex(ServerBlock &_default_conf)
+{
+	_index.insert(_index.begin(), _default_conf.getIndex().begin(), _default_conf.getIndex().end());
+}
+
+void ServerBlock::setClientBodyBufferSize(int _default_client_body_buffer_size)
+{
+	_client_body_buffer_size = _default_client_body_buffer_size;
+}
+
+void ServerBlock::setAutoIndex(){}
+
+void ServerBlock::setCgiParam(std::string key, std::string value)
+{
+	_cgi_param.insert(std::make_pair(key, value));
+}
+
+void ServerBlock::setCgiPass(std::string _default_cgi_pass)
+{
+	_cgi_pass = _default_cgi_pass;
+}
+
 // serverBlock 파싱
 int ServerBlock::parseServerBlock(unsigned int &index, fileVector &file)
 {

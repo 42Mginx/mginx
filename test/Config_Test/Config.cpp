@@ -9,7 +9,7 @@ Config::Config(std::string config_path)
 {
 	_initDefaultServer(DEFAULT_CONFIG_PATH);
 	parseProcess(config_path);
-	parseAllListens();
+	parseListenAndFillBlank();
 }
 
 Config::~Config() {}
@@ -152,9 +152,8 @@ fileVector Config::split(std::string str, std::string charset)
 	return tokens;
 }
 
-std::vector<t_listen> Config::parseAllListens(std::vector<ServerBlock>::const_iterator serverBlock) const
+void Config::parseAllListens(std::vector<t_listen> &allListens, std::vector<ServerBlock>::const_iterator serverBlock)
 {
-	std::vector<t_listen> allListens;
 	// listen 백터를 순환
 	std::vector<t_listen> listenVec = serverBlock->getListen();
 	for (std::vector<t_listen>::iterator listen = listenVec.begin(); listen != listenVec.end(); listen++)
@@ -166,57 +165,63 @@ std::vector<t_listen> Config::parseAllListens(std::vector<ServerBlock>::const_it
 		if (i == allListens.end())
 			allListens.push_back(*listen);
 	}
-	return allListens;
 }
 
-void Config::passMembers(std::vector<ServerBlock>::const_iterator serverBlock)
+void Config::passMembers(ServerBlock &serverBlock)
 {
+	if (&serverBlock != &_defaultConf)
+	{
 	// 서버 _listen이 비었니
-	if (serverBlock->getListen().empty())
-		// this 클래스의 getListen값으로 채워줌
-		serverBlock->getListen().insert(serverBlock->getListen().begin(), _defaultConf.getListen().begin(), _defaultConf.getListen().end());
-	// 서버 _root 비었니
-	if (serverBlock->getRoot() == "")
-		// _defaultConf->트 넣어줌
-		serverBlock->getRoot() = _defaultConf.getRoot();
-	// _serverBlock_name에 _defaultConf.넣어줌
-	serverBlock->getServerName().insert(serverBlock->getServerName().end(), _defaultConf.getServerName().begin(), _defaultConf.getServerName().end());
-	// _error_page 넣어줌
-	for (std::map<int, std::string>::const_iterator i = _defaultConf.getErrorPage().begin(); i != _defaultConf.getErrorPage().end(); i++)
-	{
-		if (serverBlock->getErrorPage().find(i->first) == serverBlock->getErrorPage().end())
-			serverBlock->getErrorPage()[i->first] = i->second;
+		if (serverBlock.getListen().empty())
+			// this 클래스의 getListen값으로 채워줌
+			serverBlock.setListen(_defaultConf);
+		// 서버 _root 비었니
+		if (serverBlock.getRoot() == "")
+			serverBlock.setRoot(_defaultConf.getRoot());
+		// _serverBlock_name 맨 뒤에 _defaultConf.넣어줌
+		serverBlock.setServerName(_defaultConf);
+		// _allowed_methods 넣어줌
+		if (serverBlock.getAllowedMethods().empty())
+			serverBlock.setAllowedMethods(_defaultConf.getAllowedMethods());
+		// _error_page 넣어줌
+		std::map<int, std::string> tmp_error_page = _defaultConf.getErrorPage();
+		for (std::map<int, std::string>::const_iterator i = tmp_error_page.begin(); i != tmp_error_page.end(); i++)
+		{
+			if (serverBlock.getErrorPage().find(i->first) == serverBlock.getErrorPage().end())
+				serverBlock.setErrorPage(i->first, i->second);
+		}
+		// _index 넣어줌
+		serverBlock.setIndex(_defaultConf);
+		// _client_body_buffer_size 넣어줌
+		if (serverBlock.getClientBodyBufferSize() == 0)
+			serverBlock.setClientBodyBufferSize(_defaultConf.getClientBodyBufferSize());
+		// _cgi_param 넗어줌
+		std::map<std::string, std::string> tmp_default_conf = _defaultConf.getCgiParam();
+		for (std::map<std::string, std::string>::const_iterator i = tmp_default_conf.begin(); i != tmp_default_conf.end(); i++)
+		{
+			if (serverBlock.getCgiParam().find(i->first) == serverBlock.getCgiParam().end())
+				serverBlock.setCgiParam(i->first , i->second);
+		}
+		// _cgi_pass 넣어줌
+		if (serverBlock.getCgiPass() == "")
+			serverBlock.setCgiPass(_defaultConf.getCgiPass());
+		// _location 넣어줌
+		std::map<std::string, ServerBlock> tmpServerBlock = serverBlock.getLocation();
+		for (std::map<std::string, ServerBlock>::iterator i = tmpServerBlock.begin(); i != tmpServerBlock.end(); i++)
+			passMembers(i->second);
 	}
-	// _client_body_buffer_size 넣어줌
-	if (serverBlock->getClientBodyBufferSize() == 0)
-		serverBlock->getClientBodyBufferSize() = _defaultConf.getClientBodyBufferSize();
-	// _cgi_param 넗어줌
-	for (std::map<std::string, std::string>::const_iterator i = _defaultConf._cgi_param.begin(); i != _defaultConf._cgi_param.end(); i++)
-	{
-		if (serverBlock->_cgi_param.find(i->first) == serverBlock->_cgi_param.end())
-			serverBlock->_cgi_param[i->first] = i->second;
-	}
-	// _cgi_pass 넣어줌
-	if (serverBlock->_cgi_pass == "")
-		serverBlock->_cgi_pass = _defaultConf._cgi_pass;
-	// _allowed_methods 넣어줌
-	if (serverBlock->_allowed_methods.empty())
-		serverBlock->_allowed_methods = _defaultConf._allowed_methods;
-	// _index 넣어줌
-	serverBlock->_index.insert(serverBlock->_index.begin(), _defaultConf._index.begin(), _defaultConf._index.end());
-	// _location 넣어줌
-	for (std::map<std::string, ServerBlock>::iterator i = serverBlock->_location.begin(); i != serverBlock->_location.end(); i++)
-		serverBlock->passMembers(i->second);
 }
 
-std::vector<t_listen> Config::HIHI()
+void Config::parseListenAndFillBlank()
 {
+	std::vector<t_listen> allListens;
 	// 서버블록을 순환
 	for (std::vector<ServerBlock>::const_iterator serverBlock = _serverBlocks.begin(); serverBlock != _serverBlocks.end(); serverBlock++)
 	{
-		_allListens = parseAllListens(serverBlock);
+		parseAllListens(allListens, serverBlock);
 		passMembers(serverBlock);
 	}
+	_allListens = allListens;
 }
 
 ServerBlock Config::getDefaultConf()

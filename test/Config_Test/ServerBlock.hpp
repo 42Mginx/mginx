@@ -38,24 +38,26 @@ public:
 	std::string getRoot() const;
 	std::set<std::string> getAllowedMethods() const;
 	std::map<int, std::string> getErrorPage() const;
-	std::vector<std::string> getIndex() const;
 	int getClientBodyBufferSize() const;
 	bool getAutoIndex() const;
-
-	void setServerName(std::string _string);
-	void setListen();
-	void setRoot();
-	void setAllowedMethods();
-	void setErrorPage();
-	void setIndex();
-	void setClientBodyBufferSize();
-	void setAutoIndex();
+	std::vector<std::string> getIndex() const;
 
 	std::map<std::string, ServerBlock> getLocation() const;
 	std::map<std::string, std::string> getCgiParam() const;
 	std::string getCgiPass() const;
 	std::string getAlias() const;
 	bool getAliasSet() const;
+
+	void setServerName(ServerBlock &_default_conf);
+	void setListen(ServerBlock &_default_conf);
+	void setRoot(std::string _default_root);
+	void setAllowedMethods(std::set<std::string> _default_allowed_methods);
+	void setErrorPage(int key, std::string value);
+	void setIndex(ServerBlock &_default_conf);
+	void setClientBodyBufferSize(int _default_client_body_buffer_size);
+	void setAutoIndex();
+	void setCgiParam(std::string key, std::string value);
+	void setCgiPass(std::string _default_cgi_pass);
 
 	// 지시어 파싱 함수
 	void addServerName(std::vector<std::string> args);
