@@ -10,6 +10,12 @@ Config::Config(std::string config_path)
 	_initDefaultServer(DEFAULT_CONFIG_PATH);
 	parseProcess(config_path);
 	parseListenAndFillBlank();
+	// std::cout << "---------------------------------" << std::endl;
+	// if (!_serverBlocks[0].getAllowedMethods().empty())
+	// 	std::cout << "NOOOOOO" << std::endl;
+	// std::cout << _serverBlocks[1].getErrorPage()[403] << std::endl;
+	// std::cout << _defaultConf.getErrorPage()[400] << std::endl;
+	// std::cout << _allListens[0].port << std::endl;
 }
 
 Config::~Config() {}
@@ -187,8 +193,9 @@ void Config::passMembers(ServerBlock &serverBlock)
 		std::map<int, std::string> tmp_error_page = _defaultConf.getErrorPage();
 		for (std::map<int, std::string>::const_iterator i = tmp_error_page.begin(); i != tmp_error_page.end(); i++)
 		{
-			if (serverBlock.getErrorPage().find(i->first) == serverBlock.getErrorPage().end())
-				serverBlock.setErrorPage(i->first, i->second);
+			std::map<int, std::string> tmp = serverBlock.getErrorPage();
+			if (tmp.find(i->first) == tmp.end())
+				serverBlock.setErrorPage(i->first, i->second);\
 		}
 		// _index 넣어줌
 		serverBlock.setIndex(_defaultConf);
