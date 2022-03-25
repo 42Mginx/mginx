@@ -1,10 +1,8 @@
 #include "Webserver.hpp"
-
 #include "WebserverProcess.hpp"
 
 void Webserver::parseConfig(std::string config_path) {
     _config.parseProcess(config_path);
-    std::cout << "testing// after parse conf" << std::endl;
 }
 
 void Webserver::init() {
@@ -22,14 +20,10 @@ void Webserver::init() {
     if (!_listens_v.empty())
         _listens_v.clear();
     _listens_v = _config.getAllListens();
-    std::cout << "init 완료" << std::endl;
 }
 
 int Webserver::setup(void) {
     std::vector<t_listen>::const_iterator listen_i = _listens_v.begin();
-    if (_listens_v.empty()) {
-        std::cout << "listens is empty" << std::endl;
-    }
     for (; listen_i != _listens_v.end(); listen_i++) {
         WebserverProcess process(*listen_i, _config);
         std::cout << listen_i->host << ": " << listen_i->port << std::endl;
@@ -159,7 +153,6 @@ void Webserver::handle_error(std::string const &error_message) {
         process_it->clear();
     }
     // 2 멤버 변수 초기화
-
     init();
     setup();
 }
