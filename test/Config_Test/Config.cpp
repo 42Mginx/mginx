@@ -14,29 +14,34 @@ Config::Config(std::string config_path)
 
 Config::~Config() {}
 
-int			Config::parseProcess(std::string config_path)
+int Config::parseProcess(std::string config_path)
 {
-	fileVector					file;
-	unsigned int				fileSize;
+	fileVector file;
+	unsigned int fileSize;
 
 	file = readFile(config_path);
 	fileSize = file.size();
-	for (unsigned int i = 0 ; i < fileSize; i++) {
-		if (file[i] == "server") {
-			ServerBlock					tmpServerBlock;
+	for (unsigned int i = 0; i < fileSize; i++)
+	{
+		if (file[i] == "server")
+		{
+			ServerBlock tmpServerBlock;
 			++i;
-			if (file[i] != "{") {
+			if (file[i] != "{")
+			{
 				std::cerr << "Error: expected '{' after server directive." << std::endl;
 				return 1;
 			}
 			++i;
-			if (!tmpServerBlock.parseServerBlock(i, file)) {
-				std::cerr << "Error: error in config file [" << config_path << "]" <<  std::endl;
+			if (!tmpServerBlock.parseServerBlock(i, file))
+			{
+				std::cerr << "Error: error in config file [" << config_path << "]" << std::endl;
 				return 1;
 			}
 			this->_serverBlocks.push_back(tmpServerBlock);
 		}
-		else {
+		else
+		{
 			std::cerr << "Error: unknown directive [" << file[i] << "]" << std::endl;
 			return 1;
 		}
@@ -45,20 +50,23 @@ int			Config::parseProcess(std::string config_path)
 }
 
 // default conf 읽고 파싱해서 ServerBlock클래스 공통 멤버변수 _defaultConf에 넣어줌
-ServerBlock		Config::_initDefaultServer(const char *filename) {
-	ServerBlock	server;
-	fileVector		file;
+ServerBlock Config::_initDefaultServer(const char *filename)
+{
+	ServerBlock server;
+	fileVector file;
 
 	// file 읽어줌
 	file = readFile(filename);
-	if (file.empty()) {
+	if (file.empty())
+	{
 		std::cerr << "Could not open default file at location [" << filename << "]" << std::endl;
 		// throw FileNotFoundException();
 	}
-	fileVector	begin;
-	unsigned int	index = 0;
+	fileVector begin;
+	unsigned int index = 0;
 	// 파일 내용 파싱하고 잘못되면 에러처리
-	if (!server.parseServerBlock(index, file)) {
+	if (!server.parseServerBlock(index, file))
+	{
 		std::cerr << "Invalid default config file." << std::endl;
 		// throw ServerBlock::ExceptionInvalidArguments();
 	}
@@ -68,109 +76,160 @@ ServerBlock		Config::_initDefaultServer(const char *filename) {
 }
 
 // file 이름 받아서 읽은 값을 '띄어쓰기 엔터랑 탭' 단위로 쪼개서 vector에 넣어준 후 리턴해줌
-fileVector	Config::readFile(std::string config_path_str) {
-	int							ret = READER_BUFFER_SIZE;
-	char						buffer[READER_BUFFER_SIZE + 1];
-	std::string					line = "";
-	int							fd;
-	fileVector					file;
-	const char					*config_path;
+fileVector Config::readFile(std::string config_path_str)
+{
+	int ret = READER_BUFFER_SIZE;
+	char buffer[READER_BUFFER_SIZE + 1];
+	std::string line = "";
+	int fd;
+	fileVector file;
+	const char *config_path;
 
 	// 버퍼 초기화
-	for (int i = 0; i < READER_BUFFER_SIZE + 1;  i++)
+	for (int i = 0; i < READER_BUFFER_SIZE + 1; i++)
 		buffer[i] = '\0';
 
 	// str -> char*로 변환
 	config_path = config_path_str.c_str();
 	// 파일 오픈 -> 실패시 에러 throw
 	if ((fd = open(config_path, O_RDONLY)) <= 0)
-		throw ;
+		throw;
 
 	// line에 read해서 계속해서 값 넣어주기
-	for (ret = READER_BUFFER_SIZE; ret > 0; ret = read(fd, buffer,READER_BUFFER_SIZE )) {
+	for (ret = READER_BUFFER_SIZE; ret > 0; ret = read(fd, buffer, READER_BUFFER_SIZE))
+	{
 		buffer[ret] = '\0';
 		line += buffer;
 	}
 
 	//	read 에러 발생시 => 에러 출력 후 빈 file 리턴 출력
-	if (ret == -1) {
+	if (ret == -1)
+	{
 		std::cerr << "Error while reading config file." << std::endl;
 		return file;
 	}
 
 	// line에서 띄어쓰기(' ') 엔터('\n')랑 탭('\t') 단위로 쪼개서 vector에 넣어준 후 리턴해줌
 	file = split(line, std::string(" \n\t"));
- 	return file;
+	return file;
 }
 
-//charset안의 char(한 단어단어)와 일치하는 부분 단위로 string으로 쪼개서 fileVector에 넣어 리턴해줌
+// charset안의 char(한 단어단어)와 일치하는 부분 단위로 string으로 쪼개서 fileVector에 넣어 리턴해줌
 
-fileVector				Config::split(std::string str, std::string charset)
+fileVector Config::split(std::string str, std::string charset)
 {
-	fileVector	tokens;
+	fileVector tokens;
 
 	// str에 charset[0] 추가
 	str += charset[0];
-	
-	// charset과 str 틀린 부분 찾기
-	std::string::size_type	start = str.find_first_not_of(charset, 0);
-	std::string::size_type	end = 0;
 
-	while (true) {
+	// charset과 str 틀린 부분 찾기
+	std::string::size_type start = str.find_first_not_of(charset, 0);
+	std::string::size_type end = 0;
+
+	while (true)
+	{
 		// charset과 str 틀린 부분 부터 str과 charset 같은 부분 인덱스 찾기
 		end = str.find_first_of(charset, start);
-		
+
 		// end == npos 라는 뜻은 같은 부분이 없다는 뜻이고 그 말은 end가 곧 str끝이라는 뜻이니 while문 탈출
-		if (end == std::string::npos) {
+		if (end == std::string::npos)
+		{
 			break;
 		}
 
 		// s에 str과 charset 다른 부분 넣기
-		std::string	s = str.substr(start, end - start);
-		
-		// tonks에 s 밀어 넣기 
+		std::string s = str.substr(start, end - start);
+
+		// tonks에 s 밀어 넣기
 		tokens.push_back(s);
 
 		// charset과 str 틀린 부분을 다시 찾음 혹시 없으면 break;
 		if ((start = str.find_first_not_of(charset, end)) == std::string::npos)
-			break ;
+			break;
 	}
 	// 토큰 리턴
 	return tokens;
 }
 
-std::vector<t_listen>				Config::parseAllListens() const
+std::vector<t_listen> Config::parseAllListens(std::vector<ServerBlock>::const_iterator serverBlock) const
 {
-	std::vector<t_listen>	allListens;
-
-	// 서버블록을 순환
-	for (std::vector<ServerBlock>::const_iterator serverBlock = _serverBlocks.begin(); serverBlock != _serverBlocks.end(); serverBlock++) {
-		// listen 백터를 순환
-		std::vector<t_listen>	listenVec = serverBlock->getListen();
-		for (std::vector<t_listen>::iterator listen = listenVec.begin(); listen != listenVec.end(); listen++) {
-			std::vector<t_listen>::iterator i = allListens.begin();
-			for ( ; i != allListens.end(); i++)
-				if (listen->host == i->host && listen->port == i->port)
-					break ;
-			if (i == allListens.end())
-				allListens.push_back(*listen);
-		}
+	std::vector<t_listen> allListens;
+	// listen 백터를 순환
+	std::vector<t_listen> listenVec = serverBlock->getListen();
+	for (std::vector<t_listen>::iterator listen = listenVec.begin(); listen != listenVec.end(); listen++)
+	{
+		std::vector<t_listen>::iterator i = allListens.begin();
+		for (; i != allListens.end(); i++)
+			if (listen->host == i->host && listen->port == i->port)
+				break;
+		if (i == allListens.end())
+			allListens.push_back(*listen);
 	}
 	return allListens;
 }
 
+void Config::passMembers(std::vector<ServerBlock>::const_iterator serverBlock)
+{
+	// 서버 _listen이 비었니
+	if (serverBlock->getListen().empty())
+		// this 클래스의 getListen값으로 채워줌
+		serverBlock->getListen().insert(serverBlock->getListen().begin(), _defaultConf.getListen().begin(), _defaultConf.getListen().end());
+	// 서버 _root 비었니
+	if (serverBlock->getRoot() == "")
+		// _defaultConf->트 넣어줌
+		serverBlock->getRoot() = _defaultConf.getRoot();
+	// _serverBlock_name에 _defaultConf.넣어줌
+	serverBlock->getServerName().insert(serverBlock->getServerName().end(), _defaultConf.getServerName().begin(), _defaultConf.getServerName().end());
+	// _error_page 넣어줌
+	for (std::map<int, std::string>::const_iterator i = _defaultConf.getErrorPage().begin(); i != _defaultConf.getErrorPage().end(); i++)
+	{
+		if (serverBlock->getErrorPage().find(i->first) == serverBlock->getErrorPage().end())
+			serverBlock->getErrorPage()[i->first] = i->second;
+	}
+	// _client_body_buffer_size 넣어줌
+	if (serverBlock->getClientBodyBufferSize() == 0)
+		serverBlock->getClientBodyBufferSize() = _defaultConf.getClientBodyBufferSize();
+	// _cgi_param 넗어줌
+	for (std::map<std::string, std::string>::const_iterator i = _defaultConf._cgi_param.begin(); i != _defaultConf._cgi_param.end(); i++)
+	{
+		if (serverBlock->_cgi_param.find(i->first) == serverBlock->_cgi_param.end())
+			serverBlock->_cgi_param[i->first] = i->second;
+	}
+	// _cgi_pass 넣어줌
+	if (serverBlock->_cgi_pass == "")
+		serverBlock->_cgi_pass = _defaultConf._cgi_pass;
+	// _allowed_methods 넣어줌
+	if (serverBlock->_allowed_methods.empty())
+		serverBlock->_allowed_methods = _defaultConf._allowed_methods;
+	// _index 넣어줌
+	serverBlock->_index.insert(serverBlock->_index.begin(), _defaultConf._index.begin(), _defaultConf._index.end());
+	// _location 넣어줌
+	for (std::map<std::string, ServerBlock>::iterator i = serverBlock->_location.begin(); i != serverBlock->_location.end(); i++)
+		serverBlock->passMembers(i->second);
+}
 
-ServerBlock				Config::getDefaultConf()
+std::vector<t_listen> Config::HIHI()
+{
+	// 서버블록을 순환
+	for (std::vector<ServerBlock>::const_iterator serverBlock = _serverBlocks.begin(); serverBlock != _serverBlocks.end(); serverBlock++)
+	{
+		_allListens = parseAllListens(serverBlock);
+		passMembers(serverBlock);
+	}
+}
+
+ServerBlock Config::getDefaultConf()
 {
 	return this->_defaultConf;
 }
 
-std::vector<ServerBlock>				Config::getServerBlock()
+std::vector<ServerBlock> Config::getServerBlock()
 {
 	return this->_serverBlocks;
 }
 
-std::vector<t_listen>				Config::getAllListens()
+std::vector<t_listen> Config::getAllListens()
 {
 	return this->_allListens;
 }

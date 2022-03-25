@@ -294,6 +294,24 @@ bool ServerBlock::getAliasSet() const
 	return this->_aliasSet;
 }
 
+void ServerBlock::setServerName(std::string _string)
+{
+	_server_name.insert(_string);
+}
+
+void ServerBlock::setListen()
+{
+}
+
+void ServerBlock::setRoot()
+{
+}
+
+void ServerBlock::setAllowedMethods();
+void ServerBlock::setErrorPage();
+void ServerBlock::setIndex();
+void ServerBlock::setClientBodyBufferSize();
+void ServerBlock::setAutoIndex();
 // serverBlock 파싱
 int ServerBlock::parseServerBlock(unsigned int &index, fileVector &file)
 {
@@ -302,7 +320,7 @@ int ServerBlock::parseServerBlock(unsigned int &index, fileVector &file)
 	std::string directive;
 
 	// arg를 매개 변수로 사용하여 지시어에 해당하는 함수를 호출합니다.
-	//directivesParseFunc을 돌면서 관련 명령어가 있는 지 파싱
+	// directivesParseFunc을 돌면서 관련 명령어가 있는 지 파싱
 	for (; index < file.size() && file[index] != "}"; index++)
 	{
 		std::cout << index << ": " << file[index] << std::endl;
