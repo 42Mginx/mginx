@@ -16,7 +16,8 @@ std::vector<std::string>					_valid_methods;
 Request::Request()
 {
 	_method ="GET";
-	_target_path ="files/default_error_pages";
+	_target_path ="dummy.html";
+	// _target_path ="files/default_error_pages";
 	// _target_path ="";
 
 	_query = "a=42";

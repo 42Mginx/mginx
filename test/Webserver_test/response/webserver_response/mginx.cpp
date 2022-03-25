@@ -1,7 +1,7 @@
 #include "Webserver.hpp"
-#include "Response.hpp"
+#include "response/Response.hpp"
 #include "request/Request.hpp"
-#include "GetConf.hpp"
+#include "response/GetConf.hpp"
 
 int main()
 {

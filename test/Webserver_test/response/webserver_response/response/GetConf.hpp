@@ -1,9 +1,9 @@
 #ifndef GETCONF_HPP
 # define GETCONF_HPP
 
-# include "Webserver.hpp"
-# include "./request/Request.hpp"
-# include "ServerBlock.hpp"
+# include "../Webserver.hpp"
+# include "../request/Request.hpp"
+# include "../ServerBlock.hpp"
 
 //Request, ServerBlock 인자로 받아오기
 class GetConf{

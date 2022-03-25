@@ -1,10 +1,10 @@
 #ifndef RESPONSEHEADER_HPP
 # define RESPONSEHEADER_HPP
 
-# include "Webserver.hpp"
-# include "cgi/CgiHandler.hpp"
-# include "autoindex/AutoIndexGenerator.hpp"
-# include "request/Request.hpp"
+# include "../Webserver.hpp"
+# include "../cgi/CgiHandler.hpp"
+# include "../autoindex/AutoIndexGenerator.hpp"
+# include "../request/Request.hpp"
 # include "GetConf.hpp"
 
 

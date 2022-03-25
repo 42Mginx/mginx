@@ -1,11 +1,11 @@
 #ifndef RESPONSE_HPP
 # define RESPONSE_HPP
 
-# include "Webserver.hpp"
+# include "../Webserver.hpp"
 # include "ResponseHeader.hpp"
-# include "cgi/CgiHandler.hpp"
-# include "autoindex/AutoIndexGenerator.hpp"
-# include "request/Request.hpp"
+# include "../cgi/CgiHandler.hpp"
+# include "../autoindex/AutoIndexGenerator.hpp"
+# include "../request/Request.hpp"
 # include "GetConf.hpp"
 
 typedef struct s_listen {
