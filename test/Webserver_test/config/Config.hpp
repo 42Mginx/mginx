@@ -1,31 +1,23 @@
-#ifndef Config_HPP
-# define Config_HPP
+#ifndef CONFIG_HPP
+#define CONFIG_HPP
+#include <iostream>
+#include <map>
+#include <vector>
 
 #include "ServerBlock.hpp"
-#include "ConfigUtil.hpp"
+#include "listen.hpp"
 
 class Config {
-	private:
-		ServerBlock						_defaultConf;
-		// server_name으로 ServerBlock 가져갈 수 있도록 함.
-		std::vector<ServerBlock>		_serverBlocks;
-		std::vector<t_listen>			_allListens;
+    std::vector<ServerBlock> _server_block;
 
-	public:
-		Config();
-		Config(std::string config_path);
-		~Config();
+   public:
+    Config();
+    Config(std::string config_path);
+    ~Config();
 
-		ServerBlock	_initDefaultServer(const char *filename);
-		int			parseProcess(std::string config_path);
-		fileVector	readFile(std::string config_path_str);
-		fileVector	split(std::string str, std::string charset);
-		std::vector<t_listen>	parseAllListens() const;
-		
-		// get 함수
-		ServerBlock		getDefaultConf();
-		std::vector<ServerBlock>		getServerBlock();
-		std::vector<t_listen>		getAllListens();
+    void parseProcess(std::string config_path);
+    std::vector<t_listen> getAllListens();
+    std::vector<ServerBlock> getServerBlock();
 };
 
 #endif

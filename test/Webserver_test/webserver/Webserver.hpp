@@ -20,7 +20,6 @@
 
 // C Includes
 #include <dirent.h>
-#include <errno.h>
 #include <fcntl.h>
 #include <limits.h>
 #include <stdio.h>
@@ -54,7 +53,7 @@
 class WebserverProcess;
 
 class Webserver {
-   private:
+  private:
     // tmp
     // std::vector<t_listen> getListens();
 
@@ -72,7 +71,7 @@ class Webserver {
     // private method
     void init();
 
-   public:
+  public:
     // occf
     Webserver(void);
     Webserver(const Webserver &src);
