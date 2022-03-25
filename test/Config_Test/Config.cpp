@@ -10,9 +10,6 @@ Config::Config(std::string config_path)
 	_initDefaultServer(DEFAULT_CONFIG_PATH);
 	parseProcess(config_path);
 	parseListenAndFillBlank();
-	std::cout << "---------------------------------" << std::endl;
-	std::cout << _serverBlocks[0].getErrorPage()[400] << std::endl;
-	std::cout << _defaultConf.getErrorPage()[400] << std::endl;
 }
 
 Config::~Config() {}
