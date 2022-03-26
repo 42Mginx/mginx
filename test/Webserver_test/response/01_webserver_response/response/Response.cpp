@@ -4,44 +4,24 @@ void			Response::responseSet(Request &request,GetConf &getConf)//(request, getCo
 {
 	_statusCode = request.getStatus();
 	_targetPath = request.getTargetPath();
-	_errorMap = getConf.GetErrorPage();
-	_isAutoIndex = getConf.GetAutoIndex();
+	_errorMap = getConf.getErrorPage();
+	_isAutoIndex = getConf.getAutoIndex();
 	_requestMethod = request.getMethod();
 
+	//405 413 예외처리
 	checkClientError(request, getConf);
-}
-
-void			Response::checkClientError(Request &request,GetConf &getConf)
-{
-	if(getConf.GetAllowedMethods().find(request.getMethod()) == getConf.GetAllowedMethods().end())
-		_statusCode = 405;
-	else if (getConf.GetClientBodyBufferSize() < request.getBody().size())
-		_statusCode = 413;
 }
 
 void			Response::run(Request &request,GetConf &getConf)//(request, getConf ) //받기
 {
-	//1. statusCode
-	//2. _targetPath = conf.getpath  -> requeestConf.getpath
-	//3. response constructor
-
-	//response 값 세팅
+	//Response valule setting
 	responseSet(request, getConf);
-
-	//405 413 예외처리
-	// if(getConf.GetAllowedMethods().find(request.getMethod()) == getConf.GetAllowedMethods().end())
-	// 	_statusCode = 405;
-	// else if (getConf.GetClientBodyBufferSize() < request.getBody().size())
-	// 	_statusCode = 413;
-
-
 	if(_statusCode == 405 || _statusCode == 413)
 	{
 		ResponseHeader header;
 		_response = header.notAllowedMethod(getConf, _statusCode);
 		return ;
 	}
-
 	//Run Method
 	if(_requestMethod == "GET")
 		getMethod(request,getConf);
@@ -55,20 +35,26 @@ void			Response::run(Request &request,GetConf &getConf)//(request, getConf ) //�
 		deleteMethod(request,getConf);
 	else
 		std::cout<<"Error : This method is not exist";
-
 }
 
 void	Response::getMethod(Request &request,GetConf &getConf)
 {
 	ResponseHeader header;
 
-	if(_statusCode == 200)
+	if (getConf.getCgiPass() != "")
+	{
+		std::cout<<"Cgi_Pass : "<<getConf.getCgiPass()<<std::endl;
+		CgiHandler	cgi(request, getConf);
+		_response = cgi.executeCgi(getConf.getCgiPass()); //cig결과값 _response에 넣기
+	}
+
+	else if(_statusCode == 200)
 		_statusCode = readContent(); //_body 만 작성된 상태
 	else
 		_response = this->readHtml(_errorMap[_statusCode]);
 	if (_statusCode == 500) //예측하지 못한 서버에러
 		_response = this->readHtml(_errorMap[_statusCode]);
-	_response = header.getHeader(_response.size(), _targetPath, _statusCode, _type, getConf.GetContentLocation()) + "\r\n" + _response;
+	_response = header.getHeader(_response.size(), _targetPath, _statusCode, _type, getConf.getContentLocation()) + "\r\n" + _response;
 }
 
 
@@ -78,7 +64,7 @@ void			Response::headMethod(Request &request,GetConf &getConf)
 	ResponseHeader	header;
 
 	_statusCode = readContent();
-	_response = header.getHeader(_response.size(), _targetPath, _statusCode, _type, getConf.GetContentLocation() +"\r\n");
+	_response = header.getHeader(_response.size(), _targetPath, _statusCode, _type, getConf.getContentLocation() +"\r\n");
 }
 
 //post METHOD
@@ -93,7 +79,7 @@ void			Response::postMethod(Request &request,GetConf &getConf)
 	}
 	if (_statusCode == 500)
 		_response = this->readHtml(_errorMap[_statusCode]);
-	_response = header.getHeader(_response.size(), _targetPath, _statusCode, _type, getConf.GetContentLocation() + "\r\n" + _response);
+	_response = header.getHeader(_response.size(), _targetPath, _statusCode, _type, getConf.getContentLocation() + "\r\n" + _response);
 }
 
 //put METHOD
@@ -109,7 +95,7 @@ void			Response::putMethod(Request &request,GetConf &getConf)
 	_statusCode = writeContent(content);
 	if (_statusCode != 201 && _statusCode != 204)
 		_response = this->readHtml(_errorMap[_statusCode]);
-	_response = header.getHeader(_response.size(), _targetPath, _statusCode, _type, getConf.GetContentLocation() + "\r\n" + _response);
+	_response = header.getHeader(_response.size(), _targetPath, _statusCode, _type, getConf.getContentLocation() + "\r\n" + _response);
 
 }
 
@@ -134,7 +120,7 @@ void			Response::deleteMethod(Request &request,GetConf &getConf)
 		_statusCode = 404;
 	if (_statusCode == 403 || _statusCode == 404)
 		_response = this->readHtml(_errorMap[_statusCode]);
-	_response = header.getHeader(_response.size(), _targetPath, _statusCode, _type, getConf.GetContentLocation() + "\r\n" + _response);
+	_response = header.getHeader(_response.size(), _targetPath, _statusCode, _type, getConf.getContentLocation() + "\r\n" + _response);
 	// _response = head.getHeader(_response.size(), _targetPath, _code, _type, requestConf.getContentLocation(), requestConf.getLang()) + "\r\n" + _response;
 }
 
@@ -245,6 +231,15 @@ std::string	Response::to_string(size_t n)
 	tmp << n;
 
 	return tmp.str();
+}
+
+//405 413 예외처리
+void			Response::checkClientError(Request &request,GetConf &getConf)
+{
+	if(getConf.getAllowedMethods().find(request.getMethod()) == getConf.getAllowedMethods().end())
+		_statusCode = 405;
+	else if (getConf.getClientBodyBufferSize() < request.getBody().size())
+		_statusCode = 413;
 }
 
 //getter

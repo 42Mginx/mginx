@@ -30,16 +30,16 @@ class GetConf{
 		void 										getConfTester();
 
 	//getter
-		const std::string&							GetContentLocation() const;
-		const std::string&							GetTargetPath() const;
-		const std::map<int, std::string>&			GetErrorPage() const;
-		const unsigned long&						GetClientBodyBufferSize() const;
-		const std::map<std::string, std::string>&	GetCgiParam() const;
-		const std::string&							GetCgiPass() const;
-		const std::string&							GetLang() const;
-		const std::set<std::string>&				GetAllowedMethods() const;
+		const std::string&							getContentLocation() const;
+		const std::string&							getTargetPath() const;
+		const std::map<int, std::string>&			getErrorPage() const;
+		const unsigned long&						getClientBodyBufferSize() const;
+		const std::map<std::string, std::string>&	getCgiParam() const;
+		const std::string&							getCgiPass() const;
+		const std::string&							getLang() const;
+		const std::set<std::string>&				getAllowedMethods() const;
 		// const t_listen							&getHostPort() const;
-		bool  										GetAutoIndex() const;
+		bool  										getAutoIndex() const;
 
 	//utils
 		// std::string							addIndex(Request& request);

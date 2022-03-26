@@ -8,8 +8,9 @@ CgiHandler	&CgiHandler::operator=(CgiHandler const &src) {
 	return *this;
 }
 
-// void		CgiHandler::_initEnv(Request &request, RequestConfig &config)
-void		CgiHandler::_initEnv(void) {
+
+void		CgiHandler::_initEnv(Request &request, GetConf &getConf)
+{
 
 	std::map<std::string, std::string>	headers = request.getHeaders(); //request에서 '요청헤더' 가져옴
 
@@ -18,13 +19,13 @@ void		CgiHandler::_initEnv(void) {
 
 	// this->_env["REDIRECT_STATUS"] = "200"; //Security needed to execute php-cgi
 	// this->_env["GATEWAY_INTERFACE"] = "CGI/1.1";
-	this->_env["SCRIPT_NAME"] = config.getPath(); //HTTP 요청의 첫 번째 라인에 있는 조회 문자열까지의 URL.
+	this->_env["SCRIPT_NAME"] = getConf.getContentLocation(); //HTTP 요청의 첫 번째 라인에 있는 조회 문자열까지의 URL.
 	// this->_env["SCRIPT_FILENAME"] = config.getPath();
 	this->_env["REQUEST_METHOD"] = request.getMethod();
 	// this->_env["CONTENT_LENGTH"] = to_string(this->_body.length());
 	// this->_env["CONTENT_TYPE"] = headers["Content-Type"];
-	this->_env["PATH_INFO"] = request.getPath(); //might need some change, using config path/contentLocation
-	this->_env["PATH_TRANSLATED"] = request.getPath(); //might need some change, using config path/contentLocation //진짜경로
+	this->_env["PATH_INFO"] = request.getTargetPath(); //might need some change, using config path/contentLocation
+	this->_env["PATH_TRANSLATED"] = request.getTargetPath(); //might need some change, using config path/contentLocation //진짜경로
 	// this->_env["QUERY_STRING"] = request.getQuery();
 	// this->_env["REMOTE_ADDRr"] = to_string(config.getHostPort().host);
 	// this->_env["REMOTE_IDENT"] = headers["Authorization"];
@@ -39,7 +40,7 @@ void		CgiHandler::_initEnv(void) {
 	this->_env["SERVER_PROTOCOL"] = "HTTP/1.1";
 	// this->_env["SERVER_SOFTWARE"] = "Weebserv/1.0";
 
-	this->_env.insert(config.getCgiParam().begin(), config.getCgiParam().end());
+	this->_env.insert(getConf.getCgiParam().begin(), getConf.getCgiParam().end());
 }
 
 
@@ -64,14 +65,13 @@ std::string		CgiHandler::executeCgi(const std::string& scriptName) {
 	char		**env;
 	std::string	cgiBody;
 
-	std::cout<<scriptName<<std::endl;
-	std::string scriptName2 = "test_us/root/a.out";
-
 	try {
 		env = this->_getEnvAsCstrArray();
+		/* CGI ENV 출력 TEST
 		std::cout<<"env cout"<<std::endl;
 		for(int i = 0;env[i] != NULL;i++)
 			std::cout<<env[i]<<std::endl;
+		*/
 	}
 	catch (std::bad_alloc &e) {
 		std::cerr << e.what()  << std::endl;
@@ -102,8 +102,8 @@ std::string		CgiHandler::executeCgi(const std::string& scriptName) {
 
 		dup2(fdIn, STDIN_FILENO);
 		dup2(fdOut, STDOUT_FILENO);
-		// execve(scriptName.c_str(), nll, env);
-		execve(scriptName2.c_str(), nll, env);
+		execve(scriptName.c_str(), nll, env);
+		// execve(scriptName2.c_str(), nll, env);
 		std::cerr << "CGI Execve crashed." << std::endl;
 		write(STDOUT_FILENO, "Status: 500\r\n\r\n", 15);
 	}
@@ -141,10 +141,10 @@ std::string		CgiHandler::executeCgi(const std::string& scriptName) {
 
 //
 
-CgiHandler::CgiHandler(Request &request, RequestConfig &config):
+CgiHandler::CgiHandler(Request &request, GetConf &getConf):
 _body(request.getBody())
 {
-	this->_initEnv(request, config);
+	this->_initEnv(request, getConf);
 }
 
 CgiHandler::CgiHandler(CgiHandler const &src) {

@@ -11,7 +11,7 @@ GetConf::GetConf(Request &request, ServerBlock &serverBlock )
 		_errorPage = serverBlock.getErrorPage(); // 에러페이지 위치
 		_clientBodyBufferSize = serverBlock.getClientBodyBufferSize(); // Conf에서 제한한 Client max body size, defaults to 8 000
 		// std::map<std::string, std::string>	_cgiParam;
-		_cgiPass = ""; // CGI 위치
+		_cgiPass = serverBlock.getCgiPass();; // CGI 위치
 		// _cgiPass = serverBlock.getCgiPass(); //CGI위치
 		_allowedMethods = serverBlock.getAllowedMethods(); // allowed http METHOD for request
 		// t_listen							_hostPort;
@@ -33,31 +33,31 @@ void GetConf::getConfTester(){
 }
 
 //getters
-const std::string&							GetConf::GetContentLocation() const {
+const std::string&							GetConf::getContentLocation() const {
 	return this->_contentLocation;
 }
 
-const std::string&							GetConf::GetTargetPath() const {
+const std::string&							GetConf::getTargetPath() const {
 	return this->_targetPath;
 }
 
-const std::map<int, std::string>&			GetConf::GetErrorPage() const {
+const std::map<int, std::string>&			GetConf::getErrorPage() const {
 	return this->_errorPage;
 }
 
-const unsigned long							&GetConf::GetClientBodyBufferSize() const {
+const unsigned long							&GetConf::getClientBodyBufferSize() const {
 	return this->_clientBodyBufferSize;
 }
 
-const std::map<std::string, std::string>	&GetConf::GetCgiParam() const {
+const std::map<std::string, std::string>	&GetConf::getCgiParam() const {
 	return this->_cgiParam;
 }
 
-const std::string&							GetConf::GetCgiPass() const {
+const std::string&							GetConf::getCgiPass() const {
 	return this->_cgiPass;
 }
 
-const std::set<std::string>				&GetConf::GetAllowedMethods() const {
+const std::set<std::string>				&GetConf::getAllowedMethods() const {
 	return this->_allowedMethods;
 }
 
@@ -65,6 +65,6 @@ const std::set<std::string>				&GetConf::GetAllowedMethods() const {
 // 	return this->_hostPort;
 // }
 
-bool  									GetConf::GetAutoIndex() const {
+bool  									GetConf::getAutoIndex() const {
 	return this->_autoindex;
 }

@@ -3,6 +3,10 @@
 # define CGI_HANDLER_HPP
 
 # include "../Webserver.hpp"
+# include "../request/Request.hpp"
+# include "../response/GetConf.hpp"
+
+# define CGI_BUFSIZE 65536
 
 class CgiHandler {
 	private:
@@ -10,7 +14,7 @@ class CgiHandler {
 		std::string							_body;
 	public:
 		CgiHandler(void);
-		// CgiHandler(Request &request, RequestConfig &config); // sets up env according to the request
+		CgiHandler(Request &request, GetConf &getConf); // sets up env according to the request
 
 
 		CgiHandler(CgiHandler const &src);
@@ -18,8 +22,8 @@ class CgiHandler {
 		CgiHandler   	&operator=(CgiHandler const &src);
 
 		char								**_getEnvAsCstrArray() const;
-		// void								_initEnv(Request &request, RequestConfig &config);
-		void								_initEnv(void);
+		void								_initEnv(Request &request, GetConf &getConf);
+
 
 		std::string		executeCgi(const std::string &scriptName);	// executes cgi and returns body
 

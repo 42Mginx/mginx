@@ -34,7 +34,7 @@ std::string		ResponseHeader::notAllowedMethod(GetConf &getConf, int statusCode)
 {
 	std::string	header;
 	initValues();
-	setValues(0, getConf.GetContentLocation(), statusCode, "", getConf.GetContentLocation());
+	setValues(0, getConf.getContentLocation(), statusCode, "", getConf.getContentLocation());
 
 	if (statusCode == 405)
 		header = "HTTP/1.1 405 Method Not Allowed\r\n";

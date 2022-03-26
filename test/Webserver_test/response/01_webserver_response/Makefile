@@ -1,7 +1,7 @@
 PWD = $(shell pwd)
 
-all: mginx.cpp Webserver.cpp response/Response.cpp response/ResponseHeader.cpp  autoindex/AutoindexGenerator.cpp request/Request.cpp response/GetConf.cpp ServerBlock.cpp
-	clang++ -o server_file Webserver.cpp mginx.cpp response/Response.cpp response/ResponseHeader.cpp  autoindex/AutoindexGenerator.cpp request/Request.cpp response/GetConf.cpp ServerBlock.cpp
+all: mginx.cpp Webserver.cpp response/Response.cpp response/ResponseHeader.cpp  autoindex/AutoindexGenerator.cpp request/Request.cpp response/GetConf.cpp ServerBlock.cpp cgi/CgiHandler.cpp
+	clang++ -o server_file Webserver.cpp mginx.cpp response/Response.cpp response/ResponseHeader.cpp  autoindex/AutoindexGenerator.cpp request/Request.cpp response/GetConf.cpp ServerBlock.cpp cgi/CgiHandler.cpp
 
 clean:
 	rm -rf server_file
