@@ -36,6 +36,7 @@ int main()
 	//serverblock 은 찾아서 넘겨줄예정
 	//dummy 서버블록 만들어서 테스트하기
  	GetConf getConf(request,serverblock);
+	//location탐색 함수
 	response.run(request, getConf);
 	std::cout<<response.getResponse();
 }
