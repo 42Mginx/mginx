@@ -5,7 +5,7 @@
 GetConf::GetConf()
 {}
 
-GetConf::GetConf(Request &request, ServerBlock &server_block )
+GetConf::GetConf(Request &request, ServerBlock &server_block)
 {
 
 
@@ -47,8 +47,14 @@ GetConf::GetConf(Request &request, ServerBlock &server_block )
 			_index.push_back(*it);
 		}
 
+		//alias, location 없는상태
+		ret = root + request.getTargetPath();
+		_content_location = removeNearSlashes(request.getTargetPath());
+		_target_path = removeNearSlashes(ret);
+
+
 		// _target_path = removeNearSlashes("dummy.html");//Path는 진짜 파일경로
-		_content_location = "dummy.html"; // 실제 대상 파일 위치
+		// _content_location = "dummy.html"; // 실제 대상 파일 위치
 
 		/*추가작업해야할 것들
 
