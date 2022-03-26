@@ -10,6 +10,7 @@ ServerBlock::ServerBlock(void) {
 	tempMethod.insert("GET");
 	tempMethod.insert("POST");
 	tempMethod.insert("PUT");
+	tempMethod.insert("DELETE");
 	_allowed_methods = tempMethod; // 얘는 여러개
 
 	std::map<int, std::string> tempError;

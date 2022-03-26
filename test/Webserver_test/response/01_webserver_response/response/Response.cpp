@@ -47,7 +47,6 @@ void	Response::getMethod(Request &request,GetConf &getConf)
 		CgiHandler	cgi(request, getConf);
 		_response = cgi.executeCgi(getConf.getCgiPass()); //cig결과값 _response에 넣기
 	}
-
 	else if(_statusCode == 200)
 		_statusCode = readContent(); //_body 만 작성된 상태
 	else
@@ -72,7 +71,13 @@ void			Response::postMethod(Request &request,GetConf &getConf)
 {
 	ResponseHeader	header;
 
-	if(_statusCode == 204)
+	if (getConf.getCgiPass() != "")
+	{
+		std::cout<<"Cgi_Pass : "<<getConf.getCgiPass()<<std::endl;
+		CgiHandler	cgi(request, getConf);
+		_response = cgi.executeCgi(getConf.getCgiPass()); //cig결과값 _response에 넣기
+	}
+	else if(_statusCode == 204)
 	{
 		_statusCode = 204;
 		_response = "";
@@ -89,9 +94,8 @@ void			Response::putMethod(Request &request,GetConf &getConf)
 	ResponseHeader	header;
 	std::string		content;
 
-		content = request.getBody();
+	content = request.getBody();
 	_response = ""; //_response 초기화
-	_targetPath = "dummy2.html"; //PUT샘플용 더미
 	_statusCode = writeContent(content);
 	if (_statusCode != 201 && _statusCode != 204)
 		_response = this->readHtml(_errorMap[_statusCode]);
@@ -105,9 +109,6 @@ void			Response::deleteMethod(Request &request,GetConf &getConf)
 	getConf.getConfTester();
 
 	ResponseHeader	header;
-
-	_targetPath = "dummy2.html";
-
 	_response = "";
 	if (pathIsFile(_targetPath))
 	{
@@ -121,7 +122,6 @@ void			Response::deleteMethod(Request &request,GetConf &getConf)
 	if (_statusCode == 403 || _statusCode == 404)
 		_response = this->readHtml(_errorMap[_statusCode]);
 	_response = header.getHeader(_response.size(), _targetPath, _statusCode, _type, getConf.getContentLocation() + "\r\n" + _response);
-	// _response = head.getHeader(_response.size(), _targetPath, _code, _type, requestConf.getContentLocation(), requestConf.getLang()) + "\r\n" + _response;
 }
 
 

@@ -15,8 +15,8 @@ std::vector<std::string>					_valid_methods;
 
 Request::Request()
 {
-	_method ="GET";
-	_target_path ="dummy.html";
+	_method ="PUT";
+	_target_path ="dummy2.html";
 	// _target_path ="files/default_error_pages";
 	// _target_path ="";
 
