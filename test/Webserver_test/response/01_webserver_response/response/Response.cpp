@@ -1,94 +1,98 @@
 #include "Response.hpp"
 
-void			Response::responseSet(Request &request,GetConf &getConf)//(request, getConf ) //받기
+void			Response::responseSet(Request &request,GetConf &getconf)//(request, getconf ) //받기
 {
-	_statusCode = request.getStatus();
-	_targetPath = request.getTargetPath();
-	_errorMap = getConf.getErrorPage();
-	_isAutoIndex = getConf.getAutoIndex();
-	_requestMethod = request.getMethod();
+	_status_code = request.getStatus();
+	_request_method = request.getMethod();
+
+	_error_map = getconf.getErrorPage();
+	_target_path = getconf.getTargetPath();
+	_auto_index = getconf.getAutoIndex();
+	//host
+	//port
+
 
 	//405 413 예외처리
-	checkClientError(request, getConf);
+	checkClientError(request, getconf);
 }
 
-void			Response::run(Request &request,GetConf &getConf)//(request, getConf ) //받기
+void			Response::run(Request &request,GetConf &getconf)//(request, getconf ) //받기
 {
 	//Response valule setting
-	responseSet(request, getConf);
-	if(_statusCode == 405 || _statusCode == 413)
+	responseSet(request, getconf);
+	if(_status_code == 405 || _status_code == 413)
 	{
 		ResponseHeader header;
-		_response = header.notAllowedMethod(getConf, _statusCode);
+		_response = header.notAllowedMethod(getconf, _status_code);
 		return ;
 	}
 	//Run Method
-	if(_requestMethod == "GET")
-		getMethod(request,getConf);
-	else if(_requestMethod == "HEAD")
-		headMethod(request,getConf);
-	else if(_requestMethod == "POST")
-		postMethod(request,getConf);
-	else if(_requestMethod == "PUT")
-		putMethod(request,getConf);
-	else if(_requestMethod == "DELETE")
-		deleteMethod(request,getConf);
+	if(_request_method == "GET")
+		getMethod(request,getconf);
+	else if(_request_method == "HEAD")
+		headMethod(request,getconf);
+	else if(_request_method == "POST")
+		postMethod(request,getconf);
+	else if(_request_method == "PUT")
+		putMethod(request,getconf);
+	else if(_request_method == "DELETE")
+		deleteMethod(request,getconf);
 	else
 		std::cout<<"Error : This method is not exist";
 }
 
-void	Response::getMethod(Request &request,GetConf &getConf)
+void	Response::getMethod(Request &request,GetConf &getconf)
 {
 	ResponseHeader header;
 
-	if (getConf.getCgiPass() != "")
+	if (getconf.getCgiPass() != "")
 	{
-		std::cout<<"Cgi_Pass : "<<getConf.getCgiPass()<<std::endl;
-		CgiHandler	cgi(request, getConf);
-		_response = cgi.executeCgi(getConf.getCgiPass()); //cig결과값 _response에 넣기
+		std::cout<<"Cgi_Pass : "<<getconf.getCgiPass()<<std::endl;
+		CgiHandler	cgi(request, getconf);
+		_response = cgi.executeCgi(getconf.getCgiPass()); //cig결과값 _response에 넣기
 	}
-	else if(_statusCode == 200)
-		_statusCode = readContent(); //_body 만 작성된 상태
+	else if(_status_code == 200)
+		_status_code = readContent(); //_body 만 작성된 상태
 	else
-		_response = this->readHtml(_errorMap[_statusCode]);
-	if (_statusCode == 500) //예측하지 못한 서버에러
-		_response = this->readHtml(_errorMap[_statusCode]);
-	_response = header.getHeader(_response.size(), _targetPath, _statusCode, _type, getConf.getContentLocation()) + "\r\n" + _response;
+		_response = this->readHtml(_error_map[_status_code]);
+	if (_status_code == 500) //예측하지 못한 서버에러
+		_response = this->readHtml(_error_map[_status_code]);
+	_response = header.getHeader(_response.size(), _target_path, _status_code, _type, getconf.getContentLocation()) + "\r\n" + _response;
 }
 
 
 //head METHOD
-void			Response::headMethod(Request &request,GetConf &getConf)
+void			Response::headMethod(Request &request,GetConf &getconf)
 {
 	ResponseHeader	header;
 
-	_statusCode = readContent();
-	_response = header.getHeader(_response.size(), _targetPath, _statusCode, _type, getConf.getContentLocation() +"\r\n");
+	_status_code = readContent();
+	_response = header.getHeader(_response.size(), _target_path, _status_code, _type, getconf.getContentLocation() +"\r\n");
 }
 
 //post METHOD
-void			Response::postMethod(Request &request,GetConf &getConf)
+void			Response::postMethod(Request &request,GetConf &getconf)
 {
 	ResponseHeader	header;
 
-	if (getConf.getCgiPass() != "")
+	if (getconf.getCgiPass() != "")
 	{
-		std::cout<<"Cgi_Pass : "<<getConf.getCgiPass()<<std::endl;
-		CgiHandler	cgi(request, getConf);
-		_response = cgi.executeCgi(getConf.getCgiPass()); //cig결과값 _response에 넣기
+		std::cout<<"Cgi_Pass : "<<getconf.getCgiPass()<<std::endl;
+		CgiHandler	cgi(request, getconf);
+		_response = cgi.executeCgi(getconf.getCgiPass()); //cig결과값 _response에 넣기
 	}
-	else if(_statusCode == 204)
+	else if(_status_code == 204)
 	{
-		_statusCode = 204;
+		_status_code = 204;
 		_response = "";
 	}
-	if (_statusCode == 500)
-		_response = this->readHtml(_errorMap[_statusCode]);
-	_response = header.getHeader(_response.size(), _targetPath, _statusCode, _type, getConf.getContentLocation() + "\r\n" + _response);
+	if (_status_code == 500)
+		_response = this->readHtml(_error_map[_status_code]);
+	_response = header.getHeader(_response.size(), _target_path, _status_code, _type, getconf.getContentLocation() + "\r\n" + _response);
 }
 
 //put METHOD
-void			Response::putMethod(Request &request,GetConf &getConf)
+void			Response::putMethod(Request &request,GetConf &getconf)
 {
 
 	ResponseHeader	header;
@@ -96,32 +100,32 @@ void			Response::putMethod(Request &request,GetConf &getConf)
 
 	content = request.getBody();
 	_response = ""; //_response 초기화
-	_statusCode = writeContent(content);
-	if (_statusCode != 201 && _statusCode != 204)
-		_response = this->readHtml(_errorMap[_statusCode]);
-	_response = header.getHeader(_response.size(), _targetPath, _statusCode, _type, getConf.getContentLocation() + "\r\n" + _response);
+	_status_code = writeContent(content);
+	if (_status_code != 201 && _status_code != 204)
+		_response = this->readHtml(_error_map[_status_code]);
+	_response = header.getHeader(_response.size(), _target_path, _status_code, _type, getconf.getContentLocation() + "\r\n" + _response);
 
 }
 
-void			Response::deleteMethod(Request &request,GetConf &getConf)
+void			Response::deleteMethod(Request &request,GetConf &getconf)
 {
 	request.coutRequest();
-	getConf.getConfTester();
+	getconf.getConfTester();
 
 	ResponseHeader	header;
 	_response = "";
-	if (pathIsFile(_targetPath))
+	if (pathIsFile(_target_path))
 	{
-		if (remove(_targetPath.c_str()) == 0)
-			_statusCode = 204;
+		if (remove(_target_path.c_str()) == 0)
+			_status_code = 204;
 		else
-			_statusCode = 403;
+			_status_code = 403;
 	}
 	else
-		_statusCode = 404;
-	if (_statusCode == 403 || _statusCode == 404)
-		_response = this->readHtml(_errorMap[_statusCode]);
-	_response = header.getHeader(_response.size(), _targetPath, _statusCode, _type, getConf.getContentLocation() + "\r\n" + _response);
+		_status_code = 404;
+	if (_status_code == 403 || _status_code == 404)
+		_response = this->readHtml(_error_map[_status_code]);
+	_response = header.getHeader(_response.size(), _target_path, _status_code, _type, getconf.getContentLocation() + "\r\n" + _response);
 }
 
 
@@ -133,31 +137,31 @@ int				Response::readContent(void)
 	std::stringstream	buffer;
 
 	_response = "";//response초기화
-	if (pathIsFile(_targetPath)) //path에 파일이 있는지 확인하기 1이면 파일, 나머지는 0, [path = root + target_targetPath]
+	if (pathIsFile(_target_path)) //path에 파일이 있는지 확인하기 1이면 파일, 나머지는 0, [path = root + target_target_path]
 	{
-		file.open(_targetPath.c_str(), std::ifstream::in); //파일열기
+		file.open(_target_path.c_str(), std::ifstream::in); //파일열기
 		if (file.is_open() == false)
 		{
-			_response = this->readHtml(_errorMap[403]); //403읽고 반납, 작동중인 서버에 클라이언트의 요청이 도달했으나, 서버가 클라이언트의 접근을 거부할 때 반환하는 HTTP 응답 코드이자 오류 코드이다. 이 에러는 서버 자체 또는 서버에 있는 파일에 접근할 권한이 없을 경우에 발생한다.
+			_response = this->readHtml(_error_map[403]); //403읽고 반납, 작동중인 서버에 클라이언트의 요청이 도달했으나, 서버가 클라이언트의 접근을 거부할 때 반환하는 HTTP 응답 코드이자 오류 코드이다. 이 에러는 서버 자체 또는 서버에 있는 파일에 접근할 권한이 없을 경우에 발생한다.
 			return (403);
 		}
 		buffer << file.rdbuf(); //현재 읽은 파일을 버퍼에 넣음
 		_response = buffer.str(); //_buffer에 있는걸 response에 넣음
 		file.close(); //파일 닫기
 	}
-	else if (_isAutoIndex) // 파일이 없으면 + 오토인덱스가 켜져있으면
+	else if (_auto_index) // 파일이 없으면 + 오토인덱스가 켜져있으면
 	{
 		std::cout<<"autoindex test 실행됨"<<std::endl;
 		int tmpHost = 0;
 		int tmpPort = 80;
 		// buffer << AutoIndexGenerator::getPage(_tatgetPath.c_str(), to_string(_hostPort.host), _hostPort.port);
-		buffer << AutoIndexGenerator::getPage(_targetPath.c_str(), to_string(tmpHost), tmpPort);//HOST, PORT  정리되면 다시 넣어야함
+		buffer << AutoIndexGenerator::getPage(_target_path.c_str(), to_string(tmpHost), tmpPort);//HOST, PORT  정리되면 다시 넣어야함
 		_response = buffer.str();
 		_type = "text/html";
 	}
 	else
 	{
-		_response = this->readHtml(_errorMap[404]); //404readhtml 넣기
+		_response = this->readHtml(_error_map[404]); //404readhtml 넣기
 		return (404);
 	}
 	return (200);
@@ -167,16 +171,16 @@ int				Response::writeContent(std::string content)
 {
 	std::ofstream	file;
 
-	if (pathIsFile(_targetPath))
+	if (pathIsFile(_target_path))
 	{
-		file.open(_targetPath.c_str());
+		file.open(_target_path.c_str());
 		file << content;
 		file.close();
 		return (204); //흔히 204를 반환하는 경우는 PUT 요청에 대한 응답으로, 사용자에게 보여지는 페이지를 바꾸지 않고 리소스를 업데이트할 때 쓰입니다. 있는 파일에다가 쓸ㅇㅜ
 	}
 	else
 	{
-		file.open(_targetPath.c_str(), std::ofstream::out | std::ofstream::trunc);
+		file.open(_target_path.c_str(), std::ofstream::out | std::ofstream::trunc);
 		if (file.is_open() == false)
 			return (403);
 
@@ -234,12 +238,12 @@ std::string	Response::to_string(size_t n)
 }
 
 //405 413 예외처리
-void			Response::checkClientError(Request &request,GetConf &getConf)
+void			Response::checkClientError(Request &request,GetConf &getconf)
 {
-	if(getConf.getAllowedMethods().find(request.getMethod()) == getConf.getAllowedMethods().end())
-		_statusCode = 405;
-	else if (getConf.getClientBodyBufferSize() < request.getBody().size())
-		_statusCode = 413;
+	if(getconf.getAllowedMethods().find(request.getMethod()) == getconf.getAllowedMethods().end())
+		_status_code = 405;
+	else if (getconf.getClientBodyBufferSize() < request.getBody().size())
+		_status_code = 413;
 }
 
 //getter
@@ -253,7 +257,7 @@ std::string		Response::getResponse(void)
 Response & Response::operator=(const Response & src)
 {
 	_response = src._response;
-	_targetPath = src._targetPath;
+	_target_path = src._target_path;
 	return (*this);
 }
 

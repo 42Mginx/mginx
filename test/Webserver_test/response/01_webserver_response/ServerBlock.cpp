@@ -29,9 +29,13 @@ ServerBlock::ServerBlock(void) {
 
 	// location directives
 	// std::map<std::string, std::string> _cgi_param;
-	_cgi_pass = "selfCgiTester";
+	// _cgi_pass = "selfCgiTester";
+	_cgi_pass = "";
 
 		std::vector<std::string> tempIndex;
+	tempIndex.push_back("index.html");
+	tempIndex.push_back("index2.html");
+	tempIndex.push_back("index3.html");
 	tempIndex.push_back("index.html");
 	_index = tempIndex; //파일명임
 	// std::string _alias;

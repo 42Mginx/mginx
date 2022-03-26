@@ -17,13 +17,13 @@ class Response {
 private:
 
 	std::string					_response;
-	std::string					_targetPath;
-	int							_statusCode;
+	std::string					_target_path;
+	int							_status_code;
 	std::string					_type;
-	std::string					_requestMethod;
-	bool						_isAutoIndex;
+	std::string					_request_method;
+	bool						_auto_index;
 	t_listen					_hostPort;
-	std::map<int, std::string>	_errorMap;
+	std::map<int, std::string>	_error_map;
 
 
 public:
@@ -36,17 +36,17 @@ public:
 	std::string		getResponse(void);
 
 	//response setting
-	void	responseSet(Request &request,GetConf &getConf);
+	void	responseSet(Request &request,GetConf &getconf);
 
 	//resposne 실행
-	void	run(Request &request,GetConf &getConf);
+	void	run(Request &request,GetConf &getconf);
 
 	//reqeuest method 따라서 실행
-	void	getMethod(Request &request, GetConf &getConf);
-	void	headMethod(Request &request,GetConf &getConf);
-	void	postMethod(Request &request,GetConf &getConf);
-	void	putMethod(Request &request,GetConf &getConf);
-	void	deleteMethod(Request &request,GetConf &getConf);
+	void	getMethod(Request &request, GetConf &getconf);
+	void	headMethod(Request &request,GetConf &getconf);
+	void	postMethod(Request &request,GetConf &getconf);
+	void	putMethod(Request &request,GetConf &getconf);
+	void	deleteMethod(Request &request,GetConf &getconf);
 
 	//utils
 	int				readContent(void);
@@ -54,7 +54,7 @@ public:
 	std::string		readHtml(const std::string& path);
 	int				pathIsFile(const std::string& path);
 	std::string					to_string(size_t n);
-	void			checkClientError(Request &request, GetConf &getConf);
+	void			checkClientError(Request &request, GetConf &getconf);
 
 
 
