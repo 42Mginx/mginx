@@ -8,59 +8,40 @@ CgiHandler	&CgiHandler::operator=(CgiHandler const &src) {
 	return *this;
 }
 
+// void		CgiHandler::_initEnv(Request &request, RequestConfig &config)
 void		CgiHandler::_initEnv(void) {
-	std::map<std::string, std::string>	headers = request.getHeaders();
 
-	this->_env["CONTENT_LENGTH"] = to_string(this->_body.length());
-	this->_env["CONTENT_TYPE"] = headers["Content-Type"];
-	this->_env["GATEWAY_INTERFACE"] = "CGI/1.1";
+	std::map<std::string, std::string>	headers = request.getHeaders(); //request에서 '요청헤더' 가져옴
+
+	// if (headers.find("Auth-Scheme") != headers.end() && headers["Auth-Scheme"] != "")
+		// this->_env["AUTH_TYPE"] = headers["Authorization"];
+
+	// this->_env["REDIRECT_STATUS"] = "200"; //Security needed to execute php-cgi
+	// this->_env["GATEWAY_INTERFACE"] = "CGI/1.1";
+	this->_env["SCRIPT_NAME"] = config.getPath(); //HTTP 요청의 첫 번째 라인에 있는 조회 문자열까지의 URL.
+	// this->_env["SCRIPT_FILENAME"] = config.getPath();
+	this->_env["REQUEST_METHOD"] = request.getMethod();
+	// this->_env["CONTENT_LENGTH"] = to_string(this->_body.length());
+	// this->_env["CONTENT_TYPE"] = headers["Content-Type"];
 	this->_env["PATH_INFO"] = request.getPath(); //might need some change, using config path/contentLocation
 	this->_env["PATH_TRANSLATED"] = request.getPath(); //might need some change, using config path/contentLocation //진짜경로
-	this->_env["QUERY_STRING"] = request.getQuery();
-	this->_env["REQUEST_METHOD"] = request.getMethod();
-	this->_env["REQUEST_URI"] = request.getPath() + request.getQuery(); //현재 페이지 주소에서 도메인을 제외한 값.
-	this->_env["SCRIPT_NAME"] = config.getPath(); //HTTP 요청의 첫 번째 라인에 있는 조회 문자열까지의 URL.
-	this->_env["SERVER_PROTOCOL"] = "HTTP/1.1";
-	this->_env["SERVER_SOFTWARE"] = "Weebserv/1.0";
+	// this->_env["QUERY_STRING"] = request.getQuery();
+	// this->_env["REMOTE_ADDRr"] = to_string(config.getHostPort().host);
+	// this->_env["REMOTE_IDENT"] = headers["Authorization"];
+	// this->_env["REMOTE_USER"] = headers["Authorization"];
+	// this->_env["REQUEST_URI"] = request.getPath() + request.getQuery(); //현재 페이지 주소에서 도메인을 제외한 값.
+	// if (headers.find("Hostname") != headers.end())
+		// this->_env["SERVER_NAME"] = headers["Hostname"];
+	// else
+		// this->_env["SERVER_NAME"] = this->_env["REMOTEaddr"];
 
-	//밑에 두개는 애매함
+	// this->_env["SERVER_PORT"] = to_string(config.getHostPort().port);
+	this->_env["SERVER_PROTOCOL"] = "HTTP/1.1";
+	// this->_env["SERVER_SOFTWARE"] = "Weebserv/1.0";
 
 	this->_env.insert(config.getCgiParam().begin(), config.getCgiParam().end());
 }
 
-
-// void		CgiHandler::_initEnv(Request &request, RequestConfig &config) {
-// 	std::map<std::string, std::string>	headers = request.getHeaders();
-
-
-// 	if (headers.find("Auth-Scheme") != headers.end() && headers["Auth-Scheme"] != "")
-// 		this->_env["AUTH_TYPE"] = headers["Authorization"];
-// 	this->_env["CONTENT_LENGTH"] = to_string(this->_body.length());
-// 	this->_env["CONTENT_TYPE"] = headers["Content-Type"];
-// 	this->_env["GATEWAY_INTERFACE"] = "CGI/1.1";
-// 	this->_env["PATH_INFO"] = request.getPath(); //might need some change, using config path/contentLocation
-// 	this->_env["PATH_TRANSLATED"] = request.getPath(); //might need some change, using config path/contentLocation
-// 	this->_env["QUERY_STRING"] = request.getQuery();
-// 	this->_env["REMOTE_ADDRr"] = to_string(config.getHostPort().host);
-// 	this->_env["REMOTE_IDENT"] = headers["Authorization"];
-// 	this->_env["REMOTE_USER"] = headers["Authorization"];
-// 	this->_env["REQUEST_METHOD"] = request.getMethod();
-// 	this->_env["REQUEST_URI"] = request.getPath() + request.getQuery();
-// 	this->_env["SCRIPT_NAME"] = config.getPath();
-// 	if (headers.find("Hostname") != headers.end())
-// 		this->_env["SERVER_NAME"] = headers["Hostname"];
-// 	else
-// 		this->_env["SERVER_NAME"] = this->_env["REMOTE_ADDR"];
-// 	this->_env["SERVER_PORT"] = to_string(config.getHostPort().port);
-// 	this->_env["SERVER_PROTOCOL"] = "HTTP/1.1";
-// 	this->_env["SERVER_SOFTWARE"] = "Weebserv/1.0";
-
-// 	//밑에 두개는 애매함
-// 	this->_env["REDIRECT_STATUS"] = "200";
-// 	this->_env["SCRIPT_FILENAME"] = config.getPath();
-
-// 	this->_env.insert(config.getCgiParam().begin(), config.getCgiParam().end());
-// }
 
 char					**CgiHandler::_getEnvAsCstrArray() const {
 	char	**env = new char*[this->_env.size() + 1];

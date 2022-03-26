@@ -7,7 +7,7 @@ ServerBlock::ServerBlock(void) {
 	// std::vector<t_listen> _listen;			// 여러개일 수 있음
 	_root = "";						// 얘는 한개
 	std::set<std::string> tempMethod;
-	tempMethod.insert("GET");
+	// tempMethod.insert("GET");
 	tempMethod.insert("POST");
 	tempMethod.insert("PUT");
 	_allowed_methods = tempMethod; // 얘는 여러개
@@ -23,7 +23,7 @@ ServerBlock::ServerBlock(void) {
 
 
 	_error_page = tempError; // 얘도 여러개
-	_client_body_buffer_size = 100;			// 한 개
+	_client_body_buffer_size = 1;			// 한 개
 	_auto_index = false;						// 한 개
 
 	// location directives

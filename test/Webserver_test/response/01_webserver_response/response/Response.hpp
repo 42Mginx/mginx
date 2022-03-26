@@ -35,6 +35,9 @@ public:
 
 	std::string		getResponse(void);
 
+	//response setting
+	void	responseSet(Request &request,GetConf &getConf);
+
 	//resposne 실행
 	void	run(Request &request,GetConf &getConf);
 
@@ -51,6 +54,7 @@ public:
 	std::string		readHtml(const std::string& path);
 	int				pathIsFile(const std::string& path);
 	std::string					to_string(size_t n);
+	void			checkClientError(Request &request, GetConf &getConf);
 
 
 

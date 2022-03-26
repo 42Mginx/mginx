@@ -1,30 +1,47 @@
 #include "Response.hpp"
 
+void			Response::responseSet(Request &request,GetConf &getConf)//(request, getConf ) //받기
+{
+	_statusCode = request.getStatus();
+	_targetPath = request.getTargetPath();
+	_errorMap = getConf.GetErrorPage();
+	_isAutoIndex = getConf.GetAutoIndex();
+	_requestMethod = request.getMethod();
+
+	checkClientError(request, getConf);
+}
+
+void			Response::checkClientError(Request &request,GetConf &getConf)
+{
+	if(getConf.GetAllowedMethods().find(request.getMethod()) == getConf.GetAllowedMethods().end())
+		_statusCode = 405;
+	else if (getConf.GetClientBodyBufferSize() < request.getBody().size())
+		_statusCode = 413;
+}
+
 void			Response::run(Request &request,GetConf &getConf)//(request, getConf ) //받기
 {
 	//1. statusCode
 	//2. _targetPath = conf.getpath  -> requeestConf.getpath
 	//3. response constructor
 
-	//Init
-	_statusCode = request.getStatus();
-	_targetPath = request.getTargetPath();
-	_errorMap = getConf.GetErrorPage();
-	_isAutoIndex = getConf.GetAutoIndex();
-
-	_requestMethod = request.getMethod();
+	//response 값 세팅
+	responseSet(request, getConf);
 
 	//405 413 예외처리
-	if(getConf.GetAllowedMethods().find(request.getMethod()) == getConf.GetAllowedMethods().end())
-		_statusCode = 405;
-	else if (getConf.GetClientBodyBufferSize() < request.getBody().size())
-		_statusCode = 413;
+	// if(getConf.GetAllowedMethods().find(request.getMethod()) == getConf.GetAllowedMethods().end())
+	// 	_statusCode = 405;
+	// else if (getConf.GetClientBodyBufferSize() < request.getBody().size())
+	// 	_statusCode = 413;
+
+
 	if(_statusCode == 405 || _statusCode == 413)
 	{
 		ResponseHeader header;
 		_response = header.notAllowedMethod(getConf, _statusCode);
 		return ;
 	}
+
 	//Run Method
 	if(_requestMethod == "GET")
 		getMethod(request,getConf);
