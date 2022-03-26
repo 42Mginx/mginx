@@ -8,13 +8,14 @@
 //Request, ServerBlock 인자로 받아오기
 class GetConf{
 	private:
-		std::string							_contentLocation; // 실제 대상 파일 위치
-		std::string							_targetPath; // request 요청 위치
-		std::map<int, std::string>			_errorPage; // 에러페이지 위치
-		unsigned long						_clientBodyBufferSize; // Conf에서 제한한 Client max body size, defaults to 8 000
-		std::map<std::string, std::string>	_cgiParam;
-		std::string							_cgiPass; // CGI 위치
-		std::set<std::string>				_allowedMethods; // allowed http METHOD for request
+
+		std::string							_content_location; // 실제 대상 파일 위치
+		std::string							_target_path; // request 요청 위치
+		std::map<int, std::string>			_error_page; // 에러페이지 위치
+		unsigned long						_client_body_buffer_size; // Conf에서 제한한 Client max body size, defaults to 8 000
+		std::map<std::string, std::string>	_cgi_param;
+		std::string							_cgi_ass; // CGI 위치
+		std::set<std::string>				_allowed_methods; // allowed http METHOD for request
 		// t_listen							_hostPort;
 
 		//아래 두 멤버는 요청의 끝자리가 '/'일때만 필요, autoindex는 해당파일이 존재하지않을대도 필요

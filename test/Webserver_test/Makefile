@@ -40,7 +40,7 @@ OBJS = $(addprefix $(OBJ_DIR)/, $(SRCS:.cpp=.o))
 
 CLIENT_DIR = client
 
-all: $(NAME) 
+all: $(NAME)
 
 $(NAME): $(CLIENT) $(OBJ_DIR) $(OBJS)
 		@$(MAKE) -C $(CLIENT_DIR) re

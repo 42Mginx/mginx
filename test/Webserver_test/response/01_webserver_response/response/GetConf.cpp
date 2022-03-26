@@ -5,20 +5,25 @@
 GetConf::GetConf()
 {}
 
-GetConf::GetConf(Request &request, ServerBlock &serverBlock )
+GetConf::GetConf(Request &request, ServerBlock &server_block )
 {
 		_contentLocation = "dummy.html"; // 실제 대상 파일 위치
-		_errorPage = serverBlock.getErrorPage(); // 에러페이지 위치
-		_clientBodyBufferSize = serverBlock.getClientBodyBufferSize(); // Conf에서 제한한 Client max body size, defaults to 8 000
-		// std::map<std::string, std::string>	_cgiParam;
-		_cgiPass = serverBlock.getCgiPass();; // CGI 위치
-		// _cgiPass = serverBlock.getCgiPass(); //CGI위치
-		_allowedMethods = serverBlock.getAllowedMethods(); // allowed http METHOD for request
+		_errorPage = server_block.getErrorPage(); // 에러페이지 위치
+		_clientBodyBufferSize = server_block.getClientBodyBufferSize(); // Conf에서 제한한 Client max body size, defaults to 8 000
+
+		_cgiPass = server_block.getCgiPass();; // CGI 위치
+		_allowedMethods = server_block.getAllowedMethods(); // allowed http METHOD for request
 		// t_listen							_hostPort;
 
 		//아래 두 멤버는 요청의 끝자리가 '/'일때만 필요, autoindex는 해당파일이 존재하지않을대도 필요
-		_index = serverBlock.getIndex(); // GET요청에 아무것도 들어 오지않앗을 경우 처리
-		_autoindex = serverBlock.getAutoIndex(); // Autoindex FLAG
+		_index = server_block.getIndex(); // GET요청에 아무것도 들어 오지않앗을 경우 처리
+		_autoindex = server_block.getAutoIndex(); // Autoindex FLAG
+
+		/*추가작업해야할 것들
+		_root
+		_cgiParam;
+		*/
+
 
 }
 
