@@ -1,5 +1,5 @@
-DELETE /index_example.html HTTP/1.1
+DELETE /index2.html HTTP/1.1
 User-Agent: custom-client
-Host: mginx 
+Host: mginx
 Accept-Language: en-US
 Connection: Keep-Alive
