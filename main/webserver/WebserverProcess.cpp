@@ -114,7 +114,10 @@ int WebserverProcess::process(void) {
         std::cout << "==> listnes: " << listen_it->host << "," << listen_it->port << std::endl;
     }
 
-    _response.run(_request, server_block);
+		std::cout<<"webserver process request_target_path : "<<_request.getTargetPath()<<std::endl;
+
+    GetConf getConf(_request,server_block);
+	_response.run(_request, getConf);
     // 3. make response
     _res = _response.getResponse();
     if (_res.empty()) {

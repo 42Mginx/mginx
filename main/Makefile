@@ -6,7 +6,7 @@ CC = clang++
 
 CFLAGS = -Wall -Wextra -Werror -g -std=c++98
 
-CLASSES = -I config -I request -I response -I webserver -I utils
+CLASSES = -I config -I request -I response -I webserver -I utils -I cgi -I autoindex
 
 ##############
 ### sources ##
@@ -23,18 +23,24 @@ CONFIG = Config ConfigUtil ServerBlock
 
 REQUEST = Request RequestUtil
 
-RESPONSE = Response
+RESPONSE = Response ResponseHeader GetConf
+
+AUTOINDEX = AutoIndexGenerator
+
+CGI = CgiHandler
 
 SRCS = $(addsuffix .cpp, $(MAIN)) \
 	$(addprefix webserver/, $(addsuffix .cpp, $(WEBSERVER))) \
 	$(addprefix config/, $(addsuffix .cpp, $(CONFIG))) \
 	$(addprefix request/, $(addsuffix .cpp, $(REQUEST))) \
 	$(addprefix response/, $(addsuffix .cpp, $(RESPONSE))) \
+	$(addprefix autoindex/, $(addsuffix .cpp, $(AUTOINDEX))) \
+	$(addprefix cgi/, $(addsuffix .cpp, $(CGI))) \
 
 
 OBJ_DIR = obj
 
-OBJ_SUBDIR = $(addprefix $(OBJ_DIR)/, config request response webserver)
+OBJ_SUBDIR = $(addprefix $(OBJ_DIR)/, config request response webserver cgi autoindex)
 
 OBJS = $(addprefix $(OBJ_DIR)/, $(SRCS:.cpp=.o))
 

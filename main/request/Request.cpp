@@ -1,6 +1,6 @@
 #include "Request.hpp"
 
-Request::Request() : 
+Request::Request() :
 	_method (""), _target_path(""), _query(""), _version(""), _body(""), _status_code(200)
 {
 	initHeaders();
@@ -54,6 +54,8 @@ void	Request::initValidMethod()
 	_valid_methods.push_back("GET");
 	_valid_methods.push_back("POST");
 	_valid_methods.push_back("DELETE");
+	_valid_methods.push_back("PUT");
+	_valid_methods.push_back("HEAD");
 }
 
 void	Request::parseProcess(std::string request_value)
@@ -106,7 +108,7 @@ void	Request::parseProcess(std::string request_value)
 void	Request::parseStartLine(const std::string& str)
 {
 	size_t	i(0);
-	
+
 	if (_status_code == 200)
 		parseMethod(str, i);
 	if (_status_code == 200)
@@ -155,11 +157,11 @@ void	Request::parsePath(const std::string& line, size_t &i)
 	_target_path.assign(line, start, i - start);
 }
 
-// path에서 쿼리 찾아 쿼리 변수에 넣고, path에서 쿼리 제거 
+// path에서 쿼리 찾아 쿼리 변수에 넣고, path에서 쿼리 제거
 void				Request::parseQuery()
 {
 	size_t		i;
-	
+
 	//_path에서 ?를 찾음
 	i = _target_path.find_first_of('?');
 	// 찾으면
