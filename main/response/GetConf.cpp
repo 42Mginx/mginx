@@ -51,10 +51,18 @@ GetConf::GetConf(Request &request, ServerBlock &server_block)
 			_index.push_back(*it);
 		}
 
+
 		//alias, location 없는상태
 		ret = root + request.getTargetPath();
 		_content_location = removeNearSlashes(request.getTargetPath());
 		_target_path = removeNearSlashes(ret);
+
+		// if (!pathIsFile(this->_target_path) && request.getMethod() == "GET") {
+		if (request.getTargetPath() == "/" && request.getMethod() == "GET") {
+			_content_location =	server_block.getIndex().at(0);
+			ret = root +"/"+ _content_location;
+			_target_path = removeNearSlashes(ret);
+		}
 
 		std::cout<<"request_target_path : "<<request.getTargetPath()<<std::endl;
 		std::cout<<"target_path : "<<_target_path<<std::endl;
@@ -67,6 +75,20 @@ GetConf::GetConf(Request &request, ServerBlock &server_block)
 
 		*/
 
+	// std::string indexPath;
+	// if (!pathIsFile(this->_path) && method == "GET") {
+	// 	std::cout<<"index path@@@@@@@@@@@@@@@@"<<std::endl;
+	// 	//indexPath가 공백이 아니면?
+	// 	indexPath = this->addIndex(request);
+	// 	std::cout<<indexPath<<std::endl;
+
+	// 	// if ((indexPath = this->addIndex(request)) != "") {
+	// 	// 	config = GetConf.getLocationForRequest(indexPath, locationName);
+	// 	// 	this->_cgi_pass = get.getCgiPass();
+	// 	// 	this->_cgi_param = config.getCgiParam();
+	// 	// 	std::cout<<_cgi_pass<<std::endl;
+	// 	// }
+	// }
 
 }
 
@@ -137,3 +159,71 @@ std::string						GetConf::removeNearSlashes(const std::string &str) {
 	}
 	return ret;
 }
+
+
+int		GetConf::pathIsFile(const std::string& path)
+{
+	struct stat s;
+	if (stat(path.c_str(), &s) == 0 ) //s에다가 저장해두기
+	{
+		if (s.st_mode & S_IFDIR) //폴더면 0
+			return 0;
+		else if (s.st_mode & S_IFREG) //regular file이면 1
+			return 1;
+		else
+			return 0;
+	}
+	else
+		return 0;
+}
+
+
+// std::string								RequestConfig::addIndex(Request& request)
+// {
+// 	std::vector<std::string>::iterator							it;
+// 	std::list<std::pair<std::string, float> >::const_iterator	lang;
+// 	std::string													path;
+
+// 	it = this->_index.begin();
+// 	while(it != this->_index.end()) // Check with language prefs
+// 	{
+// 		for (lang = request.getLang().begin(); lang != request.getLang().end(); lang++)
+// 		{
+// 			path = this->_path;
+// 			if (path[path.size() - 1] != '/')
+// 				path += "/";
+// 			if ((*it).find('.') != (*it).npos)
+// 				path += (*it).substr(0, (*it).find_last_of('.') + 1) + lang->first + (*it).substr((*it).find_last_of('.'));
+// 			if (pathIsFile(path))
+// 			{
+// 				this->_path = path;
+// 				if (this->_contentLocation.size() && this->_contentLocation[this->_contentLocation.size() - 1] != '/')
+// 					this->_contentLocation += "/";
+// 				// NOT PROTECTED AGAINST INDEXES WITHOUT EXTENSION
+// 				if ((*it).find('.') != (*it).npos)
+// 					this->_contentLocation += (*it).substr(0, (*it).find_last_of('.') + 1) + lang->first + (*it).substr((*it).find_last_of('.'));
+// 				return this->_path;
+// 			}
+// 		}
+// 		it++;
+// 	}
+
+// 	it = this->_index.begin();
+// 	while(it != this->_index.end()) // check with index file only
+// 	{
+// 		path = this->_path;
+// 		if (path[path.size() - 1] != '/')
+// 			path += "/";
+// 		path += *it;
+// 		if (pathIsFile(path))
+// 		{
+// 			this->_path = path;
+// 			if (this->_contentLocation[this->_contentLocation.size() - 1] != '/')
+// 				this->_contentLocation += "/";
+// 			this->_contentLocation += *it;
+// 			return this->_path;
+// 		}
+// 		it++;
+// 	}
+// 	return "";
+// }

@@ -45,6 +45,7 @@ class GetConf{
 	//utils
 		// std::string							addIndex(Request& request); // GET요청에 아무것도 들어 오지않앗을 경우 처리, index는 default에 있는거랑 config에 있는거 둘다 체크하네
 		std::string									removeNearSlashes(const std::string &str);
+		int											pathIsFile(const std::string& path);
 
 
 };
