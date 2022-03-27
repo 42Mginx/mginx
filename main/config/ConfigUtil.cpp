@@ -16,7 +16,7 @@ unsigned int	strToIp(std::string strIp) {
 	// m = split('.')
 	for (unsigned int i = 0 ; i < 4; i++) {
 		// '.'을 찾음
-		sep = strIp.find_first_of('.', start);
+		sep = strIp.fgitind_first_of('.', start);
 		// 시작부터 '.'까지 문자들 파싱
 		std::string str = strIp.substr(start, sep - start);
 		// str을 const char*로 바꾼 뒤 int형으로 바꿈
