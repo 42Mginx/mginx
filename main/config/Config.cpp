@@ -179,62 +179,6 @@ void Config::parseAllListens(
     }
 }
 
-void Config::passMembers(ServerBlock &serverBlock)
-{
-    if (&serverBlock != &_defaultConf)
-    {
-        // 서버 _listen이 비었니
-        if (serverBlock.getListen().empty())
-            // this 클래스의 getListen값으로 채워줌
-            serverBlock.setListen(_defaultConf);
-        // 서버 _root 비었니
-        if (serverBlock.getRoot() == "")
-            serverBlock.setRoot(_defaultConf.getRoot());
-        // _serverBlock_name 맨 뒤에 _defaultConf.넣어줌
-        serverBlock.setServerName(_defaultConf);
-        // _allowed_methods 넣어줌
-        if (serverBlock.getAllowedMethods().empty())
-            serverBlock.setAllowedMethods(_defaultConf.getAllowedMethods());
-        // _error_page 넣어줌
-        std::map<int, std::string> tmp_error_page = _defaultConf.getErrorPage();
-        for (std::map<int, std::string>::const_iterator i =
-                 tmp_error_page.begin();
-             i != tmp_error_page.end(); i++)
-        {
-            std::map<int, std::string> tmp = serverBlock.getErrorPage();
-            if (tmp.find(i->first) == tmp.end())
-                serverBlock.setErrorPage(i->first, i->second);
-        }
-        // _index 넣어줌
-        serverBlock.setIndex(_defaultConf);
-        // _client_body_buffer_size 넣어줌
-        if (serverBlock.getClientBodyBufferSize() == 0)
-            serverBlock.setClientBodyBufferSize(
-                _defaultConf.getClientBodyBufferSize());
-        // _cgi_param 넗어줌
-        std::map<std::string, std::string> tmp_default_conf =
-            _defaultConf.getCgiParam();
-        for (std::map<std::string, std::string>::const_iterator i =
-                 tmp_default_conf.begin();
-             i != tmp_default_conf.end(); i++)
-        {
-            std::map<std::string, std::string> tmp = serverBlock.getCgiParam();
-            if (tmp.find(i->first) == tmp.end())
-                serverBlock.setCgiParam(i->first, i->second);
-        }
-        // _cgi_pass 넣어줌
-        if (serverBlock.getCgiPass() == "")
-            serverBlock.setCgiPass(_defaultConf.getCgiPass());
-        // _location 넣어줌
-        std::map<std::string, ServerBlock> tmpServerBlock =
-            serverBlock.getLocation();
-        for (std::map<std::string, ServerBlock>::iterator i =
-                 tmpServerBlock.begin();
-             i != tmpServerBlock.end(); i++)
-            passMembers(i->second);
-    }
-}
-
 void Config::parseListenAndFillBlank()
 {
     std::vector<t_listen> allListens;
@@ -243,7 +187,13 @@ void Config::parseListenAndFillBlank()
          serverBlock != _serverBlocks.end(); serverBlock++)
     {
         parseAllListens(allListens, serverBlock);
-        passMembers((*serverBlock));
+        std::cout << "나가게 해줘" << std::endl;
+        _defaultConf.passMembers((*serverBlock));
+        std::cout << "나갔다해줘..." << std::endl;
+        std::map<std::string, ServerBlock> tmpLocation = serverBlock->getLocation();
+        for (std::map<std::string, ServerBlock>::iterator i = tmpLocation.begin() ; i != tmpLocation.end(); i++)
+			serverBlock->passMembers(i->second);
+        std::cout << "나갔다해줘...2" << std::endl;
     }
     _allListens = allListens;
 }

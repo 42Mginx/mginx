@@ -76,7 +76,7 @@ public:
 	// 지시어(directives) 모음 맵
 	static directivesMap _initDirectivesMap();
 	static directivesMap _initLocationDirectivesMap();
-
+	void	passMembers(ServerBlock &server) const;
 	class ExceptionInvalidArguments : public std::exception
 	{
 		virtual const char *what() const throw();

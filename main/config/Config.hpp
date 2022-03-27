@@ -24,7 +24,6 @@ class Config
 
 		void parseListenAndFillBlank();
 		void parseAllListens(std::vector<t_listen> &allListens, std::vector<ServerBlock>::const_iterator serverBlock);
-		void passMembers(ServerBlock &serverBlock);
 		// get 함수
 		ServerBlock getDefaultConf();
 		std::vector<ServerBlock> getServerBlock();
