@@ -117,6 +117,34 @@ int WebserverProcess::process(void) {
 		std::cout<<"webserver process request_target_path : "<<_request.getTargetPath()<<std::endl;
 
     GetConf getConf(_request,server_block);
+
+      //@@location
+    // std::map<std::string, ServerBlock> location_test = server_block.getLocation();
+
+    // std::map<std::string, ServerBlock>::iterator iter_location = location_test.begin();
+
+    // while (iter_location != location_test.end()) {
+    //     std::cout << "[" << iter_location->first <<" ]\n";
+    //     ++iter_location;
+    // }
+    // iter_location = location_test.begin();
+    // // std::cout<<"iter_location_second : "<<iter_location->second.getRoot()<<std::endl;
+
+	// std::cout<<"client body size : "<<iter_location->first<<std::endl;
+	// std::cout<<"client body size : "<<iter_location->second.getClientBodyBufferSize()<<std::endl;
+	// std::cout<<"client body size : "<<(++iter_location)->first<<std::endl;
+	// std::cout<<"client body size : "<<(++iter_location)->second.getClientBodyBufferSize()<<std::endl;
+	// std::cout<<"client body size : "<<server_block.getClientBodyBufferSize()<<std::endl;
+
+
+
+
+    // for(; iter_location != iter_location.end(); iter_location++){
+    // std::cout<<"@@@@iter_location : "<<(iter_location--)->first<<std::endl;
+    // }
+
+
+    std::cout<<"check point"<<std::endl;
 	_response.run(_request, getConf);
     // 3. make response
     _res = _response.getResponse();
@@ -150,7 +178,7 @@ void WebserverProcess::clear(void) {
 // util
 void WebserverProcess::setAddr(void) {
     int addrlen;
-    
+
     addrlen = sizeof(_addr);
     _addr.sin_family = AF_INET;
     _addr.sin_addr.s_addr = _listen_info.host;
