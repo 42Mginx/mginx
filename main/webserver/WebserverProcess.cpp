@@ -118,7 +118,7 @@ int WebserverProcess::process(void) {
 
     GetConf getConf(_request,server_block);
 
-      //@@location
+    //   @@location test
     // std::map<std::string, ServerBlock> location_test = server_block.getLocation();
 
     // std::map<std::string, ServerBlock>::iterator iter_location = location_test.begin();
@@ -128,20 +128,14 @@ int WebserverProcess::process(void) {
     //     ++iter_location;
     // }
     // iter_location = location_test.begin();
-    // // std::cout<<"iter_location_second : "<<iter_location->second.getRoot()<<std::endl;
-
-	// std::cout<<"client body size : "<<iter_location->first<<std::endl;
+    // for(;iter_location != location_test.end(); iter_location++)
+    // {
+    // std::cout<<"client body size : "<<iter_location->first<<std::endl;
 	// std::cout<<"client body size : "<<iter_location->second.getClientBodyBufferSize()<<std::endl;
-	// std::cout<<"client body size : "<<(++iter_location)->first<<std::endl;
-	// std::cout<<"client body size : "<<(++iter_location)->second.getClientBodyBufferSize()<<std::endl;
-	// std::cout<<"client body size : "<<server_block.getClientBodyBufferSize()<<std::endl;
 
-
-
-
-    // for(; iter_location != iter_location.end(); iter_location++){
-    // std::cout<<"@@@@iter_location : "<<(iter_location--)->first<<std::endl;
     // }
+    // location test
+
 
 
     std::cout<<"check point"<<std::endl;
