@@ -25,12 +25,6 @@ ServerBlock &ServerBlock::operator=(ServerBlock const &src)
     return *this;
 }
 
-// EXCEPTION HANDLING
-const char *ExceptionInvalidArguments::what() const throw()
-{
-    return "Exception: invalid arguments in configuration file";
-}
-
 /*------------- 지시어 파싱 맵과 함수들
  * --------------------------------------------------*/
 
