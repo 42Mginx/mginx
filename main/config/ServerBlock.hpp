@@ -7,6 +7,8 @@
 class ServerBlock
 {
 private:
+	static  ServerBlock				_default_conf;
+
 	std::vector<std::string> _server_name;	// 여러개일 수 있음
 	std::vector<t_listen> _listen;			// 여러개일 수 있음
 	std::string _root;						// 얘는 한개
@@ -44,17 +46,6 @@ public:
 	std::string getAlias() const;
 	bool getAliasSet() const;
 
-	void setServerName(ServerBlock &_default_conf);
-	void setListen(ServerBlock &_default_conf);
-	void setRoot(std::string _default_root);
-	void setAllowedMethods(std::set<std::string> _default_allowed_methods);
-	void setErrorPage(int key, std::string value);
-	void setIndex(ServerBlock &_default_conf);
-	void setClientBodyBufferSize(int _default_client_body_buffer_size);
-	void setAutoIndex();
-	void setCgiParam(std::string key, std::string value);
-	void setCgiPass(std::string _default_cgi_pass);
-
 	// 지시어 파싱 함수
 	void addServerName(std::vector<std::string> args);
 	void addListen(std::vector<std::string> args);
@@ -68,6 +59,8 @@ public:
 	void addCgiPass(std::vector<std::string> args);
 	void addIndex(std::vector<std::string> args);
 	void addAlias(std::vector<std::string> args);
+
+	static void _initDefaultServer(const char *filename);
 
 	int parseServerBlock(unsigned int &index, fileVector &file);
 	int parseLocationBlock(unsigned int &index, fileVector &file);

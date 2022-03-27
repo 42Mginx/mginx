@@ -16,16 +16,10 @@ class Config
 		Config(std::string config_path);
 		~Config();
 
-		void _initDefaultServer(const char *filename);
 		void parseProcess(std::string config_path);
-
-		fileVector readFile(std::string config_path_str);
-		fileVector split(std::string str, std::string charset);
-
 		void parseListenAndFillBlank();
 		void parseAllListens(std::vector<t_listen> &allListens, std::vector<ServerBlock>::const_iterator serverBlock);
 		// get 함수
-		ServerBlock getDefaultConf();
 		std::vector<ServerBlock> getServerBlock();
 		std::vector<t_listen> getAllListens();
 

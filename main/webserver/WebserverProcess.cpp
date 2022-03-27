@@ -182,7 +182,7 @@ void WebserverProcess::setAddr(void) {
     addrlen = sizeof(_addr);
     _addr.sin_family = AF_INET;
     _addr.sin_addr.s_addr = _listen_info.host;
-    _addr.sin_port = htonl(_listen_info.port);
+    _addr.sin_port = htons(_listen_info.port);
 };
 
 int WebserverProcess::findKeyIndex(std::string key) {

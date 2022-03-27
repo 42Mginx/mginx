@@ -2,6 +2,10 @@
 
 /*------------- 캐노니컬  --------------------------------------------------*/
 
+// INITIALIZING STATIC MEMBERS
+
+ServerBlock	ServerBlock::_default_conf = ServerBlock();
+
 ServerBlock::ServerBlock()
     : _root(""), _client_body_buffer_size(0), _auto_index(false),
       _aliasSet(false)
@@ -66,6 +70,34 @@ directivesMap ServerBlock::_initLocationDirectivesMap()
 
 directivesMap ServerBlock::locationDirectivesParseFunc =
     ServerBlock::_initLocationDirectivesMap();
+
+// default conf 읽고 파싱해서 ServerBlock클래스 공통 멤버변수 _defaultConf에
+// 넣어줌
+void ServerBlock::_initDefaultServer(const char *filename)
+{
+    ServerBlock server;
+    fileVector file;
+
+    // file 읽어줌
+    file = readFile(filename);
+    if (file.empty())
+    {
+        std::cerr << "Could not open default file at location [" << filename
+                  << "]" << std::endl;
+        throw FileNotFoundException();
+    }
+    fileVector begin;
+    unsigned int index = 2;
+    // 파일 내용 파싱하고 잘못되면 에러처리
+    if (!server.parseServerBlock(index, file))
+    {
+        std::cerr << "Invalid default config file." << std::endl;
+        throw ServerBlock::ExceptionInvalidArguments();
+    }
+    // ServerBlock class공통(static) _defaultConf에 server(원본 파일 내용이
+    // 인자값으로 있는 것) 넣어줌
+    ServerBlock::_default_conf = server;
+}
 
 // add 함수들
 
@@ -275,56 +307,6 @@ std::string ServerBlock::getAlias() const { return this->_alias; }
 
 bool ServerBlock::getAliasSet() const { return this->_aliasSet; }
 
-void ServerBlock::setServerName(ServerBlock &_default_conf)
-{
-    _server_name.insert(this->_server_name.end(),
-                        _default_conf.getServerName().begin(),
-                        _default_conf.getServerName().end());
-}
-
-void ServerBlock::setListen(ServerBlock &_default_conf)
-{
-    _listen.insert(this->_listen.begin(), _default_conf.getListen().begin(),
-                   _default_conf.getListen().end());
-}
-
-void ServerBlock::setRoot(std::string _default_root) { _root = _default_root; }
-
-void ServerBlock::setAllowedMethods(
-    std::set<std::string> _default_allowed_methods)
-{
-    _allowed_methods = _default_allowed_methods;
-}
-
-void ServerBlock::setErrorPage(int key, std::string value)
-{
-    _error_page.insert(std::make_pair(key, value));
-}
-
-void ServerBlock::setIndex(ServerBlock &_default_conf)
-{
-    _index.insert(_index.begin(), _default_conf.getIndex().begin(),
-                  _default_conf.getIndex().end());
-}
-
-void ServerBlock::setClientBodyBufferSize(
-    int _default_client_body_buffer_size)
-{
-    _client_body_buffer_size = _default_client_body_buffer_size;
-}
-
-void ServerBlock::setAutoIndex() {}
-
-void ServerBlock::setCgiParam(std::string key, std::string value)
-{
-    _cgi_param.insert(std::make_pair(key, value));
-}
-
-void ServerBlock::setCgiPass(std::string _default_cgi_pass)
-{
-    _cgi_pass = _default_cgi_pass;
-}
-
 // serverBlock 파싱
 int ServerBlock::parseServerBlock(unsigned int &index, fileVector &file)
 {
@@ -336,7 +318,6 @@ int ServerBlock::parseServerBlock(unsigned int &index, fileVector &file)
     // directivesParseFunc을 돌면서 관련 명령어가 있는 지 파싱
     for (; index < file.size() && file[index] != "}"; index++)
     {
-        std::cout << index << ": " << file[index] << std::endl;
         // directivesParseFunc에 file[index]에 해당하는 것이 없을 경우
         if ((iter = directivesParseFunc.find(file[index])) ==
             directivesParseFunc.end())
@@ -397,7 +378,14 @@ int ServerBlock::parseServerBlock(unsigned int &index, fileVector &file)
         (this->*ServerBlock::directivesParseFunc[directive])(args);
     //  해당 서버 디렉토리스가 파싱이 끝났다면('}'을 만났다면)
     if (!file[index].compare("}"))
+    {
+        // 혹시나 빈 값 defaultServer conf값으로 채워줌
+        ServerBlock::_default_conf.passMembers(*this);
+        // location도 돌면서 값 채워줌
+        for (std::map<std::string, ServerBlock>::iterator i = this->_location.begin(); i != this->_location.end(); i++)
+            this->passMembers(i->second);
         return 1;
+    }
     return 0;
 };
 
@@ -474,44 +462,48 @@ int ServerBlock::parseLocationBlock(unsigned int &index, fileVector &file)
 }
 
 // 서버의 빈 값 default서버로 채워줌 -> 여기서 this가 defaultserver conf값임
-void	ServerBlock::passMembers(ServerBlock &server) const {
-	// 서버랑 같으면 안됑
-	if (this != &server) {
-		// 서버 _listen이 비었니
-		if (server._listen.empty())
-			//this 클래스의 _listen값으로 채워줌
-			server._listen.insert(server._listen.begin(), this->_listen.begin(), this->_listen.end());
-		// 서버 _root 비었니
-		if (server._root == "")
-			// this 루트 넣어줌
-			server._root = this->_root;
-		// _server_name에 this값 넣어줌
-		server._server_name.insert(server._server_name.end(), this->_server_name.begin(), this->_server_name.end());
-		// _error_page 넣어줌
-		for (std::map<int, std::string>::const_iterator i = this->_error_page.begin(); i != this->_error_page.end(); i++) {
-			if (server._error_page.find(i->first) == server._error_page.end())
-				server._error_page[i->first] = i->second;
-		}
-		// _client_body_buffer_size 넣어줌
-		if (server._client_body_buffer_size == 0)
-			server._client_body_buffer_size = this->_client_body_buffer_size;
-		// _cgi_param 넗어줌
-		for (std::map<std::string, std::string>::const_iterator i = this->_cgi_param.begin() ; i != this->_cgi_param.end(); i++) {
-			if (server._cgi_param.find(i->first) == server._cgi_param.end())
-				server._cgi_param[i->first] = i->second;
-		}
-		// _cgi_pass 넣어줌
-		if (server._cgi_pass == "")
-			server._cgi_pass = this->_cgi_pass;
-		// _allowed_methods 넣어줌
-		if (server._allowed_methods.empty())
-			server._allowed_methods = this->_allowed_methods;
-		// _index 넣어줌
-		server._index.insert(server._index.begin(), this->_index.begin(), this->_index.end());
-	}
-	// _location 넣어줌
-	for (std::map<std::string, ServerBlock>::iterator i = server._location.begin(); i != server._location.end(); i++)
-		server.passMembers(i->second);
+void ServerBlock::passMembers(ServerBlock &server) const
+{
+    // 서버랑 같으면 안됑
+    if (this != &server)
+    {
+        // 서버 _listen이 비었니
+        if (server._listen.empty())
+            //this 클래스의 _listen값으로 채워줌
+            server._listen.insert(server._listen.begin(), this->_listen.begin(), this->_listen.end());
+        // 서버 _root 비었니
+        if (server._root == "")
+            // this 루트 넣어줌
+            server._root = this->_root;
+        // _server_name에 this값 넣어줌
+        server._server_name.insert(server._server_name.end(), this->_server_name.begin(), this->_server_name.end());
+        // _error_page 넣어줌
+        for (std::map<int, std::string>::const_iterator i = this->_error_page.begin(); i != this->_error_page.end(); i++)
+        {
+            if (server._error_page.find(i->first) == server._error_page.end())
+                server._error_page[i->first] = i->second;
+        }
+        // _client_body_buffer_size 넣어줌
+        if (server._client_body_buffer_size == 0)
+            server._client_body_buffer_size = this->_client_body_buffer_size;
+        // _cgi_param 넗어줌
+        for (std::map<std::string, std::string>::const_iterator i = this->_cgi_param.begin(); i != this->_cgi_param.end(); i++)
+        {
+            if (server._cgi_param.find(i->first) == server._cgi_param.end())
+                server._cgi_param[i->first] = i->second;
+        }
+        // _cgi_pass 넣어줌
+        if (server._cgi_pass == "")
+            server._cgi_pass = this->_cgi_pass;
+        // _allowed_methods 넣어줌
+        if (server._allowed_methods.empty())
+            server._allowed_methods = this->_allowed_methods;
+        // _index 넣어줌
+        server._index.insert(server._index.begin(), this->_index.begin(), this->_index.end());
+    }
+    // _location 넣어줌
+    for (std::map<std::string, ServerBlock>::iterator i = server._location.begin(); i != server._location.end(); i++)
+        server.passMembers(i->second);
 }
 
 const char *ServerBlock::ExceptionInvalidArguments::what()
