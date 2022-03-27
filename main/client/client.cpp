@@ -147,9 +147,9 @@ int main(int argc, char** argv) {
     int port;
     int method;
     std::string option;
-    std::string filename = "test/request_examples/";
 
     while (1) {
+        std::string filename = "test/request_examples/";
         port = choose_port();
         method = choose_method();
         option = choose_option(method);
