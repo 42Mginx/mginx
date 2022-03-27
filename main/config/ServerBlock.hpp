@@ -66,6 +66,7 @@ public:
 	int parseLocationBlock(unsigned int &index, fileVector &file);
 	static directivesMap directivesParseFunc;
 	static directivesMap locationDirectivesParseFunc;
+
 	// 지시어(directives) 모음 맵
 	static directivesMap _initDirectivesMap();
 	static directivesMap _initLocationDirectivesMap();
@@ -74,6 +75,8 @@ public:
 	{
 		virtual const char *what() const throw();
 	};
+
+	ServerBlock		getLocationForRequest(std::string const path,std::string &locationPath);
 };
 
 #endif

@@ -5,7 +5,7 @@
 GetConf::GetConf()
 {}
 
-GetConf::GetConf(Request &request, ServerBlock &server_block)
+GetConf::GetConf(Request &request, ServerBlock &server_block, std::string &locationName)
 {
 
 
@@ -51,7 +51,7 @@ GetConf::GetConf(Request &request, ServerBlock &server_block)
 			_index.push_back(*it);
 		}
 
-
+		(void)locationName;
 		//alias, location 없는상태
 		ret = root + request.getTargetPath();
 		_content_location = removeNearSlashes(request.getTargetPath());

@@ -511,3 +511,35 @@ const char *ServerBlock::ExceptionInvalidArguments::what()
 {
     return "Exception: invalid arguments in configuration file";
 }
+
+// GET CONFIG FOR HTTP REQUEST
+ServerBlock						ServerBlock::getLocationForRequest(std::string const path, std::string &retLocationPath) {
+	std::string::size_type	tryLen = path.length();
+	std::map<std::string, ServerBlock>::iterator	iter;
+	std::string									tryLocation;
+
+	if (!tryLen)
+		return *this;
+
+	//location이 존재하면
+	if (!this->_location.empty()) {
+		do {
+			tryLocation = path.substr(0, tryLen);
+			iter = this->_location.find(tryLocation);
+			if (iter != this->_location.end() && iter->first[0] != '*') {
+				retLocationPath = tryLocation;
+				return iter->second.getLocationForRequest(path, retLocationPath);//ServerBlock(serverblock)
+			}
+			tryLen--;
+		} while (tryLen);
+		for (std::map<std::string, ServerBlock>::iterator i = this->_location.begin(); i != this->_location.end(); i++) {
+			if (i->first[0] == '*') {
+				std::string	suffix = i->first.substr(1);
+				if (path.length() > suffix.length() && !path.compare(path.length() - suffix.length(), suffix.length(), suffix)) {
+					return i->second.getLocationForRequest(path, retLocationPath);
+				}
+			}
+		}
+	}
+	return (*this);
+}

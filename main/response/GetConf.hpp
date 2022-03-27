@@ -24,7 +24,7 @@ class GetConf{
 
 	public:
 		GetConf();
-		GetConf(Request &request, ServerBlock &serverblock);
+		GetConf(Request &request, ServerBlock &serverblock, std::string &locationName);
 		~GetConf();
 
 	//tester

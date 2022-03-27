@@ -116,7 +116,17 @@ int WebserverProcess::process(void) {
 
 		std::cout<<"webserver process request_target_path : "<<_request.getTargetPath()<<std::endl;
 
-    GetConf getConf(_request,server_block);
+
+    // 3. getConf 세팅
+
+    // requestConf = conf.getConfigForRequest(this->_listen,
+    // request.getPath(), request.getHeaders().at("Host"),
+    // request.getMethod(), request);
+
+   	std::string		locationPath;
+    server_block = server_block.getLocationForRequest(_request.getTargetPath(),locationPath);
+    GetConf getConf(_request,server_block,locationPath);
+
 
     //   @@location test
     // std::map<std::string, ServerBlock> location_test = server_block.getLocation();
@@ -137,7 +147,7 @@ int WebserverProcess::process(void) {
     // location test
 
 	_response.run(_request, getConf);
-    // 3. make response
+    // 4. make response
     _res = _response.getResponse();
     if (_res.empty()) {
         return RETURN_ERROR;
