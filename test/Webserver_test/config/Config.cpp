@@ -70,7 +70,7 @@ void Config::_initDefaultServer(const char *filename)
     if (!server.parseServerBlock(index, file))
     {
         std::cerr << "Invalid default config file." << std::endl;
-        throw ServerBlock::ConfigException();
+        throw Config::ConfigException();
     }
     // ServerBlock class공통(static) _defaultConf에 server(원본 파일 내용이
     // 인자값으로 있는 것) 넣어줌
