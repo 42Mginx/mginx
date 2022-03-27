@@ -34,7 +34,7 @@ SRCS = $(addsuffix .cpp, $(MAIN)) \
 
 OBJ_DIR = obj
 
-OBJ_SUBDIR = $(addprefix $(OBJ_DIR)/, config request response_tmp webserver)
+OBJ_SUBDIR = $(addprefix $(OBJ_DIR)/, config request response webserver)
 
 OBJS = $(addprefix $(OBJ_DIR)/, $(SRCS:.cpp=.o))
 
