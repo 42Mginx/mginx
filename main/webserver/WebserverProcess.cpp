@@ -136,9 +136,6 @@ int WebserverProcess::process(void) {
     // }
     // location test
 
-
-
-    std::cout<<"check point"<<std::endl;
 	_response.run(_request, getConf);
     // 3. make response
     _res = _response.getResponse();

@@ -81,7 +81,7 @@ void			Response::postMethod(Request &request,GetConf &getconf)
 		CgiHandler	cgi(request, getconf);
 		_response = cgi.executeCgi(getconf.getCgiPass()); //cig결과값 _response에 넣기
 	}
-	else if(_status_code == 204)
+	else
 	{
 		_status_code = 204;
 		_response = "";
