@@ -1,5 +1,6 @@
 #include "Webserver.hpp"
 #include "WebserverProcess.hpp"
+#include <errno.h>
 
 void Webserver::parseConfig(std::string config_path) {
     _config.parseProcess(config_path);
@@ -25,15 +26,21 @@ void Webserver::init() {
 int Webserver::setup(void) {
     std::vector<t_listen>::const_iterator listen_i = _listens_v.begin();
     for (; listen_i != _listens_v.end(); listen_i++) {
+        // 멤버 변수에 listen이랑 config 넘기면서 생성
         WebserverProcess process(*listen_i, _config);
+        // host랑 port 출력
         std::cout << listen_i->host << ": " << listen_i->port << std::endl;
+
+        // 프로세스 셋업 실패시 에러 - 성공시 성공 출력
         if (process.setup() == -1) {
+            std::cout << "에러번호" << errno << ": "<< strerror(errno) << std::endl;
             std::cerr << RED << "Could not bind [" << listen_i->port << "]"
                       << RESET << std::endl;
         } else {
             std::cout << GREEN << "Bind success [" << listen_i->port << "]"
                       << RESET << std::endl;
         }
+        // 프로세스 넣어 줌.
         _process_v.push_back(process);
         int socket_fd = process.getFd();
         FD_SET(socket_fd, &_fd_set);

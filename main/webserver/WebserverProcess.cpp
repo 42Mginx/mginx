@@ -146,11 +146,19 @@ void WebserverProcess::clear(void) {
 
 // util
 void WebserverProcess::setAddr(void) {
-    int addrlen = sizeof(_addr);
+    int addrlen;
+    
+    addrlen = sizeof(_addr);
     _addr.sin_family = AF_INET;
-    _addr.sin_addr.s_addr = _listen_info.host || INADDR_ANY;
-    std::cout << _listen_info.port << std::endl;
-    _addr.sin_port = htons(_listen_info.port);
+    _addr.sin_addr.s_addr = _listen_info.host;
+    // _addr.sin_addr.s_addr = _listen_info.host || htonl(INADDR_ANY);
+    std::cout << "--------host_start---------" << std::endl;
+        std::cout << inet_addr("1.0.0.1") << std::endl;
+    std::cout << inet_addr("127.0.0.1") << std::endl;
+    std::cout << _listen_info.host << std::endl;
+    std::cout << INADDR_ANY << std::endl;
+    std::cout << "-----listen_host_end-----" << std::endl;
+    _addr.sin_port = htonl(_listen_info.port);
 };
 
 int WebserverProcess::findKeyIndex(std::string key) {
