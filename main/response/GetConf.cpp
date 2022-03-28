@@ -11,7 +11,7 @@ GetConf::GetConf(Request &request, ServerBlock &server_block, std::string &locat
 
 		_error_page = server_block.getErrorPage(); // 에러페이지 위치
 		_client_body_buffer_size = server_block.getClientBodyBufferSize(); // Conf에서 제한한 Client max body size, defaults to 8 000
-
+		// std::cout<< "location name" << locationName << std::endl;
 		std::cout<<"client body size : "<<_client_body_buffer_size<<std::endl;
 		_cgi_pass = server_block.getCgiPass(); // CGI 위치
 

@@ -381,18 +381,11 @@ int ServerBlock::parseServerBlock(unsigned int &index, fileVector &file)
     //  해당 서버 디렉토리스가 파싱이 끝났다면('}'을 만났다면)
     if (!file[index].compare("}"))
     {
-
-        std::cout << "_root: " << _root << std::endl;
-        std::cout << "cgi: " << _cgi_pass << std::endl;
         // 혹시나 빈 값 defaultServer conf값으로 채워줌
         ServerBlock::_default_conf.passMembers(*this);
         // location도 돌면서 값 채워줌
         for (std::map<std::string, ServerBlock>::iterator i = this->_location.begin(); i != this->_location.end(); i++)
             this->passMembers(i->second);
-        
-
-        std::cout << "_root2: " << _root << std::endl;
-        std::cout << "cgi2: " << _cgi_pass << std::endl;
         return 1;
     }
     return 0;
@@ -411,8 +404,6 @@ int ServerBlock::parseLocationBlock(unsigned int &index, fileVector &file)
     // parameters
     for (; index < file.size() && file[index] != "}"; index++)
     {
-        std::cout << index << ": " << file[index] << std::endl;
-
         // locationParsingMap에 해당 명령어 없을 경우
         if ((iter =
                  ServerBlock::locationDirectivesParseFunc.find(file[index])) ==
@@ -426,8 +417,7 @@ int ServerBlock::parseLocationBlock(unsigned int &index, fileVector &file)
 
                 if (directive != "")
                 {
-                    (this->*ServerBlock::locationDirectivesParseFunc
-                                [directive])(args);
+                    (this->*ServerBlock::locationDirectivesParseFunc[directive])(args);
                     args.clear();
                     directive = "";
                 }
@@ -507,7 +497,7 @@ void ServerBlock::passMembers(ServerBlock &server) const
         }
         // _cgi_pass 넣어줌
         if (server._cgi_pass == "")
-            server._cgi_pass = this->_cgi_pass;
+            server._cgi_pass = this->_cgi_pass;        
         // _allowed_methods 넣어줌
         if (server._allowed_methods.empty())
             server._allowed_methods = this->_allowed_methods;
