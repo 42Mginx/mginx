@@ -41,6 +41,8 @@ directivesMap ServerBlock::_initDirectivesMap()
     tmpMap["root"] = &ServerBlock::addRoot;
     tmpMap["error_page"] = &ServerBlock::addErrorPage;
     tmpMap["client_body_buffer_size"] = &ServerBlock::addClientBodyBufferSize;
+    tmpMap["cgi_param"] = &ServerBlock::addCgiParam;
+    tmpMap["cgi_pass"] = &ServerBlock::addCgiPass;
     tmpMap["autoindex"] = &ServerBlock::addAutoIndex;
     tmpMap["index"] = &ServerBlock::addIndex;
     tmpMap["allow_methods"] = &ServerBlock::addAllowedMethods;
