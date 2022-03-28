@@ -4,7 +4,7 @@
 
 // INITIALIZING STATIC MEMBERS
 
-ServerBlock	ServerBlock::_default_conf = ServerBlock();
+ServerBlock ServerBlock::_default_conf = ServerBlock();
 
 ServerBlock::ServerBlock()
     : _root(""), _client_body_buffer_size(0), _auto_index(false),
@@ -243,9 +243,11 @@ void ServerBlock::addCgiParam(std::vector<std::string> args)
 
 void ServerBlock::addCgiPass(std::vector<std::string> args)
 {
+    std::cout << "add cgi pass: " << args[0] << std::endl;
     if (args.size() != 1)
         throw ExceptionInvalidArguments();
-    this->_cgi_pass = args[0];
+    this->_cgi_pass[0] = args[0];
+    std::cout << "[IN] print member pass: " << this->_cgi_pass[0] << std::endl;
 }
 
 void ServerBlock::addIndex(std::vector<std::string> args)
@@ -348,10 +350,13 @@ int ServerBlock::parseServerBlock(unsigned int &index, fileVector &file)
                 // locationName 다음에 있는 '{' 인덱스부터 parseLocationBlock
                 // 보내 파싱해줌 -> 잘못되면 리턴 0
                 index++;
+                std::cout << "location name: "<< locationName << std::endl;
                 if (!location.parseLocationBlock(index, file))
                     return 0;
                 // 파싱한 값 -> _location에 넣어줌
                 _location[locationName] = location;
+                std::cout << "123: " << this->getLocation()["/get_test1"].getCgiPass() << std::endl;
+                std::cout << "/get_test1 buffersize: " << this->getLocation()["/get_test1"].getClientBodyBufferSize() << std::endl;
                 // 다음 index값이 "}"라면 조건문 처음으로
                 if (file[index] == "}")
                     continue;
@@ -375,17 +380,26 @@ int ServerBlock::parseServerBlock(unsigned int &index, fileVector &file)
             directive = iter->first;
         }
     }
+    std::cout << "------------------------ds--------------------------" << std::endl;
+    std::cout << "what: "<< file[index - 2] <<  " " << file[index - 3] << " " << file[index] << std::endl;
+    std::cout << "/get_test1 cgi_pass: " << this->getLocation()["*.bla"].getCgiPass() << std::endl;
+    std::cout << "/get_test1 buffersize: " << this->getLocation()["*.bla"].getClientBodyBufferSize() << std::endl;
+
     // directive가 있으면 해당 명령어 실행
     if (directive != "")
         (this->*ServerBlock::directivesParseFunc[directive])(args);
     //  해당 서버 디렉토리스가 파싱이 끝났다면('}'을 만났다면)
     if (!file[index].compare("}"))
     {
+        std::cout << this->getLocation()["/get_test1"].getCgiPass() << std::endl;
+
         // 혹시나 빈 값 defaultServer conf값으로 채워줌
         ServerBlock::_default_conf.passMembers(*this);
         // location도 돌면서 값 채워줌
         for (std::map<std::string, ServerBlock>::iterator i = this->_location.begin(); i != this->_location.end(); i++)
             this->passMembers(i->second);
+        std::cout << this->getLocation()["/get_test1"].getCgiPass() << std::endl;
+        std::cout << "------------------------ds--------------------------" << std::endl;
         return 1;
     }
     return 0;
@@ -404,6 +418,8 @@ int ServerBlock::parseLocationBlock(unsigned int &index, fileVector &file)
     // parameters
     for (; index < file.size() && file[index] != "}"; index++)
     {
+        std::cout << "index: " << index << " directive: " << directive << std::endl;
+        std::cout << "now: " << file[index] << std::endl;
         // locationParsingMap에 해당 명령어 없을 경우
         if ((iter =
                  ServerBlock::locationDirectivesParseFunc.find(file[index])) ==
@@ -420,6 +436,7 @@ int ServerBlock::parseLocationBlock(unsigned int &index, fileVector &file)
                     (this->*ServerBlock::locationDirectivesParseFunc[directive])(args);
                     args.clear();
                     directive = "";
+                    std::cout << "[OUT] print member pass: " << this->_cgi_pass << std::endl;
                 }
                 index++;
                 if (file[index] == "{" || file[index] == "}")
@@ -446,9 +463,10 @@ int ServerBlock::parseLocationBlock(unsigned int &index, fileVector &file)
             // directive이 있으면 실행
             if (directive != "")
             {
-                (this->*ServerBlock::locationDirectivesParseFunc[directive])(
-                    args);
+                (this->*ServerBlock::locationDirectivesParseFunc[directive])(args);
                 args.clear();
+                directive = "";
+                std::cout << "[OUT] print member pass: " << this->_cgi_pass << std::endl;
             }
             // directive없으면 해당 명령어 넣기
             directive = iter->first;
@@ -456,6 +474,7 @@ int ServerBlock::parseLocationBlock(unsigned int &index, fileVector &file)
     }
     if (directive != "")
         (this->*ServerBlock::locationDirectivesParseFunc[directive])(args);
+    std::cout << "[LAST OUT] print member pass: " << this->_cgi_pass << std::endl;
     //  set up default values if they were not set by the config file
     if (!file[index].compare("}"))
         return 1;
@@ -494,8 +513,10 @@ void ServerBlock::passMembers(ServerBlock &server) const
                 server._cgi_param[i->first] = i->second;
         }
         // _cgi_pass 넣어줌
+        std::cout << ">>>>PASSMEMBERS<<<<<<" <<std::endl;
+        std::cout << server._cgi_pass <<std::endl;
         if (server._cgi_pass == "")
-            server._cgi_pass = this->_cgi_pass;        
+            server._cgi_pass = this->_cgi_pass;
         // _allowed_methods 넣어줌
         if (server._allowed_methods.empty())
             server._allowed_methods = this->_allowed_methods;
@@ -514,33 +535,40 @@ const char *ServerBlock::ExceptionInvalidArguments::what()
 }
 
 // GET CONFIG FOR HTTP REQUEST
-ServerBlock						ServerBlock::getLocationForRequest(std::string const path, std::string &retLocationPath) {
-	std::string::size_type	tryLen = path.length();
-	std::map<std::string, ServerBlock>::iterator	iter;
-	std::string									tryLocation;
+ServerBlock ServerBlock::getLocationForRequest(std::string const path, std::string &retLocationPath)
+{
+    std::string::size_type tryLen = path.length();
+    std::map<std::string, ServerBlock>::iterator iter;
+    std::string tryLocation;
 
-	if (!tryLen)
-		return *this;
+    if (!tryLen)
+        return *this;
 
-	//location이 존재하면
-	if (!this->_location.empty()) {
-		do {
-			tryLocation = path.substr(0, tryLen);
-			iter = this->_location.find(tryLocation);
-			if (iter != this->_location.end() && iter->first[0] != '*') {
-				retLocationPath = tryLocation;
-				return iter->second.getLocationForRequest(path, retLocationPath);//ServerBlock(serverblock)
-			}
-			tryLen--;
-		} while (tryLen);
-		for (std::map<std::string, ServerBlock>::iterator i = this->_location.begin(); i != this->_location.end(); i++) {
-			if (i->first[0] == '*') {
-				std::string	suffix = i->first.substr(1);
-				if (path.length() > suffix.length() && !path.compare(path.length() - suffix.length(), suffix.length(), suffix)) {
-					return i->second.getLocationForRequest(path, retLocationPath);
-				}
-			}
-		}
-	}
-	return (*this);
+    //location이 존재하면
+    if (!this->_location.empty())
+    {
+        do
+        {
+            tryLocation = path.substr(0, tryLen);
+            iter = this->_location.find(tryLocation);
+            if (iter != this->_location.end() && iter->first[0] != '*')
+            {
+                retLocationPath = tryLocation;
+                return iter->second.getLocationForRequest(path, retLocationPath); //ServerBlock(serverblock)
+            }
+            tryLen--;
+        } while (tryLen);
+        for (std::map<std::string, ServerBlock>::iterator i = this->_location.begin(); i != this->_location.end(); i++)
+        {
+            if (i->first[0] == '*')
+            {
+                std::string suffix = i->first.substr(1);
+                if (path.length() > suffix.length() && !path.compare(path.length() - suffix.length(), suffix.length(), suffix))
+                {
+                    return i->second.getLocationForRequest(path, retLocationPath);
+                }
+            }
+        }
+    }
+    return (*this);
 }

@@ -4,7 +4,7 @@ NAME = webserv
 
 CC = clang++
 
-CFLAGS = -Wall -Wextra -Werror -g -std=c++98
+CXXFLAGS = -Wall -Wextra -Werror -g3 -std=c++98
 
 CLASSES = -I config -I request -I response -I webserver -I utils -I cgi -I autoindex
 
@@ -50,11 +50,11 @@ all: $(NAME)
 
 $(NAME): $(CLIENT) $(OBJ_DIR) $(OBJS)
 		@$(MAKE) -C $(CLIENT_DIR) re
-		@$(CC) -I. -o $(NAME) $(OBJS)
+		@$(CC) -g3 -fsanitize=address -I. -o $(NAME) $(OBJS)
 
 $(OBJ_DIR)/%.o: ./%.cpp
 		@printf "\033[0;33mGenerating objects... %-38.38s\r" $@
-		@$(CC) $(CLASSES) -o $@ -c $<
+		@$(CC) -g3 -fsanitize=address $(CLASSES) -o $@ -c $<
 
 $(OBJ_DIR):
 	@mkdir -p $(OBJ_DIR)
