@@ -308,6 +308,7 @@ ServerBlock WebserverProcess::findServerBlock() {
         if (listenMatched(it->getListen())) {
             std::cout << "=> find by ip address - the first one be a default" << std::endl;
             ret = &(*it);
+            break;
         }
     }
     return *ret;
