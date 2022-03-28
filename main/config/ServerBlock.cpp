@@ -320,7 +320,6 @@ int ServerBlock::parseServerBlock(unsigned int &index, fileVector &file)
     // directivesParseFunc을 돌면서 관련 명령어가 있는 지 파싱
     for (; index < file.size() && file[index] != "}"; index++)
     {
-        std::cout << index << ": " << file[index] << std::endl;
         // directivesParseFunc에 file[index]에 해당하는 것이 없을 경우
         if ((iter = directivesParseFunc.find(file[index])) ==
             directivesParseFunc.end())
@@ -330,7 +329,6 @@ int ServerBlock::parseServerBlock(unsigned int &index, fileVector &file)
             {
                 ServerBlock location;
                 std::string locationName;
-
                 // directive가 빈 문자열이 아니라면?
                 if (directive != "")
                 {
@@ -342,8 +340,6 @@ int ServerBlock::parseServerBlock(unsigned int &index, fileVector &file)
                 // 다음 단위가 '{' 또는 '}' 라면 리턴 0 (처음 반복문을 돌 때는
                 // locationName자리임.)
                 index++;
-                std::cout << index << ": " << file[index] << std::endl;
-
                 if (file[index] == "{" || file[index] == "}")
                     return 0;
                 // 아니라면 다음 인덱스는 locationName임.
@@ -351,7 +347,6 @@ int ServerBlock::parseServerBlock(unsigned int &index, fileVector &file)
                 // locationName 다음에 있는 '{' 인덱스부터 parseLocationBlock
                 // 보내 파싱해줌 -> 잘못되면 리턴 0
                 index++;
-                std::cout << index << ": " << file[index] << std::endl;
 
                 if (!location.parseLocationBlock(index, file))
                     return 0;
@@ -384,8 +379,6 @@ int ServerBlock::parseServerBlock(unsigned int &index, fileVector &file)
     if (directive != "")
         (this->*ServerBlock::directivesParseFunc[directive])(args);
     //  해당 서버 디렉토리스가 파싱이 끝났다면('}'을 만났다면)
-    std::cout << index << ": " << file[index] << std::endl;
-
     if (!file[index].compare("}"))
     {
 
@@ -396,10 +389,12 @@ int ServerBlock::parseServerBlock(unsigned int &index, fileVector &file)
         // location도 돌면서 값 채워줌
         for (std::map<std::string, ServerBlock>::iterator i = this->_location.begin(); i != this->_location.end(); i++)
             this->passMembers(i->second);
+        
+
+        std::cout << "_root2: " << _root << std::endl;
+        std::cout << "cgi2: " << _cgi_pass << std::endl;
         return 1;
     }
-    std::cout << "_root: " << _root << std::endl;
-    std::cout << "cgi: " << _cgi_pass << std::endl;
     return 0;
 };
 
@@ -437,13 +432,11 @@ int ServerBlock::parseLocationBlock(unsigned int &index, fileVector &file)
                     directive = "";
                 }
                 index++;
-                std::cout << index << ": " << file[index] << std::endl;
 
                 if (file[index] == "{" || file[index] == "}")
                     return 0;
                 locationName = file[index];
                 index++;
-                std::cout << index << ": " << file[index] << std::endl;
 
                 if (!location.parseLocationBlock(index, file))
                     return 0;
