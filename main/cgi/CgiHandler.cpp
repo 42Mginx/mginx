@@ -103,7 +103,6 @@ std::string		CgiHandler::executeCgi(const std::string& scriptName) {
 		dup2(fdIn, STDIN_FILENO);
 		dup2(fdOut, STDOUT_FILENO);
 		execve(scriptName.c_str(), nll, env);
-		// execve(scriptName2.c_str(), nll, env);
 		std::cerr << "CGI Execve crashed." << std::endl;
 		write(STDOUT_FILENO, "Status: 500\r\n\r\n", 15);
 	}

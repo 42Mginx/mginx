@@ -27,6 +27,7 @@ GetConf::GetConf(Request &request, ServerBlock &server_block, std::string &locat
 		std::cout<<"autoindex : "<<_autoindex<<std::endl;
 
 		std::string	alias = server_block.getAlias(); //기본폴더 위치 바꾸기
+		std::cout<<"alias : "<<alias<<std::endl;
 		std::string	root = server_block.getRoot(); //config 에서 기본폴더위치
 		std::string	ret;
 

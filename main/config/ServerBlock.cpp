@@ -20,6 +20,9 @@ ServerBlock &ServerBlock::operator=(ServerBlock const &src)
         _server_name = src._server_name;
         _listen = src._listen;
         _root = src._root;
+        _alias = src._alias;
+        _cgi_pass = src._cgi_pass;
+        _cgi_param = src._cgi_param;
         _allowed_methods = src._allowed_methods;
         _error_page = src._error_page;
         _client_body_buffer_size = src._client_body_buffer_size;
@@ -495,7 +498,7 @@ void ServerBlock::passMembers(ServerBlock &server) const
         }
         // _cgi_pass 넣어줌
         if (server._cgi_pass == "")
-            server._cgi_pass = this->_cgi_pass;        
+            server._cgi_pass = this->_cgi_pass;
         // _allowed_methods 넣어줌
         if (server._allowed_methods.empty())
             server._allowed_methods = this->_allowed_methods;
