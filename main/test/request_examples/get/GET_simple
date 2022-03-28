@@ -1,4 +1,4 @@
-GET /get_test/ HTTP/1.1
+GET /get_test HTTP/1.1
 Host: localhost
 User-Agent: Go-http-client/1.1
 Accept-Encoding: gzip
