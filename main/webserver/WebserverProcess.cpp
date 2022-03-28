@@ -149,6 +149,11 @@ int WebserverProcess::process(void) {
 	_response.run(_request, getConf);
     // 4. make response
     _res = _response.getResponse();
+
+
+    std::cout<<"\nresponse : ["<<std::endl;
+    std::cout<<_res<<std::endl;
+    std::cout<<"]\n"<<std::endl;;
     if (_res.empty()) {
         return RETURN_ERROR;
     } else {

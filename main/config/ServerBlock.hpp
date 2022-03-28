@@ -16,11 +16,11 @@ private:
 	std::map<int, std::string> _error_page; // 얘도 여러개
 	int _client_body_buffer_size;			// 한 개
 	bool _auto_index;						// 한 개
+
+	// location directives
 	std::map<std::string, std::string> _cgi_param;
 	std::string _cgi_pass;
 	std::vector<std::string> _index;
-	
-	// location directives
 	std::string _alias;
 	bool _aliasSet;
 

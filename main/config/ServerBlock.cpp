@@ -4,7 +4,7 @@
 
 // INITIALIZING STATIC MEMBERS
 
-ServerBlock ServerBlock::_default_conf = ServerBlock();
+ServerBlock	ServerBlock::_default_conf = ServerBlock();
 
 ServerBlock::ServerBlock()
     : _root(""), _client_body_buffer_size(0), _auto_index(false),
@@ -329,6 +329,7 @@ int ServerBlock::parseServerBlock(unsigned int &index, fileVector &file)
             {
                 ServerBlock location;
                 std::string locationName;
+
                 // directive가 빈 문자열이 아니라면?
                 if (directive != "")
                 {
@@ -347,7 +348,6 @@ int ServerBlock::parseServerBlock(unsigned int &index, fileVector &file)
                 // locationName 다음에 있는 '{' 인덱스부터 parseLocationBlock
                 // 보내 파싱해줌 -> 잘못되면 리턴 0
                 index++;
-
                 if (!location.parseLocationBlock(index, file))
                     return 0;
                 // 파싱한 값 -> _location에 넣어줌
@@ -422,12 +422,10 @@ int ServerBlock::parseLocationBlock(unsigned int &index, fileVector &file)
                     directive = "";
                 }
                 index++;
-
                 if (file[index] == "{" || file[index] == "}")
                     return 0;
                 locationName = file[index];
                 index++;
-
                 if (!location.parseLocationBlock(index, file))
                     return 0;
                 _location[locationName] = location;
@@ -516,40 +514,33 @@ const char *ServerBlock::ExceptionInvalidArguments::what()
 }
 
 // GET CONFIG FOR HTTP REQUEST
-ServerBlock ServerBlock::getLocationForRequest(std::string const path, std::string &retLocationPath)
-{
-    std::string::size_type tryLen = path.length();
-    std::map<std::string, ServerBlock>::iterator iter;
-    std::string tryLocation;
+ServerBlock						ServerBlock::getLocationForRequest(std::string const path, std::string &retLocationPath) {
+	std::string::size_type	tryLen = path.length();
+	std::map<std::string, ServerBlock>::iterator	iter;
+	std::string									tryLocation;
 
-    if (!tryLen)
-        return *this;
+	if (!tryLen)
+		return *this;
 
-    //location이 존재하면
-    if (!this->_location.empty())
-    {
-        do
-        {
-            tryLocation = path.substr(0, tryLen);
-            iter = this->_location.find(tryLocation);
-            if (iter != this->_location.end() && iter->first[0] != '*')
-            {
-                retLocationPath = tryLocation;
-                return iter->second.getLocationForRequest(path, retLocationPath); //ServerBlock(serverblock)
-            }
-            tryLen--;
-        } while (tryLen);
-        for (std::map<std::string, ServerBlock>::iterator i = this->_location.begin(); i != this->_location.end(); i++)
-        {
-            if (i->first[0] == '*')
-            {
-                std::string suffix = i->first.substr(1);
-                if (path.length() > suffix.length() && !path.compare(path.length() - suffix.length(), suffix.length(), suffix))
-                {
-                    return i->second.getLocationForRequest(path, retLocationPath);
-                }
-            }
-        }
-    }
-    return (*this);
+	//location이 존재하면
+	if (!this->_location.empty()) {
+		do {
+			tryLocation = path.substr(0, tryLen);
+			iter = this->_location.find(tryLocation);
+			if (iter != this->_location.end() && iter->first[0] != '*') {
+				retLocationPath = tryLocation;
+				return iter->second.getLocationForRequest(path, retLocationPath);//ServerBlock(serverblock)
+			}
+			tryLen--;
+		} while (tryLen);
+		for (std::map<std::string, ServerBlock>::iterator i = this->_location.begin(); i != this->_location.end(); i++) {
+			if (i->first[0] == '*') {
+				std::string	suffix = i->first.substr(1);
+				if (path.length() > suffix.length() && !path.compare(path.length() - suffix.length(), suffix.length(), suffix)) {
+					return i->second.getLocationForRequest(path, retLocationPath);
+				}
+			}
+		}
+	}
+	return (*this);
 }

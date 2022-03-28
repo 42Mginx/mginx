@@ -1,9 +1,7 @@
-POST /index.html HTTP/1.1
+POST / HTTP/1.1
 User-Agent: custom-client
 Host: weebserv
 Accept-Language: en-US
 Connection: Keep-Alive
 Content-type: text/html
-Content-length: 16
-
-<p>New File</p>
+Content-length: 0
