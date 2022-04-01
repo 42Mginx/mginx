@@ -66,7 +66,7 @@ std::string		ResponseHeader::writeHeader(void)
 		header += "Server: " + _server + "\r\n";
 
 
-	header += "Connection: close\r\n";
+	// header += "Connection: close\r\n";
 	// header += "Connection: keep-alive";
 
 	// if (_transferEncoding != "")
