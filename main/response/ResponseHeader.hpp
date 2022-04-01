@@ -40,6 +40,7 @@ public:
 
 	// Setter functions
 	void			setAllow(const std::string& allow = "");
+	void			setAllow(std::set<std::string> methods);
 	void			setContentLength(size_t size);
 	void			setContentLocation(const std::string& path);
 	void			setContentType(std::string type, std::string path);

@@ -5,9 +5,8 @@ int WebserverProcess::setup(void) {
     // 소켓 fd 만듦
     _socket_fd = socket(AF_INET, SOCK_STREAM, 0);
     if (_socket_fd != -1) {
-        // 소켓 fd Nonblocking으로 설정 (F_SETFL은 nonblocking을 설정하려면 필요한 플래그)
-        fcntl(_socket_fd, F_SETFL, O_NONBLOCK);
-        // 소켓 fd 바인딩 (fd와 addr을 엮는 과정)
+
+        // fcntl(_socket_fd, F_SETFL, O_NONBLOCK);
         if (bind(_socket_fd, (struct sockaddr *)&_addr, sizeof(_addr)) == -1) {
             return -1;
         }
@@ -20,7 +19,10 @@ int WebserverProcess::setup(void) {
 
 int WebserverProcess::accept(void) { 
     _connected_fd = ::accept(_socket_fd, NULL, NULL);
-    std::cout << "===> accept(WebserverProcess) " << _connected_fd << std::endl;
+    std::cout << "===> accept(WebserverProcess) " << _socket_fd << ":" << _connected_fd << std::endl;
+    if (_connected_fd != -1) {
+        fcntl(_connected_fd, F_SETFL, O_NONBLOCK);
+    }
     return _connected_fd;  // success: fd, fail: -1
 };
 
@@ -72,7 +74,7 @@ int WebserverProcess::readRequest(void) {
     if (ret == RETURN_PROCEED) {
         ret = process();
     }
-    std::cout << "request is [" << _req << "]" << std::endl;
+    std::cout << YELLOW << "request is [" << _req << "]" << RESET << std::endl;
 
     if (ret == RETURN_ERROR) {
         std::cerr << "// empty response error //" << std::endl;
@@ -81,9 +83,10 @@ int WebserverProcess::readRequest(void) {
     }
     if (ret == RETURN_PROCEED) {
         std::cout << "// res is ready... //" << std::endl;
+        std::cout << YELLOW << "res: [" << _res << "]" << RESET << std::endl;
         _ready_to_response = true;
     }
-    return ret;  // success: 0(RETURN_WAIT)/1(RETURN_PROCEED)
+    return ret;  // success: 1(RETURN_WAIT)/0(RETURN_PROCEED)
 };
 
 int WebserverProcess::process(void) {
@@ -119,8 +122,7 @@ int WebserverProcess::process(void) {
         std::cout << "==> listnes: " << listen_it->host << "," << listen_it->port << std::endl;
     }
 
-		std::cout<<"webserver process request_target_path : "<<_request.getTargetPath()<<std::endl;
-
+    std::cout << "webserver process request_target_path : " << _request.getTargetPath() << std::endl;
 
     // 3. getConf 세팅
 
@@ -128,10 +130,9 @@ int WebserverProcess::process(void) {
     // request.getPath(), request.getHeaders().at("Host"),
     // request.getMethod(), request);
 
-   	std::string		locationPath;
-    server_block = server_block.getLocationForRequest(_request.getTargetPath(),locationPath);
-    GetConf getConf(_request,server_block,locationPath);
-
+    std::string locationPath;
+    server_block = server_block.getLocationForRequest(_request.getTargetPath(), locationPath);
+    GetConf getConf(_request, server_block, locationPath);
 
     //   @@location test
     // std::map<std::string, ServerBlock> location_test = server_block.getLocation();
@@ -146,19 +147,21 @@ int WebserverProcess::process(void) {
     // for(;iter_location != location_test.end(); iter_location++)
     // {
     // std::cout<<"client body size : "<<iter_location->first<<std::endl;
-	// std::cout<<"client body size : "<<iter_location->second.getClientBodyBufferSize()<<std::endl;
+    // std::cout<<"client body size : "<<iter_location->second.getClientBodyBufferSize()<<std::endl;
 
     // }
     // location test
 
-	_response.run(_request, getConf);
+    _response.run(_request, getConf);
     // 4. make response
     _res = _response.getResponse();
 
 
-    std::cout<<"\nresponse : ["<<std::endl;
-    std::cout<<_res<<std::endl;
-    std::cout<<"]\n"<<std::endl;;
+    std::cout << "\nresponse : [" << std::endl;
+    std::cout << PURPLE << _res << std::endl;
+    std::cout << "]\n"
+              << RESET << std::endl;
+    ;
     if (_res.empty()) {
         return RETURN_ERROR;
     } else {
@@ -168,10 +171,26 @@ int WebserverProcess::process(void) {
 
 int WebserverProcess::writeResponse(void) {
     std::cout << "===> write" << std::endl;
+    //     _res =
+    //         "HTTP/1.1 405 Method Not Allowed\r\n\
+// Date: Fri, 01 Apr 2022 07:05:38 GMT\r\n\
+// Server: Mginx/1.0.0\r\n\
+// Content-Length: 0\r\n\
+// Content-Location: /\r\n\
+// Content-Type: text/plain\r\n\
+// Last-Modified: Tue, 19 Oct 2021 05:22:24 GMT\r\n\
+// \r\n";
 
+    std::cout << "this is odd:" << _res << std::endl;
     int ret = write(_connected_fd, _res.c_str(), _res.size());
-    _connected_fd = -1;
+    std::cout << "write result : " << ret << std::endl;
+
+    if (ret == -1) {
+        clear();
+    }
+    // _connected_fd = -1;
     _ready_to_response = false;
+    _res = "";
     _req = "";
     return ret;  // success: 양수, fail: -1
 };
@@ -181,9 +200,11 @@ void WebserverProcess::clear(void) {
     if (_socket_fd > 0) {
         close(_socket_fd);
     }
-    if (_connected_fd > 0) {
+    if (_connected_fd > -0) {
         close(_connected_fd);
     }
+    _socket_fd = -1;
+    _connected_fd = -1;
 }
 
 // util
@@ -192,8 +213,7 @@ void WebserverProcess::setAddr(void) {
 
     addrlen = sizeof(_addr);
     _addr.sin_family = AF_INET;
-    _addr.sin_addr.s_addr = _listen_info.host;
-    // 질문: 우리 listen port가 int인데 왜 htonl이 아니라 htons를 쓰는 지?? -> 어짜피 포트 크기가 2바이트를 넘지 않기 때문에 상관이 없음(보통의 경우에도 unsigned short(4byte)를 씀)
+    _addr.sin_addr.s_addr = htonl(_listen_info.host);
     _addr.sin_port = htons(_listen_info.port);
 };
 
@@ -337,6 +357,7 @@ WebserverProcess::WebserverProcess(void) {}
 WebserverProcess::WebserverProcess(t_listen const &listen, Config &config) {
     _socket_fd = -1;
     _connected_fd = -1;
+    _sent = -1;
     _listen_info = listen;
     _ready_to_response = false;
     _config = &config;
@@ -355,6 +376,7 @@ WebserverProcess &WebserverProcess::operator=(WebserverProcess const &src) {
     _request = src._request;
     _res = src._res;
     _response = src._response;
+    _sent = src._sent;
 
     _config = src._config;
     return (*this);

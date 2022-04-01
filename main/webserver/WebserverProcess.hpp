@@ -6,8 +6,7 @@
 #include "Response.hpp"
 #include "Webserver.hpp"
 
-
-
+#define RECV_SIZE 65536
 #define RETURN_PROCEED 0
 #define RETURN_WAIT 1
 #define RETURN_ERROR -1
@@ -19,6 +18,7 @@ class WebserverProcess {
     t_listen _listen_info;
     struct sockaddr_in _addr;
     bool _ready_to_response;  // flag to indicate ready state
+    int _sent;
 
     std::string _req;
     Request _request;

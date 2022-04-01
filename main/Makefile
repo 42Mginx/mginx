@@ -73,8 +73,11 @@ fclean: clean
 re: fclean all
 
 test: re
-	osascript -e 'tell application "Terminal" to do script "cd $(PWD) && clear && ./client/client"'
+	@osascript -e 'tell application "Terminal" to do script "cd $(PWD) && clear && ./client/client"'
+	@osascript -e 'tell application "Terminal" to activate'
+	@./webserv ./test/conf/mac_test.conf
+
+run: re
 	@./webserv ./test/conf/mac.conf
 
-
-.PHONY: all clean fclean re test
+.PHONY: all clean fclean re test run

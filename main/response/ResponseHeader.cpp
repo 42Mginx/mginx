@@ -35,6 +35,7 @@ std::string		ResponseHeader::notAllowedMethod(GetConf &getConf, int statusCode)
 	std::string	header;
 	initValues();
 	setValues(0, getConf.getContentLocation(), statusCode, "", getConf.getContentLocation());
+	setAllow(getConf.getAllowedMethods());
 
 	if (statusCode == 405)
 		header = "HTTP/1.1 405 Method Not Allowed\r\n";
@@ -49,19 +50,24 @@ std::string		ResponseHeader::writeHeader(void)
 {
 	std::string	header = "";
 
-	if (_date != "")
-		header += "Date: " + _date + "\r\n";
-	if (_server != "")
-		header += "Server: " + _server + "\r\n";
+	if (_allow != "")
+		header += "Allow: " + _allow + "\r\n";
 	if (_contentLength != "")
 		header += "Content-Length: " + _contentLength + "\r\n";
 	if (_contentLocation != "")
 		header += "Content-Location: " + _contentLocation + "\r\n";
 	if (_contentType != "")
 		header += "Content-Type: " + _contentType + "\r\n";
-
+	if (_date != "")
+		header += "Date: " + _date + "\r\n";
 	if (_lastModified != "")
 		header += "Last-Modified: " + _lastModified + "\r\n";
+	if (_server != "")
+		header += "Server: " + _server + "\r\n";
+
+
+	header += "Connection: close\r\n";
+	// header += "Connection: keep-alive";
 
 	// if (_transferEncoding != "")
 	// 	header += "Transfer-Encoding: " + _transferEncoding + "\r\n";
@@ -126,9 +132,17 @@ void			ResponseHeader::initErrorMap()
 
 //############  Setter  ##############
 
-void			ResponseHeader::setAllow(const std::string& allow)
+void			ResponseHeader::setAllow(std::set<std::string> methods)
 {
-	_allow = allow;
+	std::set<std::string>::iterator it = methods.begin();
+
+	while (it != methods.end())
+	{
+		_allow += *(it++);
+
+		if (it != methods.end())
+			_allow += ", ";
+	}
 }
 
 void			ResponseHeader::setContentLength(size_t size)
@@ -139,6 +153,11 @@ void			ResponseHeader::setContentLength(size_t size)
 void			ResponseHeader::setContentLocation(const std::string& path)
 {
 		_contentLocation = path;
+}
+
+void			ResponseHeader::setAllow(const std::string& allow)
+{
+	_allow = allow;
 }
 
 void			ResponseHeader::setContentType(std::string type, std::string path)

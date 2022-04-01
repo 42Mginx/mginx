@@ -40,14 +40,14 @@
 #include <sys/select.h>
 #include <sys/socket.h>
 
+#define RED "\033[31m"
+#define GREEN "\033[32m"
+#define YELLOW "\033[33m"
+#define RESET "\033[0m"
+
 #include "Config.hpp"
 #define BUF_SIZE 4096
 #include "listen.hpp"
-
-
-
-
-
 
 // color
 #define RED "\033[31m"
@@ -59,7 +59,7 @@
 class WebserverProcess;
 
 class Webserver {
-  private:
+   private:
     // tmp
     // std::vector<t_listen> getListens();
 
@@ -76,7 +76,7 @@ class Webserver {
 
     // private method
 
-  public:
+   public:
     // occf
     Webserver(void);
     Webserver(const Webserver &src);
