@@ -1,8 +1,0 @@
-HTTP/1.1 405 Method Not Allowed
-Date: Fri, 01 Apr 2022 07:05:38 GMT
-Server: Mginx/1.0.0
-Content-Length: 0
-Content-Location: /
-Content-Type: text/plain
-Last-Modified: Tue, 19 Oct 2021 05:22:24 GMT
-
