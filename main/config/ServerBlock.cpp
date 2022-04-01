@@ -20,7 +20,13 @@ ServerBlock &ServerBlock::operator=(ServerBlock const &src)
         _server_name = src._server_name;
         _listen = src._listen;
         _root = src._root;
+<<<<<<< HEAD
         _cgi_pass = src._cgi_pass;
+=======
+        _alias = src._alias;
+        _cgi_pass = src._cgi_pass;
+        _cgi_param = src._cgi_param;
+>>>>>>> 3e41810f096dfca1db122136c1def5290e4257ce
         _allowed_methods = src._allowed_methods;
         _error_page = src._error_page;
         _client_body_buffer_size = src._client_body_buffer_size;

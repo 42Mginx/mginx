@@ -47,8 +47,9 @@ void	Response::getMethod(Request &request,GetConf &getconf)
 
 	if (getconf.getCgiPass() != "")
 	{
-		// std::cout<<"Cgi_Pass : "<<getconf.getCgiPass()<<std::endl;
+		std::cout<<"Cgi_Pass in getMethod : "<<getconf.getCgiPass()<<std::endl;
 		CgiHandler	cgi(request, getconf);
+		std::cout<<"Debug"<<std::endl;
 		_response = cgi.executeCgi(getconf.getCgiPass()); //cig결과값 _response에 넣기
 	}
 	else if(_status_code == 200)

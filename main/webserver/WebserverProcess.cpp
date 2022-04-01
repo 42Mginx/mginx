@@ -154,8 +154,8 @@ int WebserverProcess::process(void) {
 
 
     std::cout<<"\nresponse : ["<<std::endl;
-    std::cout<<_res<<std::endl;
-    std::cout<<"]\n"<<std::endl;;
+    std::cout<<PURPLE<<_res<<std::endl;
+    std::cout<<"]\n"<<RESET<<std::endl;;
     if (_res.empty()) {
         return RETURN_ERROR;
     } else {
