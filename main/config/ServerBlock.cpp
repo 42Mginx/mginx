@@ -8,7 +8,7 @@ ServerBlock ServerBlock::_default_conf = ServerBlock();
 
 ServerBlock::ServerBlock()
     : _root(""), _client_body_buffer_size(0), _auto_index(false),
-      _aliasSet(false)
+      _aliasSet(false), _cgi_pass("")
 {
     _initDirectivesMap();
 };
@@ -20,6 +20,7 @@ ServerBlock &ServerBlock::operator=(ServerBlock const &src)
         _server_name = src._server_name;
         _listen = src._listen;
         _root = src._root;
+        _cgi_pass = src._cgi_pass;
         _allowed_methods = src._allowed_methods;
         _error_page = src._error_page;
         _client_body_buffer_size = src._client_body_buffer_size;
@@ -238,16 +239,14 @@ void ServerBlock::addCgiParam(std::vector<std::string> args)
     if (args.size() != 2)
         throw ExceptionInvalidArguments();
 
-    this->_cgi_param[args[0]] = args[1];
+    _cgi_param[args[0]] = args[1];
 }
 
 void ServerBlock::addCgiPass(std::vector<std::string> args)
 {
-    std::cout << "add cgi pass: " << args[0] << std::endl;
-    if (args.size() != 1)
+    if (args.size() != 1 || _cgi_pass != "")
         throw ExceptionInvalidArguments();
-    this->_cgi_pass[0] = args[0];
-    std::cout << "[IN] print member pass: " << this->_cgi_pass[0] << std::endl;
+    _cgi_pass = args[0];
 }
 
 void ServerBlock::addIndex(std::vector<std::string> args)
@@ -418,8 +417,6 @@ int ServerBlock::parseLocationBlock(unsigned int &index, fileVector &file)
     // parameters
     for (; index < file.size() && file[index] != "}"; index++)
     {
-        std::cout << "index: " << index << " directive: " << directive << std::endl;
-        std::cout << "now: " << file[index] << std::endl;
         // locationParsingMap에 해당 명령어 없을 경우
         if ((iter =
                  ServerBlock::locationDirectivesParseFunc.find(file[index])) ==
@@ -466,7 +463,6 @@ int ServerBlock::parseLocationBlock(unsigned int &index, fileVector &file)
                 (this->*ServerBlock::locationDirectivesParseFunc[directive])(args);
                 args.clear();
                 directive = "";
-                std::cout << "[OUT] print member pass: " << this->_cgi_pass << std::endl;
             }
             // directive없으면 해당 명령어 넣기
             directive = iter->first;
@@ -474,7 +470,6 @@ int ServerBlock::parseLocationBlock(unsigned int &index, fileVector &file)
     }
     if (directive != "")
         (this->*ServerBlock::locationDirectivesParseFunc[directive])(args);
-    std::cout << "[LAST OUT] print member pass: " << this->_cgi_pass << std::endl;
     //  set up default values if they were not set by the config file
     if (!file[index].compare("}"))
         return 1;
@@ -513,8 +508,6 @@ void ServerBlock::passMembers(ServerBlock &server) const
                 server._cgi_param[i->first] = i->second;
         }
         // _cgi_pass 넣어줌
-        std::cout << ">>>>PASSMEMBERS<<<<<<" <<std::endl;
-        std::cout << server._cgi_pass <<std::endl;
         if (server._cgi_pass == "")
             server._cgi_pass = this->_cgi_pass;
         // _allowed_methods 넣어줌

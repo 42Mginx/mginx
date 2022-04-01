@@ -1,8 +1,9 @@
 #include "WebserverProcess.hpp"
 
-// action
 int WebserverProcess::setup(void) {
+    // 소켓 fd 만듦
     _socket_fd = socket(AF_INET, SOCK_STREAM, 0);
+
     if (_socket_fd != -1) {
         fcntl(_socket_fd, F_SETFL, O_NONBLOCK);
         if (bind(_socket_fd, (struct sockaddr *)&_addr, sizeof(_addr)) == -1) {
@@ -10,6 +11,7 @@ int WebserverProcess::setup(void) {
         }
         listen(_socket_fd, 1000);
     }
+    // 에러 시 -1 리턴 아닐 시 소켓 fd 리턴
     return _socket_fd;
 };
 

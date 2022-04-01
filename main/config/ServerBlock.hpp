@@ -10,6 +10,7 @@ private:
 	static  ServerBlock				_default_conf;
 
 	std::vector<std::string> _server_name;	// 여러개일 수 있음
+	std::string _cgi_pass;
 	std::vector<t_listen> _listen;			// 여러개일 수 있음
 	std::string _root;						// 얘는 한개
 	std::set<std::string> _allowed_methods; // 얘는 여러개
@@ -17,7 +18,6 @@ private:
 	int _client_body_buffer_size;			// 한 개
 	bool _auto_index;						// 한 개
 	std::map<std::string, std::string> _cgi_param;
-	std::string _cgi_pass;
 
 	// location directives
 	std::vector<std::string> _index;
