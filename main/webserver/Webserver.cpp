@@ -28,12 +28,12 @@ void Webserver::init() {
 int Webserver::setup(void) {
     std::vector<t_listen>::const_iterator listen_i = _listens_v.begin();
     for (; listen_i != _listens_v.end(); listen_i++) {
-        // 멤버 변수에 listen이랑 config 넘기면서 생성
+        // 멤버 변수에 listen이랑 config 넘기면서 WebserverProcess 클래스 생성
         WebserverProcess process(*listen_i, _config);
         // host랑 port 출력
         std::cout << listen_i->host << ": " << listen_i->port << std::endl;
 
-        // 프로세스 셋업 실패시 에러 - 성공시 성공 출력
+        // 프로세스 셋업 실패시 에러 - 성공시 성공 출력 (소켓 fd 생성부터 bind, listen까지 함)
         if (process.setup() == -1) {
             std::cout << "에러번호" << errno << ": " << strerror(errno) << std::endl;
             std::cerr << RED << "Could not bind [" << listen_i->port << "]"
@@ -42,10 +42,13 @@ int Webserver::setup(void) {
             std::cout << GREEN << "Bind success [" << listen_i->port << "/" << process.getFd() << "]"
                       << RESET << std::endl;
         }
-        // 프로세스 넣어 줌.
+        // 프로세스 넣어 줌. (의문: 왜 실패한 것도?)
         _process_v.push_back(process);
+        // 프로세스 _socket_fd 가져와서 넣어줌.
         int socket_fd = process.getFd();
+        // 소켓 fd를 fd_set에 set해줌 -> 일단 지금은 0
         FD_SET(socket_fd, &_fd_set);
+        // max_fd 설정(어디까지 읽어야할 지)
         if (socket_fd > _max_fd)
             _max_fd = socket_fd;
     }
@@ -62,11 +65,14 @@ int Webserver::run() {
 
         while (ret == 0) {
             struct timeval timeout;
-            timeout.tv_sec = 1;
-            timeout.tv_usec = 0;
+            timeout.tv_sec = 1; // 초
+            timeout.tv_usec = 0; // micro초
             FD_ZERO(&_writing_set);
+            // reading_set 
             memcpy(&_reading_set, &_fd_set, sizeof(_fd_set));
             process_it = _process_v.begin();
+            // process 돌면서 _ready_to_response 값 받아와서
+            // true이면(response줄 준비가 되면) _connected_fd를 wrtting_set에 추가해줌(읽을 준비)
             for (; process_it != _process_v.end(); process_it++) {
                 bool ready_to_response = process_it->getReadyToResponse();
                 if (ready_to_response == true) {
@@ -77,7 +83,6 @@ int Webserver::run() {
                         _max_fd = connected_fd;
                 }
             }
-
             if (flag == 1) {
                 std::cout << "\r[" << ret << "] ....waiting...." << &std::flush;
                 flag = 0;
@@ -88,6 +93,7 @@ int Webserver::run() {
             ret = select(_max_fd + 1, &_reading_set, &_writing_set, NULL,
                          &timeout);
         }
+
 
         // std::cout << "\r! something changed !" << std::endl;
         if (ret < 0) {

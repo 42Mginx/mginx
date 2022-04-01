@@ -1,0 +1,16 @@
+{
+    "tasks": [
+        {
+            "type": "shell",
+            "label": "clang++ build active file",
+            "command": "make",
+            "args": [
+                "test"
+            ],
+            "options": {
+                "cwd": "./main"
+            }
+        }
+    ],
+    "version": "2.0.0"
+}

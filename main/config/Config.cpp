@@ -72,7 +72,6 @@ void Config::parseAllListens(
 void Config::parseListenAndFillBlank()
 {
     std::vector<t_listen> allListens;
-    // 서버블록을 순환
     for (std::vector<ServerBlock>::iterator serverBlock = _serverBlocks.begin();
          serverBlock != _serverBlocks.end(); serverBlock++)
     {
@@ -95,5 +94,5 @@ const char *Config::FileNotFoundException::what() const throw()
 
 const char *Config::ConfigException::what() const throw()
 {
-    return "Exception thrown: confile error";
+    return "Exception thrown: Confile Parsing Error";
 }

@@ -4,11 +4,11 @@
 
 // INITIALIZING STATIC MEMBERS
 
-ServerBlock	ServerBlock::_default_conf = ServerBlock();
+ServerBlock ServerBlock::_default_conf = ServerBlock();
 
 ServerBlock::ServerBlock()
     : _root(""), _client_body_buffer_size(0), _auto_index(false),
-      _aliasSet(false)
+      _aliasSet(false), _cgi_pass("")
 {
     _initDirectivesMap();
 };
@@ -241,14 +241,14 @@ void ServerBlock::addCgiParam(std::vector<std::string> args)
     if (args.size() != 2)
         throw ExceptionInvalidArguments();
 
-    this->_cgi_param[args[0]] = args[1];
+    _cgi_param[args[0]] = args[1];
 }
 
 void ServerBlock::addCgiPass(std::vector<std::string> args)
 {
-    if (args.size() != 1)
+    if (args.size() != 1 || _cgi_pass != "")
         throw ExceptionInvalidArguments();
-    this->_cgi_pass = args[0];
+    _cgi_pass = args[0];
 }
 
 void ServerBlock::addIndex(std::vector<std::string> args)
@@ -378,6 +378,7 @@ int ServerBlock::parseServerBlock(unsigned int &index, fileVector &file)
             directive = iter->first;
         }
     }
+
     // directive가 있으면 해당 명령어 실행
     if (directive != "")
         (this->*ServerBlock::directivesParseFunc[directive])(args);
@@ -449,9 +450,9 @@ int ServerBlock::parseLocationBlock(unsigned int &index, fileVector &file)
             // directive이 있으면 실행
             if (directive != "")
             {
-                (this->*ServerBlock::locationDirectivesParseFunc[directive])(
-                    args);
+                (this->*ServerBlock::locationDirectivesParseFunc[directive])(args);
                 args.clear();
+                directive = "";
             }
             // directive없으면 해당 명령어 넣기
             directive = iter->first;
@@ -513,37 +514,44 @@ void ServerBlock::passMembers(ServerBlock &server) const
 const char *ServerBlock::ExceptionInvalidArguments::what()
     const throw()
 {
-    return "Exception: invalid arguments in configuration file";
+    return "Exception: ServerBlock Parsing Error";
 }
 
 // GET CONFIG FOR HTTP REQUEST
-ServerBlock						ServerBlock::getLocationForRequest(std::string const path, std::string &retLocationPath) {
-	std::string::size_type	tryLen = path.length();
-	std::map<std::string, ServerBlock>::iterator	iter;
-	std::string									tryLocation;
+ServerBlock ServerBlock::getLocationForRequest(std::string const path, std::string &retLocationPath)
+{
+    std::string::size_type tryLen = path.length();
+    std::map<std::string, ServerBlock>::iterator iter;
+    std::string tryLocation;
 
-	if (!tryLen)
-		return *this;
+    if (!tryLen)
+        return *this;
 
-	//location이 존재하면
-	if (!this->_location.empty()) {
-		do {
-			tryLocation = path.substr(0, tryLen);
-			iter = this->_location.find(tryLocation);
-			if (iter != this->_location.end() && iter->first[0] != '*') {
-				retLocationPath = tryLocation;
-				return iter->second.getLocationForRequest(path, retLocationPath);//ServerBlock(serverblock)
-			}
-			tryLen--;
-		} while (tryLen);
-		for (std::map<std::string, ServerBlock>::iterator i = this->_location.begin(); i != this->_location.end(); i++) {
-			if (i->first[0] == '*') {
-				std::string	suffix = i->first.substr(1);
-				if (path.length() > suffix.length() && !path.compare(path.length() - suffix.length(), suffix.length(), suffix)) {
-					return i->second.getLocationForRequest(path, retLocationPath);
-				}
-			}
-		}
-	}
-	return (*this);
+    //location이 존재하면
+    if (!this->_location.empty())
+    {
+        do
+        {
+            tryLocation = path.substr(0, tryLen);
+            iter = this->_location.find(tryLocation);
+            if (iter != this->_location.end() && iter->first[0] != '*')
+            {
+                retLocationPath = tryLocation;
+                return iter->second.getLocationForRequest(path, retLocationPath); //ServerBlock(serverblock)
+            }
+            tryLen--;
+        } while (tryLen);
+        for (std::map<std::string, ServerBlock>::iterator i = this->_location.begin(); i != this->_location.end(); i++)
+        {
+            if (i->first[0] == '*')
+            {
+                std::string suffix = i->first.substr(1);
+                if (path.length() > suffix.length() && !path.compare(path.length() - suffix.length(), suffix.length(), suffix))
+                {
+                    return i->second.getLocationForRequest(path, retLocationPath);
+                }
+            }
+        }
+    }
+    return (*this);
 }

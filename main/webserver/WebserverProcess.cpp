@@ -1,19 +1,23 @@
 #include "WebserverProcess.hpp"
 
-// action
+// 소켓 fd 생성부터 listen까지
 int WebserverProcess::setup(void) {
+    // 소켓 fd 만듦
     _socket_fd = socket(AF_INET, SOCK_STREAM, 0);
     if (_socket_fd != -1) {
+
         // fcntl(_socket_fd, F_SETFL, O_NONBLOCK);
         if (bind(_socket_fd, (struct sockaddr *)&_addr, sizeof(_addr)) == -1) {
             return -1;
         }
+        // fd 소켓 열어줌.
         listen(_socket_fd, 1000);
     }
+    // 에러 시 -1 리턴 아닐 시 소켓 fd 리턴
     return _socket_fd;
 };
 
-int WebserverProcess::accept(void) {
+int WebserverProcess::accept(void) { 
     _connected_fd = ::accept(_socket_fd, NULL, NULL);
     std::cout << "===> accept(WebserverProcess) " << _socket_fd << ":" << _connected_fd << std::endl;
     if (_connected_fd != -1) {
@@ -356,6 +360,8 @@ bool WebserverProcess::getReadyToResponse(void) { return _ready_to_response; };
 
 // occf
 WebserverProcess::WebserverProcess(void) {}
+
+// 값들 초기화 하고, 받은 listen과 config 받음, 받은 listen 구조체로 addr설정
 WebserverProcess::WebserverProcess(t_listen const &listen, Config &config) {
     _socket_fd = -1;
     _connected_fd = -1;
