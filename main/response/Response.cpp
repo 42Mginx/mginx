@@ -67,7 +67,7 @@ void			Response::headMethod(Request &request,GetConf &getconf)
 	ResponseHeader	header;
 
 	_status_code = readContent();
-	_response = header.getHeader(_response.size(), _target_path, _status_code, _type, getconf.getContentLocation() +"\r\n");
+	_response = header.getHeader(_response.size(), _target_path, _status_code, _type, getconf.getContentLocation())  + "\r\n" + _response;
 }
 
 //post METHOD
@@ -88,7 +88,7 @@ void			Response::postMethod(Request &request,GetConf &getconf)
 	}
 	if (_status_code == 500)
 		_response = this->readHtml(_error_map[_status_code]);
-	_response = header.getHeader(_response.size(), _target_path, _status_code, _type, getconf.getContentLocation() + "\r\n" + _response);
+	_response = header.getHeader(_response.size(), _target_path, _status_code, _type, _response);
 }
 
 //put METHOD
@@ -103,7 +103,7 @@ void			Response::putMethod(Request &request,GetConf &getconf)
 	_status_code = writeContent(content);
 	if (_status_code != 201 && _status_code != 204)
 		_response = this->readHtml(_error_map[_status_code]);
-	_response = header.getHeader(_response.size(), _target_path, _status_code, _type, getconf.getContentLocation() + "\r\n" + _response);
+	_response = header.getHeader(_response.size(), _target_path, _status_code, _type, getconf.getContentLocation()) + "\r\n" + _response;
 
 }
 
@@ -122,7 +122,7 @@ void			Response::deleteMethod(Request &request,GetConf &getconf)
 		_status_code = 404;
 	if (_status_code == 403 || _status_code == 404)
 		_response = this->readHtml(_error_map[_status_code]);
-	_response = header.getHeader(_response.size(), _target_path, _status_code, _type, getconf.getContentLocation() + "\r\n" + _response);
+	_response = header.getHeader(_response.size(), _target_path, _status_code, _type, getconf.getContentLocation()) + "\r\n" + _response;
 }
 
 
