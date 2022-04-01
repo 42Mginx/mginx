@@ -22,7 +22,7 @@ void			Response::run(Request &request,GetConf &getconf)//(request, getconf ) //�
 	if(_status_code == 405 || _status_code == 413)
 	{
 		ResponseHeader header;
-		_response = header.notAllowedMethod(getconf, _status_code);
+		_response = header.notAllowedMethod(getconf, _status_code) + "\r\n";
 		return ;
 	}
 	//Run Method
@@ -88,7 +88,7 @@ void			Response::postMethod(Request &request,GetConf &getconf)
 	}
 	if (_status_code == 500)
 		_response = this->readHtml(_error_map[_status_code]);
-	_response = header.getHeader(_response.size(), _target_path, _status_code, _type, _response);
+	_response = header.getHeader(_response.size(), _target_path, _status_code, _type, _response)+ "\r\n" + _response;
 }
 
 //put METHOD
@@ -134,6 +134,7 @@ int				Response::readContent(void)
 	std::stringstream	buffer;
 
 	_response = "";//response초기화
+	std::cout<<"@@@@@@@@@@@@@@@@@@read content : "<<_response<<std::endl;
 	if (pathIsFile(_target_path)) //path에 파일이 있는지 확인하기 1이면 파일, 나머지는 0, [path = root + target_target_path]
 	{
 		file.open(_target_path.c_str(), std::ifstream::in); //파일열기
@@ -144,6 +145,7 @@ int				Response::readContent(void)
 		}
 		buffer << file.rdbuf(); //현재 읽은 파일을 버퍼에 넣음
 		_response = buffer.str(); //_buffer에 있는걸 response에 넣음
+		std::cout<<"read content : "<<_response<<std::endl;
 		file.close(); //파일 닫기
 	}
 	else if (_auto_index) // 파일이 없으면 + 오토인덱스가 켜져있으면

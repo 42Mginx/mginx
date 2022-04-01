@@ -161,7 +161,15 @@ int WebserverProcess::process(void) {
     std::cout << PURPLE << _res << std::endl;
     std::cout << "]\n"
               << RESET << std::endl;
-    ;
+    //  _res = "HTTP/1.1 405 Method Not Allowed\r\n\
+    // Allow: GET\r\n\
+    // Content-Length: 0\r\n\
+    // Content-Location: /\r\n\
+    // Content-Type: text/plain\r\n\
+    // Date: Fri, 01 Apr 2022 08:26:22 GMT\r\n\
+    // Last-Modified: Sat, 26 Feb 2022 07:05:07 GMT\r\n\
+    // Server: Weebserv/1.0.0 (Unix)\r\n\
+    // \r\n\r\n";
     if (_res.empty()) {
         return RETURN_ERROR;
     } else {
@@ -171,8 +179,8 @@ int WebserverProcess::process(void) {
 
 int WebserverProcess::writeResponse(void) {
     std::cout << "===> write" << std::endl;
-    //     _res =
-    //         "HTTP/1.1 405 Method Not Allowed\r\n\
+//         _res =
+//             "HTTP/1.1 405 Method Not Allowed\r\n\
 // Date: Fri, 01 Apr 2022 07:05:38 GMT\r\n\
 // Server: Mginx/1.0.0\r\n\
 // Content-Length: 0\r\n\
