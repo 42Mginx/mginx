@@ -58,7 +58,7 @@ GetConf::GetConf(Request &request, ServerBlock &server_block, std::string &locat
 		ret = root + request.getTargetPath();
 		_content_location = removeNearSlashes(request.getTargetPath());
 		_target_path = removeNearSlashes(ret);
-		_target_path = "/";
+
 
 
 		// if (!pathIsFile(this->_target_path) && request.getMethod() == "GET") {
