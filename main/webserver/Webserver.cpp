@@ -1,6 +1,8 @@
 #include "Webserver.hpp"
-#include "WebserverProcess.hpp"
+
 #include <errno.h>
+
+#include "WebserverProcess.hpp"
 
 void Webserver::parseConfig(std::string config_path) {
     _config.parseProcess(config_path);
@@ -33,11 +35,11 @@ int Webserver::setup(void) {
 
         // 프로세스 셋업 실패시 에러 - 성공시 성공 출력
         if (process.setup() == -1) {
-            std::cout << "에러번호" << errno << ": "<< strerror(errno) << std::endl;
+            std::cout << "에러번호" << errno << ": " << strerror(errno) << std::endl;
             std::cerr << RED << "Could not bind [" << listen_i->port << "]"
                       << RESET << std::endl;
         } else {
-            std::cout << GREEN << "Bind success [" << listen_i->port << "]"
+            std::cout << GREEN << "Bind success [" << listen_i->port << "/" << process.getFd() << "]"
                       << RESET << std::endl;
         }
         // 프로세스 넣어 줌.
@@ -75,8 +77,7 @@ int Webserver::run() {
                         _max_fd = connected_fd;
                 }
             }
-            ret = select(_max_fd + 1, &_reading_set, &_writing_set, NULL,
-                         &timeout);
+
             if (flag == 1) {
                 std::cout << "\r[" << ret << "] ....waiting...." << &std::flush;
                 flag = 0;
@@ -84,68 +85,75 @@ int Webserver::run() {
                 std::cout << "\r[" << ret << "] ..for change..." << &std::flush;
                 flag = 1;
             }
+            ret = select(_max_fd + 1, &_reading_set, &_writing_set, NULL,
+                         &timeout);
         }
 
-        std::cout << "\r! something changed !" << std::endl;
-        if (ret == -1) {
-            std::cout << "===> select error!!" << std::endl;
+        // std::cout << "\r! something changed !" << std::endl;
+        if (ret < 0) {
+            handle_error("===> select error!!");
             return -1;
         }
-
-        // write
-        std::cout << "write 진입전" << std::endl;
-        process_it = _process_v.begin();
-        for (; process_it != _process_v.end(); process_it++) {
-            bool ready_to_response = process_it->getReadyToResponse();
-            int connected_fd = process_it->getConnectedFd();
-            if (ready_to_response == true && connected_fd > 0 &&
-                FD_ISSET(connected_fd, &_writing_set)) {
-                std::cout << "write" << std::endl;
-                if (process_it->writeResponse() == -1) {
-                    handle_error("write");
-                    return -1;
-                }
-                break;
-            }
-        };
-
-        // read
-        std::cout << "read 진입전" << std::endl;
-
-        process_it = _process_v.begin();
-        for (; process_it != _process_v.end(); process_it++) {
-            int connected_fd = process_it->getConnectedFd();
-            if (connected_fd > 0 && FD_ISSET(connected_fd, &_reading_set)) {
-                std::cout << "read 실행" << std::endl;
-                FD_CLR(connected_fd, &_fd_set);
-                int result = process_it->readRequest();
-                if (result == -1) {
-                    std::cout << "read 에러" << std::endl;
-                    return -1;
-                }
-                break;
-            }
-        };
-
-        // accept
-        std::cout << "accept 진입전" << std::endl;
-
-        process_it = _process_v.begin();
-        for (; process_it != _process_v.end(); process_it++) {
-            int socket_fd = process_it->getFd();
-            if (FD_ISSET(socket_fd, &_reading_set)) {
-                std::cout << "accept" << std::endl;
-                if (process_it->accept() == -1) {
-                    std::cout << "accept 에러" << std::endl;
-                    return -1;
-                }
+        if (ret > 0) {
+            // write
+            // std::cout << "write 진입전" << std::endl;
+            process_it = _process_v.begin();
+            for (; ret && process_it != _process_v.end(); process_it++) {
+                bool ready_to_response = process_it->getReadyToResponse();
                 int connected_fd = process_it->getConnectedFd();
-                FD_SET(connected_fd, &_fd_set);
-                if (_max_fd < connected_fd)
-                    _max_fd = connected_fd;
-                break;
-            }
-        };
+                if (ready_to_response == true && connected_fd > 0 &&
+                    FD_ISSET(connected_fd, &_writing_set)) {
+                    std::cout << "write 진입" << std::endl;
+                    if (process_it->writeResponse() == -1) {
+                        handle_error("write error");
+                        return -1;
+                    }
+                    ret = 0;
+                    break;
+                }
+            };
+
+            // read
+            // std::cout << "read 진입전" << std::endl;
+
+            process_it = _process_v.begin();
+            for (; ret && process_it != _process_v.end(); process_it++) {
+                int connected_fd = process_it->getConnectedFd();
+                if (connected_fd > 0 && FD_ISSET(connected_fd, &_reading_set)) {
+                    std::cout << "read 진입" << std::endl;
+                    FD_CLR(connected_fd, &_fd_set);
+                    int result = process_it->readRequest();
+                    if (result == -1) {
+                        std::cout << "read 에러" << std::endl;
+                        return -1;
+                    }
+                    ret = 0;
+                    break;
+                }
+            };
+
+            // accept
+            // std::cout << "accept 진입전" << std::endl;
+
+            process_it = _process_v.begin();
+            for (; ret && process_it != _process_v.end(); process_it++) {
+                int socket_fd = process_it->getFd();
+                if (FD_ISSET(socket_fd, &_reading_set)) {
+                    int connected_fd = process_it->getConnectedFd();
+                    std::cout << "accept 진입" << std::endl;
+                    if (process_it->accept() == -1) {
+                        std::cout << "accept 에러" << std::endl;
+                        return -1;
+                    }
+                    connected_fd = process_it->getConnectedFd();
+                    FD_SET(connected_fd, &_fd_set);
+                    if (_max_fd < connected_fd)
+                        _max_fd = connected_fd;
+                    ret = 0;
+                    break;
+                }
+            };
+        }
     }
     return 0;
 }
