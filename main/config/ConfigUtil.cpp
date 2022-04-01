@@ -23,7 +23,6 @@ unsigned int	strToIp(std::string strIp) {
 		n = atoi(str.c_str());
 		// n을 다시 unsigned_char로 캐스팅해서 m[i]에 넣음
 		m[i] = static_cast<unsigned char>(n);
-		std::cout << m[i] << std::endl;
 		// '.'다음으로 넘김
 		sep++;
 		// start 다시 지정해줌

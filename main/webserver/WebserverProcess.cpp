@@ -1,21 +1,24 @@
 #include "WebserverProcess.hpp"
 
+// 소켓 fd 생성부터 listen까지
 int WebserverProcess::setup(void) {
     // 소켓 fd 만듦
     _socket_fd = socket(AF_INET, SOCK_STREAM, 0);
-
     if (_socket_fd != -1) {
+        // 소켓 fd Nonblocking으로 설정 (F_SETFL은 nonblocking을 설정하려면 필요한 플래그)
         fcntl(_socket_fd, F_SETFL, O_NONBLOCK);
+        // 소켓 fd 바인딩 (fd와 addr을 엮는 과정)
         if (bind(_socket_fd, (struct sockaddr *)&_addr, sizeof(_addr)) == -1) {
             return -1;
         }
+        // fd 소켓 열어줌.
         listen(_socket_fd, 1000);
     }
     // 에러 시 -1 리턴 아닐 시 소켓 fd 리턴
     return _socket_fd;
 };
 
-int WebserverProcess::accept(void) {
+int WebserverProcess::accept(void) { 
     _connected_fd = ::accept(_socket_fd, NULL, NULL);
     std::cout << "===> accept(WebserverProcess) " << _connected_fd << std::endl;
     return _connected_fd;  // success: fd, fail: -1
@@ -154,8 +157,8 @@ int WebserverProcess::process(void) {
 
 
     std::cout<<"\nresponse : ["<<std::endl;
-    std::cout<<PURPLE<<_res<<std::endl;
-    std::cout<<"]\n"<<RESET<<std::endl;;
+    std::cout<<_res<<std::endl;
+    std::cout<<"]\n"<<std::endl;;
     if (_res.empty()) {
         return RETURN_ERROR;
     } else {
@@ -190,6 +193,7 @@ void WebserverProcess::setAddr(void) {
     addrlen = sizeof(_addr);
     _addr.sin_family = AF_INET;
     _addr.sin_addr.s_addr = _listen_info.host;
+    // 질문: 우리 listen port가 int인데 왜 htonl이 아니라 htons를 쓰는 지?? -> 어짜피 포트 크기가 2바이트를 넘지 않기 때문에 상관이 없음(보통의 경우에도 unsigned short(4byte)를 씀)
     _addr.sin_port = htons(_listen_info.port);
 };
 
@@ -328,6 +332,8 @@ bool WebserverProcess::getReadyToResponse(void) { return _ready_to_response; };
 
 // occf
 WebserverProcess::WebserverProcess(void) {}
+
+// 값들 초기화 하고, 받은 listen과 config 받음, 받은 listen 구조체로 addr설정
 WebserverProcess::WebserverProcess(t_listen const &listen, Config &config) {
     _socket_fd = -1;
     _connected_fd = -1;

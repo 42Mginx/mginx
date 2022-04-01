@@ -20,13 +20,9 @@ ServerBlock &ServerBlock::operator=(ServerBlock const &src)
         _server_name = src._server_name;
         _listen = src._listen;
         _root = src._root;
-<<<<<<< HEAD
-        _cgi_pass = src._cgi_pass;
-=======
         _alias = src._alias;
         _cgi_pass = src._cgi_pass;
         _cgi_param = src._cgi_param;
->>>>>>> 3e41810f096dfca1db122136c1def5290e4257ce
         _allowed_methods = src._allowed_methods;
         _error_page = src._error_page;
         _client_body_buffer_size = src._client_body_buffer_size;
@@ -355,13 +351,10 @@ int ServerBlock::parseServerBlock(unsigned int &index, fileVector &file)
                 // locationName 다음에 있는 '{' 인덱스부터 parseLocationBlock
                 // 보내 파싱해줌 -> 잘못되면 리턴 0
                 index++;
-                std::cout << "location name: "<< locationName << std::endl;
                 if (!location.parseLocationBlock(index, file))
                     return 0;
                 // 파싱한 값 -> _location에 넣어줌
                 _location[locationName] = location;
-                std::cout << "123: " << this->getLocation()["/get_test1"].getCgiPass() << std::endl;
-                std::cout << "/get_test1 buffersize: " << this->getLocation()["/get_test1"].getClientBodyBufferSize() << std::endl;
                 // 다음 index값이 "}"라면 조건문 처음으로
                 if (file[index] == "}")
                     continue;
@@ -385,10 +378,6 @@ int ServerBlock::parseServerBlock(unsigned int &index, fileVector &file)
             directive = iter->first;
         }
     }
-    std::cout << "------------------------ds--------------------------" << std::endl;
-    std::cout << "what: "<< file[index - 2] <<  " " << file[index - 3] << " " << file[index] << std::endl;
-    std::cout << "/get_test1 cgi_pass: " << this->getLocation()["*.bla"].getCgiPass() << std::endl;
-    std::cout << "/get_test1 buffersize: " << this->getLocation()["*.bla"].getClientBodyBufferSize() << std::endl;
 
     // directive가 있으면 해당 명령어 실행
     if (directive != "")
@@ -396,15 +385,11 @@ int ServerBlock::parseServerBlock(unsigned int &index, fileVector &file)
     //  해당 서버 디렉토리스가 파싱이 끝났다면('}'을 만났다면)
     if (!file[index].compare("}"))
     {
-        std::cout << this->getLocation()["/get_test1"].getCgiPass() << std::endl;
-
         // 혹시나 빈 값 defaultServer conf값으로 채워줌
         ServerBlock::_default_conf.passMembers(*this);
         // location도 돌면서 값 채워줌
         for (std::map<std::string, ServerBlock>::iterator i = this->_location.begin(); i != this->_location.end(); i++)
             this->passMembers(i->second);
-        std::cout << this->getLocation()["/get_test1"].getCgiPass() << std::endl;
-        std::cout << "------------------------ds--------------------------" << std::endl;
         return 1;
     }
     return 0;
@@ -439,7 +424,6 @@ int ServerBlock::parseLocationBlock(unsigned int &index, fileVector &file)
                     (this->*ServerBlock::locationDirectivesParseFunc[directive])(args);
                     args.clear();
                     directive = "";
-                    std::cout << "[OUT] print member pass: " << this->_cgi_pass << std::endl;
                 }
                 index++;
                 if (file[index] == "{" || file[index] == "}")
@@ -530,7 +514,7 @@ void ServerBlock::passMembers(ServerBlock &server) const
 const char *ServerBlock::ExceptionInvalidArguments::what()
     const throw()
 {
-    return "Exception: invalid arguments in configuration file";
+    return "Exception: ServerBlock Parsing Error";
 }
 
 // GET CONFIG FOR HTTP REQUEST
