@@ -88,7 +88,7 @@ void			Response::postMethod(Request &request,GetConf &getconf)
 	}
 	if (_status_code == 500)
 		_response = this->readHtml(_error_map[_status_code]);
-	_response = header.getHeader(_response.size(), _target_path, _status_code, _type, _response)+ "\r\n" + _response;
+	_response = header.getHeader(_response.size(), _target_path, _status_code, _type, getconf.getContentLocation())+ "\r\n" + _response;
 }
 
 //put METHOD
