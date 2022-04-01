@@ -4,7 +4,6 @@ void			Response::responseSet(Request &request,GetConf &getconf)//(request, getco
 {
 	_status_code = request.getStatus();
 	_request_method = request.getMethod();
-
 	_error_map = getconf.getErrorPage();
 	_target_path = getconf.getTargetPath();
 	_auto_index = getconf.getAutoIndex();
