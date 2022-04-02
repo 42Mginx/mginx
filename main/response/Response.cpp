@@ -45,12 +45,7 @@ void	Response::getMethod(Request &request,GetConf &getconf)
 	ResponseHeader header;
 
 	if (getconf.getCgiPass() != "")
-	{
-		std::cout<<"Cgi_Pass in getMethod : "<<getconf.getCgiPass()<<std::endl;
-		CgiHandler	cgi(request, getconf);
-		std::cout<<"Debug"<<std::endl;
-		_response = cgi.executeCgi(getconf.getCgiPass()); //cig결과값 _response에 넣기
-	}
+		setCgiResult(request, getconf);
 	else if(_status_code == 200)
 		_status_code = readContent(); //_body 만 작성된 상태
 	else
@@ -76,12 +71,7 @@ void			Response::postMethod(Request &request,GetConf &getconf)
 	ResponseHeader	header;
 
 	if (getconf.getCgiPass() != "")
-	{
-		std::cout<<"debug #1"<<std::endl;
-		// std::cout<<"Cgi_Pass : "<<getconf.getCgiPass()<<std::endl;
-		CgiHandler	cgi(request, getconf);
-		_response = cgi.executeCgi(getconf.getCgiPass()); //cig결과값 _response에 넣기
-	}
+		setCgiResult(request, getconf);
 	else
 	{
 		_status_code = 204;
@@ -275,4 +265,28 @@ Response::Response(const Response & src)
 
 Response::~Response(void)
 {
+}
+
+
+void			Response::setCgiResult(Request &request,GetConf &getconf)
+{
+		CgiHandler	cgi(request, getconf);
+		size_t		i = 0;
+		size_t		j = _response.size() - 2;
+
+		_response = cgi.executeCgi(getconf.getCgiPass()); //cig결과값 _response에 넣기
+
+		while (_response.find("\r\n\r\n", i) != std::string::npos || _response.find("\r\n", i) == i)
+		{
+			std::string	str = _response.substr(i, _response.find("\r\n", i) - i);
+			if (str.find("Status: ") == 0)
+				_status_code = std::atoi(str.substr(8, 3).c_str());
+			else if (str.find("Content-Type: ") == 0)
+				_type = str.substr(14, str.size());
+			i += str.size() + 2;
+		}
+		while (_response.find("\r\n", j) == j)
+			j -= 2;
+
+		_response = _response.substr(i, j - i);
 }

@@ -54,11 +54,11 @@ public:
 	int				writeContent(std::string content);
 	std::string		readHtml(const std::string& path);
 	int				pathIsFile(const std::string& path);
-	std::string					to_string(size_t n);
+	std::string		to_string(size_t n);
 	void			checkClientError(Request &request, GetConf &getconf);
-
-
-
+	void			setCgiResult(Request &request,GetConf &getconf);
 };
+
+
 
 #endif
