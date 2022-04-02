@@ -77,6 +77,7 @@ void			Response::postMethod(Request &request,GetConf &getconf)
 
 	if (getconf.getCgiPass() != "")
 	{
+		std::cout<<"debug #1"<<std::endl;
 		// std::cout<<"Cgi_Pass : "<<getconf.getCgiPass()<<std::endl;
 		CgiHandler	cgi(request, getconf);
 		_response = cgi.executeCgi(getconf.getCgiPass()); //cig결과값 _response에 넣기

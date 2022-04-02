@@ -24,13 +24,14 @@ void		CgiHandler::_initEnv(Request &request, GetConf &getConf)
 	this->_env["REQUEST_METHOD"] = request.getMethod();
 	// this->_env["CONTENT_LENGTH"] = to_string(this->_body.length());
 	// this->_env["CONTENT_TYPE"] = headers["Content-Type"];
+	// this->_env["PATH_INFO"] = request.getTargetPath(); //might need some change, using config path/contentLocation
 	this->_env["PATH_INFO"] = request.getTargetPath(); //might need some change, using config path/contentLocation
 	this->_env["PATH_TRANSLATED"] = request.getTargetPath(); //might need some change, using config path/contentLocation //진짜경로
 	// this->_env["QUERY_STRING"] = request.getQuery();
 	// this->_env["REMOTE_ADDRr"] = to_string(config.getHostPort().host);
 	// this->_env["REMOTE_IDENT"] = headers["Authorization"];
 	// this->_env["REMOTE_USER"] = headers["Authorization"];
-	// this->_env["REQUEST_URI"] = request.getPath() + request.getQuery(); //현재 페이지 주소에서 도메인을 제외한 값.
+	this->_env["REQUEST_URI"] = request.getTargetPath() + request.getQuery(); //현재 페이지 주소에서 도메인을 제외한 값.
 	// if (headers.find("Hostname") != headers.end())
 		// this->_env["SERVER_NAME"] = headers["Hostname"];
 	// else
@@ -88,7 +89,7 @@ std::string		CgiHandler::executeCgi(const std::string& scriptName) {
 
 	write(fdIn, _body.c_str(), _body.size());
 	lseek(fdIn, 0, SEEK_SET);
-
+			std::cout<<"debug #2"<<std::endl;
 	pid = fork();
 
 	if (pid == -1)
@@ -98,6 +99,7 @@ std::string		CgiHandler::executeCgi(const std::string& scriptName) {
 	}
 	else if (pid == 0)
 	{
+		std::cout<<"debug #3"<<std::endl;
 		char * const * nll = NULL;
 
 		dup2(fdIn, STDIN_FILENO);
