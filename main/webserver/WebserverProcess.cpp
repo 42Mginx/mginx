@@ -223,6 +223,13 @@ int WebserverProcess::writeResponse(void) {
     else{
         _write_ret_sum += ret;
         // std::cout<<"ret_sum : "<<_sum<<" _res.size"<<_res.size()<<std::endl;
+
+        std::string filename("response.txt");
+		std::ofstream file_out;
+		file_out.open(filename, std::ios_base::app);
+		file_out<<"response : "<<_res<<std::endl;
+		file_out.close();
+
         if(_write_ret_sum >= _res.size())
         {
             _res = "";

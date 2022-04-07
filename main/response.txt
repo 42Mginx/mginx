@@ -1,0 +1,170 @@
+response : HTTP/1.1 200 OK
+Content-Length: 2
+Content-Location: /
+Content-Type: text/html
+Date: Thu, 07 Apr 2022 07:10:29 GMT
+Last-Modified: Thu, 07 Apr 2022 04:18:47 GMT
+Server: Mginx/1.0.0
+
+t
+
+response : HTTP/1.1 405 Method Not Allowed
+Allow: GET
+Content-Length: 0
+Content-Location: /
+Content-Type: text/plain
+Date: Thu, 07 Apr 2022 07:10:29 GMT
+Last-Modified: Sat, 26 Feb 2022 07:05:07 GMT
+Server: Mginx/1.0.0
+
+
+response : HTTP/1.1 405 Method Not Allowed
+Allow: GET
+Content-Length: 0
+Content-Location: /
+Content-Type: text/plain
+Date: Thu, 07 Apr 2022 07:10:29 GMT
+Last-Modified: Sat, 26 Feb 2022 07:05:07 GMT
+Server: Mginx/1.0.0
+
+
+response : HTTP/1.1 200 OK
+Content-Length: 2
+Content-Type: text/html
+Date: Thu, 07 Apr 2022 07:10:29 GMT
+Last-Modified: Thu, 07 Apr 2022 04:18:47 GMT
+Server: Mginx/1.0.0
+
+t
+
+response : HTTP/1.1 200 OK
+Content-Length: 4
+Content-Location: /youpi.bad_extension
+Content-Type: text/plain
+Date: Thu, 07 Apr 2022 07:10:29 GMT
+Last-Modified: Thu, 07 Apr 2022 04:18:47 GMT
+Server: Mginx/1.0.0
+
+Nope
+response : HTTP/1.1 200 OK
+Content-Length: 0
+Content-Location: /directory/youpi.bla
+Content-Type: text/html; charset=utf-8
+Date: Thu, 07 Apr 2022 07:10:29 GMT
+Last-Modified: Thu, 07 Apr 2022 04:18:47 GMT
+Server: Mginx/1.0.0
+
+
+response : HTTP/1.1 404 Not Found
+Content-Length: 189
+Content-Location: /oulalala
+Content-Type: text/html
+Date: Thu, 07 Apr 2022 07:10:29 GMT
+Server: Mginx/1.0.0
+
+<!DOCTYPE html>
+<html>
+	<title>404 Not Found</title>
+	<body>
+		<div>
+			<H1>404 Not Found</H1>
+			<p>Unable to find a representation of the requested resource</p>
+		</div>
+	</body>
+</html>
+
+response : HTTP/1.1 200 OK
+Content-Length: 15
+Content-Location: /nop/youpi.bad_extension
+Content-Type: text/html
+Date: Thu, 07 Apr 2022 07:10:29 GMT
+Last-Modified: Thu, 07 Apr 2022 04:18:47 GMT
+Server: Mginx/1.0.0
+
+bad extension?
+
+response : HTTP/1.1 200 OK
+Content-Length: 15
+Content-Location: /nop/youpi.bad_extension
+Content-Type: text/html
+Date: Thu, 07 Apr 2022 07:10:29 GMT
+Last-Modified: Thu, 07 Apr 2022 04:18:47 GMT
+Server: Mginx/1.0.0
+
+bad extension?
+
+response : HTTP/1.1 200 OK
+Content-Length: 14
+Content-Location: /nop/other.pouic
+Content-Type: text/html
+Date: Thu, 07 Apr 2022 07:10:29 GMT
+Last-Modified: Thu, 07 Apr 2022 04:18:47 GMT
+Server: Mginx/1.0.0
+
+pouic content
+
+response : HTTP/1.1 404 Not Found
+Content-Length: 189
+Content-Location: /nop/other.pouac
+Content-Type: text/html
+Date: Thu, 07 Apr 2022 07:10:29 GMT
+Server: Mginx/1.0.0
+
+<!DOCTYPE html>
+<html>
+	<title>404 Not Found</title>
+	<body>
+		<div>
+			<H1>404 Not Found</H1>
+			<p>Unable to find a representation of the requested resource</p>
+		</div>
+	</body>
+</html>
+
+response : HTTP/1.1 404 Not Found
+Content-Length: 189
+Content-Location: /Yeah
+Content-Type: text/html
+Date: Thu, 07 Apr 2022 07:10:29 GMT
+Last-Modified: Thu, 07 Apr 2022 04:18:47 GMT
+Server: Mginx/1.0.0
+
+<!DOCTYPE html>
+<html>
+	<title>404 Not Found</title>
+	<body>
+		<div>
+			<H1>404 Not Found</H1>
+			<p>Unable to find a representation of the requested resource</p>
+		</div>
+	</body>
+</html>
+
+response : HTTP/1.1 200 OK
+Content-Length: 12
+Content-Location: /Yeah/not_happy.bad_extension
+Content-Type: text/html
+Date: Thu, 07 Apr 2022 07:10:29 GMT
+Last-Modified: Thu, 07 Apr 2022 04:18:47 GMT
+Server: Mginx/1.0.0
+
+unhappyyyyy
+
+response : HTTP/1.1 204 No Content
+Content-Length: 0
+Content-Location: /file_should_exist_after
+Content-Type: text/html
+Date: Thu, 07 Apr 2022 07:10:29 GMT
+Last-Modified: Thu, 07 Apr 2022 07:10:29 GMT
+Server: Mginx/1.0.0
+
+
+response : HTTP/1.1 204 No Content
+Content-Length: 0
+Content-Location: /file_should_exist_after
+Content-Type: text/html
+Date: Thu, 07 Apr 2022 07:10:32 GMT
+Last-Modified: Thu, 07 Apr 2022 07:10:32 GMT
+Server: Mginx/1.0.0
+
+
