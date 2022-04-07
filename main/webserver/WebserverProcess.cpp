@@ -209,16 +209,30 @@ int WebserverProcess::writeResponse(void) {
 // \r\n";
 
     // std::cout << "this is odd:" << _res << std::endl; //0406 임시삭제 속도저하
-    int ret = write(_connected_fd, _res.c_str(), _res.size());
-    std::cout << "write result : " << ret << std::endl;
+    std::string	str = _res.substr(_write_ret_sum, RECV_SIZE); //0406 수정
+    int ret = write(_connected_fd, str.c_str(), str.size()); //0406 수정
+    // int ret = write(_connected_fd, _res.c_str(), _res.size());
+    // std::cout << "write result : " << ret << std::endl; //0406 임시삭제 속도저하
+
+
 
     if (ret == -1) {
         clear();
     }
-    // _connected_fd = -1;
-    _ready_to_response = false;
-    _res = "";
-    _req = "";
+    //wirte과정에서 body가 많을 때 모아서 써줘야 함
+    else{
+        _write_ret_sum += ret;
+        // std::cout<<"ret_sum : "<<_sum<<" _res.size"<<_res.size()<<std::endl;
+        if(_write_ret_sum >= _res.size())
+        {
+            _res = "";
+            _req = "";
+            _ready_to_response = false;
+            _write_ret_sum = 0;
+            _response.initResponse(); //초기화까지는 맞는데 res를 지우면 쓸게 없구나
+        }
+        ret =0;
+    }
     return ret;  // success: 양수, fail: -1
 };
 
@@ -388,6 +402,7 @@ WebserverProcess::WebserverProcess(t_listen const &listen, Config &config) {
     _listen_info = listen;
     _ready_to_response = false;
     _config = &config;
+    _write_ret_sum = 0;//0406 추가
     this->setAddr();
 }
 WebserverProcess::WebserverProcess(WebserverProcess const &src) { *this = src; }
@@ -404,6 +419,8 @@ WebserverProcess &WebserverProcess::operator=(WebserverProcess const &src) {
     _res = src._res;
     _response = src._response;
     _sent = src._sent;
+
+    _write_ret_sum = src._write_ret_sum; //0406 추가
 
     _config = src._config;
     return (*this);

@@ -30,6 +30,8 @@ class WebserverProcess {
     WebserverProcess(void);
 
    public:
+    size_t _write_ret_sum;
+
     WebserverProcess(t_listen const &listen, Config &config);
     WebserverProcess(WebserverProcess const &src);
     ~WebserverProcess(void);
