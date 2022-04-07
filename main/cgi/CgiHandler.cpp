@@ -42,6 +42,23 @@ void		CgiHandler::_initEnv(Request &request, GetConf &getConf)
 	// this->_env["SERVER_SOFTWARE"] = "Weebserv/1.0";
 
 	this->_env.insert(getConf.getCgiParam().begin(), getConf.getCgiParam().end());
+
+	if(getConf.getCgiParam().begin() != getConf.getCgiParam().end())
+	{
+		std::string filename("response.txt");
+		std::ofstream file_out;
+		file_out.open(filename, std::ios_base::app);
+		std::map<std::string,std::string>:: const_iterator cgi_it = getConf.getCgiParam().begin();
+		for(; cgi_it != getConf.getCgiParam().end(); cgi_it++ )
+		{
+			file_out<<"cgi param key   : "<<cgi_it->first<<std::endl;
+			file_out<<"cgi param value : "<<cgi_it->second<<std::endl;
+		}
+
+		file_out.close();
+	}
+
+
 }
 
 

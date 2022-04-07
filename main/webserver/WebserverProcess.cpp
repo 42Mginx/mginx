@@ -85,6 +85,13 @@ int WebserverProcess::readRequest(void) {
     }
 
     if (ret == RETURN_PROCEED) {
+        	std::string filename("response.txt");
+		std::ofstream file_out;
+		file_out.open(filename, std::ios_base::app);
+        std::string req_str;
+        req_str = _req.substr(0,5000);
+		file_out<<"req "<<req_str<<std::endl;
+		file_out.close();
         ret = process();
     }
     // std::cout << YELLOW << "request is [" << _req << "]" << RESET << std::endl; 0406 임시삭제, 속도저하
@@ -103,6 +110,7 @@ int WebserverProcess::readRequest(void) {
     if (ret == RETURN_PROCEED) {
         std::cout << "// res is ready... //" << std::endl;
         // std::cout << YELLOW << "res: [" << _res << "]" << RESET << std::endl; 0406 임시삭제, 속도저하
+
         _ready_to_response = true;
     }
     return ret;  // success: 1(RETURN_WAIT)/0(RETURN_PROCEED)
