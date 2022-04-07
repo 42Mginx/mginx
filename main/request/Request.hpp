@@ -25,6 +25,7 @@ public:
 	Request &operator=(const Request &);
 
 	void initHeaders();
+	void initBody(); //0408추가
 	void initValidMethod();
 	std::string formatHeaderForCGI(std::string &key);
 	void parseProcess(std::string request_value);

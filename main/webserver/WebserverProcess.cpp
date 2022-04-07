@@ -85,13 +85,16 @@ int WebserverProcess::readRequest(void) {
     }
 
     if (ret == RETURN_PROCEED) {
-        	std::string filename("response.txt");
+
+        //req 쓰기
+        std::string filename("response.txt");
 		std::ofstream file_out;
 		file_out.open(filename, std::ios_base::app);
         std::string req_str;
         req_str = _req.substr(0,5000);
-		file_out<<"req "<<req_str<<std::endl;
+		file_out<<"request: "<<req_str<<std::endl;
 		file_out.close();
+
         ret = process();
     }
     // std::cout << YELLOW << "request is [" << _req << "]" << RESET << std::endl; 0406 임시삭제, 속도저하
@@ -242,10 +245,19 @@ int WebserverProcess::writeResponse(void) {
         if(_write_ret_sum >= _res.size())
         {
             std::cout << "\n===> write" << std::endl;
+
+        //res 쓰기
+        std::string filename("response.txt");
+		std::ofstream file_out;
+		file_out.open(filename, std::ios_base::app);
+		file_out<<"response: "<<_res.substr(0,2000)<<std::endl;
+		file_out.close();
+
             _res = "";
             _req = "";
             _ready_to_response = false;
             _write_ret_sum = 0;
+            _request.initBody();
             _response.initResponse(); //초기화까지는 맞는데 res를 지우면 쓸게 없구나
         }
         ret =0;

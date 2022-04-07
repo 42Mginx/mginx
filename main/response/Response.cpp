@@ -19,6 +19,12 @@ void			Response::run(Request &request,GetConf &getconf)//(request, getconf ) //ë
 {
 	//Response valule setting
 	responseSet(request, getconf);
+		std::string filename("response.txt");
+		std::ofstream file_out;
+		file_out.open(filename, std::ios_base::app);
+		file_out<<"Getconf.getclientbodybuffersize : "<<getconf.getClientBodyBufferSize()<<std::endl;
+		file_out<<"request.getbody.size            : "<<request.getBody().size()<<std::endl;
+		file_out.close();
 	if(_status_code == 405 || _status_code == 413)
 	{
 		ResponseHeader header;

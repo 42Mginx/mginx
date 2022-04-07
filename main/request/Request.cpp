@@ -9,6 +9,7 @@ Request::Request() : _method(""), _target_path(""), _query(""), _version(""), _b
 Request::Request(std::string request_value) : _method(""), _target_path(""), _query(""), _version(""), _body(""), _status_code(200)
 {
 	initHeaders();
+	initBody(); //0408추가
 	initValidMethod();
 	parseProcess(request_value);
 }
@@ -32,6 +33,13 @@ Request &Request::operator=(const Request &_Request)
 
 	return *this;
 }
+
+//0408추가
+void Request::initBody()
+{
+	_body = "";
+}
+
 
 void Request::initHeaders()
 {
