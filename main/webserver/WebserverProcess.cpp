@@ -17,7 +17,7 @@ int WebserverProcess::setup(void) {
     return _socket_fd;
 };
 
-int WebserverProcess::accept(void) { 
+int WebserverProcess::accept(void) {
     _connected_fd = ::accept(_socket_fd, NULL, NULL);
     std::cout << "===> accept(WebserverProcess) " << _socket_fd << ":" << _connected_fd << std::endl;
     if (_connected_fd != -1) {
@@ -33,15 +33,27 @@ int WebserverProcess::readRequest(void) {
     int ret = read(_connected_fd, buffer, BUF_SIZE - 1);
     std::cout << "===> read(WebserverProcess) " << ret << std::endl;
 
-    if (ret <= 0) {
-        std::cout << "read error!" << std::endl;
-        return -1;
-    }
+    //추가
+    if (ret == 0 || ret == -1)
+	{
+		// close(_connected_fd);
+		if (!ret)
+			std::cout << "\rConnection was closed by client.\n" << std::endl;
+		else
+			std::cout << "\rRead error, closing connection.\n" << std::endl;
+		return (-1);
+	}
+
+    // if (ret <= 0) {
+    //     std::cout << "read error!" << std::endl;
+    //     return -1;
+    // }
 
     _req += std::string(buffer);
 
-    size_t header_index = _req.find("\r\n");
-    std::cout << header_index << std::endl;
+    // size_t header_index = _req.find("\r\n"); 0406 삭제
+    size_t header_index = _req.find("\r\n\r\n");//*수정
+
     if (header_index != std::string::npos) {
         bool chuncked = isChunked();
         if (!chuncked || (chuncked && isFinalChunked())) {
@@ -74,16 +86,22 @@ int WebserverProcess::readRequest(void) {
     if (ret == RETURN_PROCEED) {
         ret = process();
     }
-    std::cout << YELLOW << "request is [" << _req << "]" << RESET << std::endl;
+    // std::cout << YELLOW << "request is [" << _req << "]" << RESET << std::endl; 0406 임시삭제, 속도저하
 
     if (ret == RETURN_ERROR) {
         std::cerr << "// empty response error //" << std::endl;
         _ready_to_response = false;
         return RETURN_ERROR;  // -1
     }
+
+     //*추가 0406
+    if (ret == RETURN_WAIT)
+        _ready_to_response = false;
+
+    //*
     if (ret == RETURN_PROCEED) {
         std::cout << "// res is ready... //" << std::endl;
-        std::cout << YELLOW << "res: [" << _res << "]" << RESET << std::endl;
+        // std::cout << YELLOW << "res: [" << _res << "]" << RESET << std::endl; 0406 임시삭제, 속도저하
         _ready_to_response = true;
     }
     return ret;  // success: 1(RETURN_WAIT)/0(RETURN_PROCEED)
@@ -96,7 +114,7 @@ int WebserverProcess::process(void) {
         decodeChunk();
 
         // if (chunked_body != "") {
-        std::cout << "request: " << _req << std::endl;
+        // std::cout << "request: " << _req << std::endl; 0406 임시삭제, 속도저하
         // }
     }
 
@@ -157,10 +175,11 @@ int WebserverProcess::process(void) {
     _res = _response.getResponse();
 
 
-    std::cout << "\nresponse : [" << std::endl;
-    std::cout << PURPLE << _res << std::endl;
-    std::cout << "]\n"
-              << RESET << std::endl;
+    // std::cout << "\nresponse : [" << std::endl; //0406 임시삭제, 속도저하
+    // std::cout << PURPLE << _res << std::endl;
+    // std::cout << "]\n"
+            //   << RESET << std::endl;
+
     //  _res = "HTTP/1.1 405 Method Not Allowed\r\n\
     // Allow: GET\r\n\
     // Content-Length: 0\r\n\
@@ -189,7 +208,7 @@ int WebserverProcess::writeResponse(void) {
 // Last-Modified: Tue, 19 Oct 2021 05:22:24 GMT\r\n\
 // \r\n";
 
-    std::cout << "this is odd:" << _res << std::endl;
+    // std::cout << "this is odd:" << _res << std::endl; //0406 임시삭제 속도저하
     int ret = write(_connected_fd, _res.c_str(), _res.size());
     std::cout << "write result : " << ret << std::endl;
 
@@ -268,9 +287,9 @@ bool WebserverProcess::listenMatched(std::vector<t_listen> listens) {
 void WebserverProcess::decodeChunk() {
     std::string chunk = _req;
     std::string head = chunk.substr(0, chunk.find("\r\n\r\n"));
-    std::cout << "~~~> head: " << head << std::endl;
+    // std::cout << "~~~> head: " << head << std::endl; //0406 임시삭제 속도저하
     chunk = chunk.substr(head.length() + 4);
-    std::cout << "~~~> chunks: " << chunk << std::endl;
+    // std::cout << "~~~> chunks: " << chunk << std::endl; //0406 임시삭제 속도저하
 
     std::string body = "";
     size_t chunk_size = 0;
@@ -279,7 +298,7 @@ void WebserverProcess::decodeChunk() {
     while (chunk != "" && read_size != 0) {
         std::string chunk_size_str = chunk.substr(0, chunk.find("\r\n"));
         chunk_size = strtol(chunk_size_str.c_str(), NULL, 16);
-        std::cout << "~~~> chunk_size: " << chunk_size << std::endl;
+        // std::cout << "~~~> chunk_size: " << chunk_size << std::endl; //0406 임시삭제 속도저하
         chunk = chunk.substr(chunk_size_str.length() + 2);
 
         if (chunk_size == 0) {
@@ -290,21 +309,21 @@ void WebserverProcess::decodeChunk() {
         std::string chunk_body = "";
         size_t sub_read_size = 0;
         while (chunk_size > chunk_body.length()) {
-            std::cout << "chunk_size" << chunk_size << std::endl;
-            std::cout << "chunk_body.length()" << chunk_body.length() << std::endl;
+            // std::cout << "chunk_size" << chunk_size << std::endl; //0406 임시삭제 속도저하
+            // std::cout << "chunk_body.length()" << chunk_body.length() << std::endl; //0406 임시삭제 속도저하
             std::string sub_chunk_body = chunk.substr(0, chunk.find("\r\n"));
 
-            std::cout << "~~~> sub_chunk_body: " << sub_chunk_body << std::endl;
+            // std::cout << "~~~> sub_chunk_body: " << sub_chunk_body << std::endl; //0406 임시삭제 속도저하
             chunk = chunk.substr(sub_chunk_body.length() + 2);
-            std::cout << "~~~> 남은 chunks: " << chunk << std::endl;
+            // std::cout << "~~~> 남은 chunks: " << chunk << std::endl; //0406 임시삭제 속도저하
             chunk_body += sub_chunk_body;
         }
-        std::cout << "~~~> chunk_body: " << chunk_body << std::endl;
+        // std::cout << "~~~> chunk_body: " << chunk_body << std::endl; //0406 임시삭제 속도저하
         read_size = chunk_body.length();
         body += chunk_body;
     }
 
-    std::cout << "==========>decoded body: [" << body << "]" << std::endl;
+    // std::cout << "==========>decoded body: [" << body << "]" << std::endl;  //0406 임시삭제 속도저하
     if (chunk_size == 0 && chunk != "\r\n") {
         std::cerr << "There is body to read => [" << chunk << "]" << std::endl;
     }

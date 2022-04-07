@@ -46,7 +46,7 @@
 #define RESET "\033[0m"
 
 #include "Config.hpp"
-#define BUF_SIZE 4096
+#define BUF_SIZE 65536
 #include "listen.hpp"
 
 // color

@@ -125,7 +125,6 @@ int				Response::readContent(void)
 	std::stringstream	buffer;
 
 	_response = "";//response초기화
-	std::cout<<"@@@@@@@@@@@@@@@@@@read content : "<<_response<<std::endl;
 	if (pathIsFile(_target_path)) //path에 파일이 있는지 확인하기 1이면 파일, 나머지는 0, [path = root + target_target_path]
 	{
 		file.open(_target_path.c_str(), std::ifstream::in); //파일열기
@@ -136,12 +135,11 @@ int				Response::readContent(void)
 		}
 		buffer << file.rdbuf(); //현재 읽은 파일을 버퍼에 넣음
 		_response = buffer.str(); //_buffer에 있는걸 response에 넣음
-		std::cout<<"read content : "<<_response<<std::endl;
 		file.close(); //파일 닫기
 	}
 	else if (_auto_index) // 파일이 없으면 + 오토인덱스가 켜져있으면
 	{
-		std::cout<<"autoindex test 실행됨"<<std::endl;
+		std::cout<<"autoindex test exec"<<std::endl;
 		int tmpHost = 0;
 		int tmpPort = 80;
 		// buffer << AutoIndexGenerator::getPage(_tatgetPath.c_str(), to_string(_hostPort.host), _hostPort.port);

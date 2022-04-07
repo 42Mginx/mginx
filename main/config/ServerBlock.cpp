@@ -28,6 +28,7 @@ ServerBlock &ServerBlock::operator=(ServerBlock const &src)
         _client_body_buffer_size = src._client_body_buffer_size;
         _auto_index = src._auto_index;
         _location = src._location;
+        _index = src._index; //0406 추가
     }
     return *this;
 }

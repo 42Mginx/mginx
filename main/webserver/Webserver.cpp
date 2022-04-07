@@ -68,7 +68,7 @@ int Webserver::run() {
             timeout.tv_sec = 1; // 초
             timeout.tv_usec = 0; // micro초
             FD_ZERO(&_writing_set);
-            // reading_set 
+            // reading_set
             memcpy(&_reading_set, &_fd_set, sizeof(_fd_set));
             process_it = _process_v.begin();
             // process 돌면서 _ready_to_response 값 받아와서
@@ -127,11 +127,14 @@ int Webserver::run() {
                 int connected_fd = process_it->getConnectedFd();
                 if (connected_fd > 0 && FD_ISSET(connected_fd, &_reading_set)) {
                     std::cout << "read 진입" << std::endl;
-                    FD_CLR(connected_fd, &_fd_set);
+                    // FD_CLR(connected_fd, &_fd_set); 0407 삭제
                     int result = process_it->readRequest();
                     if (result == -1) {
                         std::cout << "read 에러" << std::endl;
-                        return -1;
+                        FD_CLR(connected_fd, &_fd_set); //0406 추가
+						FD_CLR(connected_fd, &_reading_set); //0406 추가
+                        connected_fd = process_it->getConnectedFd(); //0406 추가
+                        // return -1; 삭제, fd -1인 상태에서 종료하면 안됨 // 0407 삭제
                     }
                     ret = 0;
                     break;

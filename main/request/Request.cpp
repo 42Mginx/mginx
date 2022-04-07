@@ -68,11 +68,13 @@ void	Request::parseProcess(std::string request_value)
 
 	// 첫째 줄 파싱해서 읽기(method, http 버전)
 	parseStartLine(readLine(request_value, i));
+	/* 속도저하 임시삭제 0406
 	std::cout << "--------- start line parsing --------" << std::endl;
 	std::cout << _method << std::endl;
 	std::cout << _target_path << std::endl;
 	std::cout << _query << std::endl;
 	std::cout << _version << std::endl;
+	*/
 
 	//헤더 파싱(에러, \r, 빈문자열시 break)
 	while ((line = readLine(request_value, i)) != "\r" && line != "" && _status_code != 400)
@@ -87,6 +89,7 @@ void	Request::parseProcess(std::string request_value)
 	}
 
 	// headers 파싱 확인
+	/* 속도저하 임시삭제 0406
 	std::cout << "--------- header parsing --------" << std::endl;
 	std::cout << _headers["Host"] << std::endl;
 	std::cout << _headers["User-Agent"] << std::endl;
@@ -94,14 +97,16 @@ void	Request::parseProcess(std::string request_value)
 	std::cout << _headers["Content-Type"] << std::endl;
 	std::cout << _headers["Accept-Encoding"] << std::endl;
 	std::cout << _headers["dongslee"] << std::endl;
+	*/
 
 
 	// 헤더 읽은 후 이후 값 모두 넘기고 \r\n 제거 후 _body에 값 추가
 	if ((i = request_value.find_first_not_of("\r \n", i)) != std::string::npos)
 		parseBody(request_value.substr(i, std::string::npos));
-
+	/* 속도저하 임시삭제 0406
 	std::cout << "--------- body parsing --------" << std::endl;
 	std::cout << _body << std::endl;
+	*/
 }
 
 // 메소드 파싱 함수
