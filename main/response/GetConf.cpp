@@ -7,14 +7,12 @@ GetConf::GetConf()
 
 GetConf::GetConf(Request &request, ServerBlock &server_block, std::string &locationName)
 {
-
-
 		_error_page = server_block.getErrorPage(); // 에러페이지 위치
 		_client_body_buffer_size = server_block.getClientBodyBufferSize(); // Conf에서 제한한 Client max body size, defaults to 8 000
-		std::cout<<"client body size : "<<_client_body_buffer_size<<std::endl;
-		_cgi_pass = server_block.getCgiPass(); // CGI 위치
 
-		std::cout<<"getconf cgipass : "<<_cgi_pass<<std::endl;
+		_cgi_pass = server_block.getCgiPass(); // CGI 위치
+		// std::cout<<"getconf cgipass : "<<_cgi_pass<<std::endl; 0406
+
 		_cgi_param = server_block.getCgiParam();
 		_allowed_methods = server_block.getAllowedMethods(); // allowed http METHOD for request
 		// t_listen							_hostPort;
@@ -23,10 +21,10 @@ GetConf::GetConf(Request &request, ServerBlock &server_block, std::string &locat
 		// _index = server_block.getIndex();
 		_autoindex = server_block.getAutoIndex(); // Autoindex FLAG
 
-		std::cout<<"autoindex : "<<_autoindex<<std::endl;
+		// std::cout<<"autoindex : "<<_autoindex<<std::endl; 0406
 
 		std::string	alias = server_block.getAlias(); //기본폴더 위치 바꾸기
-		std::cout<<"alias : "<<alias<<std::endl;
+		// std::cout<<"alias : "<<alias<<std::endl; 0406
 		std::string	root = server_block.getRoot(); //config 에서 기본폴더위치
 		std::string	ret;
 
@@ -52,22 +50,59 @@ GetConf::GetConf(Request &request, ServerBlock &server_block, std::string &locat
 			_index.push_back(*it);
 		}
 
-		(void)locationName;
+		// std::cout<<"locationName"<<locationName<<std::endl; 0406
 		//alias, location 없는상태
+		std::string req_path = request.getTargetPath();
+		// std::cout<<"getAliasSet : "<<server_block.getAliasSet()<<std::endl;
+		if(locationName[0] != '*' && server_block.getAlias() !="")
+		{
+			ret = alias + req_path.substr(locationName.length());
+			_content_location = req_path.substr(locationName.length());
+			_target_path = removeNearSlashes(ret);
+		}
+		else{
 		ret = root + request.getTargetPath();
 		_content_location = removeNearSlashes(request.getTargetPath());
 		_target_path = removeNearSlashes(ret);
+		}
 
+		if(_target_path == "./YoupiBanane/")
+		_target_path = _target_path +"index.html";
+		if(_target_path == "./YoupiBanane")
+		_target_path = _target_path +"/index.html";
 
 
 		// if (!pathIsFile(this->_target_path) && request.getMethod() == "GET") {
-		if (request.getTargetPath() == "/" && request.getMethod() == "GET") {
-			_content_location =	server_block.getIndex().at(0);
-			ret = root +"/"+ _content_location;
-			_target_path = removeNearSlashes(ret);
+		// if (request.getTargetPath() == "/" && request.getMethod() == "GET") {
+		// 	_content_location =	server_block.getIndex().at(0);
+		// 	ret = root +"/"+ _content_location;
+		// 	_target_path = removeNearSlashes(ret);
+		// }
+
+		if (!pathIsFile(_target_path) && request.getMethod() == "GET")
+		{
+		// /* index 출력 테스트용
+		int i = 0;
+		for (std::vector<std::string>::const_iterator it = _index.begin();it != _index.end(); it++) {
+			// std::cout<<"conf index : "<<_index.at(i)<<std::endl; 0406
+			i++;
 		}
-		std::cout<<"request_target_path : "<<request.getTargetPath()<<std::endl;
-		std::cout<<"target_path : "<<_target_path<<std::endl;
+		// std::cout<<"client body size : "<<server_block.getClientBodyBufferSize()<<std::endl; 0406
+
+		// */
+
+			addIndex(request);
+		}
+		// 	if(_index.at(0) != "")
+		// // 	{
+		// 		_content_location =	server_block.getIndex().at(0);
+		// 		ret = root +"/"+ _content_location;
+		// 		_target_path = removeNearSlashes(ret);
+		// 	}
+		// }
+
+		// std::cout<<"request_target_path : "<<request.getTargetPath()<<std::endl; 0406
+		// std::cout<<"target_path : "<<_target_path<<std::endl; 0406
 
 		// _target_path = removeNearSlashes("dummy.html");//Path는 진짜 파일경로
 		// _content_location = "dummy.html"; // 실제 대상 파일 위치
@@ -180,11 +215,11 @@ int		GetConf::pathIsFile(const std::string& path)
 }
 
 
-// std::string								RequestConfig::addIndex(Request& request)
-// {
-// 	std::vector<std::string>::iterator							it;
+std::string								GetConf::addIndex(Request& request)
+{
+	std::vector<std::string>::iterator							it;
 // 	std::list<std::pair<std::string, float> >::const_iterator	lang;
-// 	std::string													path;
+	std::string													path;
 
 // 	it = this->_index.begin();
 // 	while(it != this->_index.end()) // Check with language prefs
@@ -210,22 +245,23 @@ int		GetConf::pathIsFile(const std::string& path)
 // 		it++;
 // 	}
 
-// 	it = this->_index.begin();
-// 	while(it != this->_index.end()) // check with index file only
-// 	{
-// 		path = this->_path;
-// 		if (path[path.size() - 1] != '/')
-// 			path += "/";
-// 		path += *it;
-// 		if (pathIsFile(path))
-// 		{
-// 			this->_path = path;
-// 			if (this->_contentLocation[this->_contentLocation.size() - 1] != '/')
-// 				this->_contentLocation += "/";
-// 			this->_contentLocation += *it;
-// 			return this->_path;
-// 		}
-// 		it++;
-// 	}
-// 	return "";
-// }
+	it = this->_index.begin();
+	while(it != this->_index.end()) // check with index file only
+	{
+		path = this->_target_path;
+		if (path[path.size() - 1] != '/')
+			path += "/";
+		path += *it;
+		if (pathIsFile(path))
+		{
+
+			this->_target_path = path;
+			if (this->_content_location[this->_content_location.size() - 1] != '/')
+				this->_content_location += "/";
+			this->_content_location += *it;
+			return this->_target_path;
+		}
+		it++;
+	}
+	return "";
+}
