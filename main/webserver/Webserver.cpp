@@ -76,7 +76,7 @@ int Webserver::run() {
             for (; process_it != _process_v.end(); process_it++) {
                 bool ready_to_response = process_it->getReadyToResponse();
                 if (ready_to_response == true) {
-                    std::cout << "make writing set" << std::endl;
+                    std::cout << "\nmake writing set" << std::endl;
                     int connected_fd = process_it->getConnectedFd();
                     FD_SET(connected_fd, &_writing_set);
                     if (_max_fd < connected_fd)
@@ -84,10 +84,10 @@ int Webserver::run() {
                 }
             }
             if (flag == 1) {
-                std::cout << "\r[" << ret << "] ....waiting...." << &std::flush;
+                std::cout << "\r[" << ret << "] ....waiting...."<< &std::flush;
                 flag = 0;
             } else {
-                std::cout << "\r[" << ret << "] ..for change..." << &std::flush;
+                std::cout << "\r[" << ret << "] ..for change..."<< &std::flush;
                 flag = 1;
             }
             ret = select(_max_fd + 1, &_reading_set, &_writing_set, NULL,
@@ -109,7 +109,7 @@ int Webserver::run() {
                 int connected_fd = process_it->getConnectedFd();
                 if (ready_to_response == true && connected_fd > 0 &&
                     FD_ISSET(connected_fd, &_writing_set)) {
-                    std::cout << "write 진입" << std::endl;
+                    // std::cout << "write 진입" << std::endl;
                     if (process_it->writeResponse() == -1) {
                         handle_error("write error");
                         return -1;
@@ -126,7 +126,7 @@ int Webserver::run() {
             for (; ret && process_it != _process_v.end(); process_it++) {
                 int connected_fd = process_it->getConnectedFd();
                 if (connected_fd > 0 && FD_ISSET(connected_fd, &_reading_set)) {
-                    std::cout << "read 진입" << std::endl;
+                    // std::cout << "read 진입" << std::endl;
                     // FD_CLR(connected_fd, &_fd_set); 0407 삭제
                     int result = process_it->readRequest();
                     if (result == -1) {

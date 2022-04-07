@@ -31,7 +31,7 @@ int WebserverProcess::readRequest(void) {
         0,
     };
     int ret = read(_connected_fd, buffer, BUF_SIZE - 1);
-    std::cout << "===> read(WebserverProcess) " << ret << std::endl;
+    // std::cout << "===> read(WebserverProcess) " << ret << std::endl;//임시삭제
 
     //추가
     if (ret == 0 || ret == -1)
@@ -58,12 +58,12 @@ int WebserverProcess::readRequest(void) {
         bool chuncked = isChunked();
         if (!chuncked || (chuncked && isFinalChunked())) {
             // chuncked 인데 다 받았거나, chuncked가 아니면 0 => PROCEED
-            std::cout << "this is not chunked, or it's final one"
-                      << isFinalChunked() << std::endl;
+            // std::cout << "this is not chunked, or it's final one"
+                    //   << isFinalChunked() << std::endl; //임시삭제, 속도저하
             ret = RETURN_PROCEED;
         } else {
             // chuncked 인데 아직 덜 받았으면 return 1 => WAIT
-            std::cout << "this is chunked, and it's not final one" << std::endl;
+            // std::cout << "this is chunked, and it's not final one" << std::endl; // 임시삭제, 속도저하
             ret = RETURN_WAIT;
         }
         std::string key = "Content-Length: ";
@@ -80,7 +80,8 @@ int WebserverProcess::readRequest(void) {
             }
         }
     } else {
-        std::cerr << "// header not found //" << std::endl;
+         ret = RETURN_WAIT; //0406
+        // std::cerr << "// header not found //" << std::endl;
     }
 
     if (ret == RETURN_PROCEED) {
@@ -197,7 +198,7 @@ int WebserverProcess::process(void) {
 }
 
 int WebserverProcess::writeResponse(void) {
-    std::cout << "===> write" << std::endl;
+    // std::cout << "===> write" << std::endl;
 //         _res =
 //             "HTTP/1.1 405 Method Not Allowed\r\n\
 // Date: Fri, 01 Apr 2022 07:05:38 GMT\r\n\
@@ -224,14 +225,15 @@ int WebserverProcess::writeResponse(void) {
         _write_ret_sum += ret;
         // std::cout<<"ret_sum : "<<_sum<<" _res.size"<<_res.size()<<std::endl;
 
-        std::string filename("response.txt");
-		std::ofstream file_out;
-		file_out.open(filename, std::ios_base::app);
-		file_out<<"response : "<<_res<<std::endl;
-		file_out.close();
+        // std::string filename("response.txt");
+		// std::ofstream file_out;
+		// file_out.open(filename, std::ios_base::app);
+		// file_out<<"response : "<<_res<<std::endl;
+		// file_out.close();
 
         if(_write_ret_sum >= _res.size())
         {
+            std::cout << "\n===> write" << std::endl;
             _res = "";
             _req = "";
             _ready_to_response = false;
