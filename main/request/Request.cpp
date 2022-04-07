@@ -58,6 +58,20 @@ void	Request::initValidMethod()
 	_valid_methods.push_back("HEAD");
 }
 
+// key-good -> HTTP_KEY_GOOD 형식으로 바꿔줌
+std::string 		Request::formatHeaderForCGI(std::string& key)
+{
+	// key 대문자로
+	to_upper(key);
+	// key에서 -를 _로 바꿔줌
+	for (size_t i = 0 ; i < key.size() ; i++) {
+		if (key[i] == '-')
+			key[i] = '_';
+	}
+	// key에 HTTP_ 붙여줌
+	return "HTTP_" + key;
+}
+
 void	Request::parseProcess(std::string request_value)
 {
 
@@ -86,7 +100,14 @@ void	Request::parseProcess(std::string request_value)
 		// key값에 해당하는 값이 있으면, 값 넣어주기
 		if (_headers.count(key))
 				_headers[key] = value;
+		// _env_for_cgi에 key 포멧해서 찾고 value 넣어줌
+		if (key.find("Secret") != std::string::npos)
+			this->_env_for_cgi[formatHeaderForCGI(key)] = value;	
 	}
+	// 헤더에 Www-Authenticate가 있으면
+	if (this->_headers["Www-Authenticate"] != "")
+		// _env_for_cgi의 Www-Authenticate에 Www-Authenticate의 value 대입
+		this->_env_for_cgi["Www-Authenticate"] = this->_headers["Www-Authenticate"];
 
 	// headers 파싱 확인
 	/* 속도저하 임시삭제 0406
