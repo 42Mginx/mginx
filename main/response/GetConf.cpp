@@ -14,6 +14,9 @@ GetConf::GetConf(Request &request, ServerBlock &server_block, std::string &locat
 		// std::cout<<"getconf cgipass : "<<_cgi_pass<<std::endl; 0406
 
 		_cgi_param = server_block.getCgiParam();
+		if(request.getEnv().begin() != request.getEnv().end())
+			_cgi_param = request.getEnv();
+
 		_allowed_methods = server_block.getAllowedMethods(); // allowed http METHOD for request
 		// t_listen							_hostPort;
 
