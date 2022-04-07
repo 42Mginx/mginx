@@ -57,6 +57,8 @@ public:
 	std::string		to_string(size_t n);
 	void			checkClientError(Request &request, GetConf &getconf);
 	void			setCgiResult(Request &request,GetConf &getconf);
+		void			initResponse(void);
+
 };
 
 

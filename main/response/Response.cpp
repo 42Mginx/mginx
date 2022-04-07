@@ -290,3 +290,9 @@ void			Response::setCgiResult(Request &request,GetConf &getconf)
 
 		_response = _response.substr(i, j - i);
 }
+
+
+void			Response::initResponse(void)
+{
+	_response = "";
+}
