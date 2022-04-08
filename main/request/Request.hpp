@@ -19,7 +19,7 @@ private:
 
 public:
 	Request();
-	Request(std::string request_value);
+	Request(std::string &request_value);
 	~Request();
 	Request(const Request &_Request);
 	Request &operator=(const Request &);
@@ -28,7 +28,7 @@ public:
 	void initBody(); //0408추가
 	void initValidMethod();
 	std::string formatHeaderForCGI(std::string &key);
-	void parseProcess(std::string request_value);
+	void parseProcess(std::string &request_value);
 	void parseStartLine(const std::string &str);
 	void parseMethod(const std::string &line, size_t &i);
 	void parsePath(const std::string &line, size_t &i);

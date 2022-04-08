@@ -41,9 +41,9 @@ int Webserver::setup(void) {
         } else {
             std::cout << GREEN << "Bind success [" << listen_i->port << "/" << process.getFd() << "]"
                       << RESET << std::endl;
-        }
         // 프로세스 넣어 줌. (의문: 왜 실패한 것도?)
         _process_v.push_back(process);
+        }
         // 프로세스 _socket_fd 가져와서 넣어줌.
         int socket_fd = process.getFd();
         // 소켓 fd를 fd_set에 set해줌 -> 일단 지금은 0
@@ -61,19 +61,17 @@ int Webserver::run() {
     while (1) {
         int ret = 0;
         std::vector<WebserverProcess>::iterator process_it;
-        size_t flag = 1;
+        // size_t flag = 1;
 
         while (ret == 0) {
             struct timeval timeout;
             timeout.tv_sec = 1; // 초
             timeout.tv_usec = 0; // micro초
             FD_ZERO(&_writing_set);
-            // reading_set
             memcpy(&_reading_set, &_fd_set, sizeof(_fd_set));
-            process_it = _process_v.begin();
             // process 돌면서 _ready_to_response 값 받아와서
             // true이면(response줄 준비가 되면) _connected_fd를 wrtting_set에 추가해줌(읽을 준비)
-            for (; process_it != _process_v.end(); process_it++) {
+            for (process_it = _process_v.begin(); process_it != _process_v.end(); process_it++) {
                 bool ready_to_response = process_it->getReadyToResponse();
                 if (ready_to_response == true) {
                     std::cout << "\nmake writing set" << std::endl;
@@ -83,28 +81,22 @@ int Webserver::run() {
                         _max_fd = connected_fd;
                 }
             }
-            if (flag == 1) {
-                std::cout << "\r[" << ret << "] ....waiting...."<< &std::flush;
-                flag = 0;
-            } else {
-                std::cout << "\r[" << ret << "] ..for change..."<< &std::flush;
-                flag = 1;
-            }
+            // if (flag == 1) {
+            //     std::cout << "\r[" << ret << "] ....waiting...."<< &std::flush;
+            //     flag = 0;
+            // } else {
+            //     std::cout << "\r[" << ret << "] ..for change..."<< &std::flush;
+            //     flag = 1;
+            // }
             ret = select(_max_fd + 1, &_reading_set, &_writing_set, NULL,
                          &timeout);
         }
 
-
-        // std::cout << "\r! something changed !" << std::endl;
-        if (ret < 0) {
-            handle_error("===> select error!!");
-            return -1;
-        }
         if (ret > 0) {
             // write
             // std::cout << "write 진입전" << std::endl;
-            process_it = _process_v.begin();
-            for (; ret && process_it != _process_v.end(); process_it++) {
+            for (process_it = _process_v.begin(); ret && process_it != _process_v.end(); process_it++)
+            {
                 bool ready_to_response = process_it->getReadyToResponse();
                 int connected_fd = process_it->getConnectedFd();
                 if (ready_to_response == true && connected_fd > 0 &&
@@ -121,16 +113,15 @@ int Webserver::run() {
 
             // read
             // std::cout << "read 진입전" << std::endl;
-
-            process_it = _process_v.begin();
-            for (; ret && process_it != _process_v.end(); process_it++) {
+            for (process_it = _process_v.begin(); ret && process_it != _process_v.end(); process_it++)
+            {
                 int connected_fd = process_it->getConnectedFd();
                 if (connected_fd > 0 && FD_ISSET(connected_fd, &_reading_set)) {
                     // std::cout << "read 진입" << std::endl;
                     // FD_CLR(connected_fd, &_fd_set); 0407 삭제
                     int result = process_it->readRequest();
                     if (result == -1) {
-                        std::cout << "read 에러" << std::endl;
+                        std::cout << "read 에러: " << strerror(errno) << std::endl;
                         FD_CLR(connected_fd, &_fd_set); //0406 추가
 						FD_CLR(connected_fd, &_reading_set); //0406 추가
                         connected_fd = process_it->getConnectedFd(); //0406 추가
@@ -144,17 +135,16 @@ int Webserver::run() {
             // accept
             // std::cout << "accept 진입전" << std::endl;
 
-            process_it = _process_v.begin();
-            for (; ret && process_it != _process_v.end(); process_it++) {
+            for (process_it = _process_v.begin(); ret && process_it != _process_v.end(); process_it++)
+            {
                 int socket_fd = process_it->getFd();
                 if (FD_ISSET(socket_fd, &_reading_set)) {
-                    int connected_fd = process_it->getConnectedFd();
                     std::cout << "accept 진입" << std::endl;
                     if (process_it->accept() == -1) {
                         std::cout << "accept 에러" << std::endl;
                         return -1;
                     }
-                    connected_fd = process_it->getConnectedFd();
+                    int connected_fd = process_it->getConnectedFd();
                     FD_SET(connected_fd, &_fd_set);
                     if (_max_fd < connected_fd)
                         _max_fd = connected_fd;
@@ -162,6 +152,11 @@ int Webserver::run() {
                     break;
                 }
             };
+        }
+        else         // std::cout << "\r! something changed !" << std::endl;
+        {
+            handle_error("===> select error!!");
+            return -1;
         }
     }
     return 0;

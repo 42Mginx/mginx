@@ -76,6 +76,7 @@ void			Response::postMethod(Request &request,GetConf &getconf)
 {
 	ResponseHeader	header;
 
+	std::cout << "In cgi" << std::endl;
 	if (getconf.getCgiPass() != "")
 		setCgiResult(request, getconf);
 	else
@@ -83,6 +84,7 @@ void			Response::postMethod(Request &request,GetConf &getconf)
 		_status_code = 204;
 		_response = "";
 	}
+	std::cout << "end cgi" << std::endl;
 	if (_status_code == 500)
 		_response = this->readHtml(_error_map[_status_code]);
 	_response = header.getHeader(_response.size(), _target_path, _status_code, _type, getconf.getContentLocation())+ "\r\n" + _response;

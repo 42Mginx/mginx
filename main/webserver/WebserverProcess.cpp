@@ -1,4 +1,5 @@
 #include "WebserverProcess.hpp"
+#include <time.h>
 
 // 소켓 fd 생성부터 listen까지
 int WebserverProcess::setup(void) {
@@ -30,7 +31,8 @@ int WebserverProcess::readRequest(void) {
     char buffer[BUF_SIZE] = {
         0,
     };
-    int ret = read(_connected_fd, buffer, BUF_SIZE - 1);
+    int ret = recv(_connected_fd, buffer, BUF_SIZE - 1, 0);
+
     // std::cout << "===> read(WebserverProcess) " << ret << std::endl;//임시삭제
 
     //추가
@@ -44,16 +46,17 @@ int WebserverProcess::readRequest(void) {
 		return (-1);
 	}
 
-    // if (ret <= 0) {
-    //     std::cout << "read error!" << std::endl;
-    //     return -1;
-    // }
-
+    if (ret <= 0) {
+        // std::cout << "read error!" << std::endl;
+        return -1;
+    }
     _req += std::string(buffer);
 
     // size_t header_index = _req.find("\r\n"); 0406 삭제
     size_t header_index = _req.find("\r\n\r\n");//*수정
-
+    std::cout << "read now: " << _prev_req_end_index << std::endl;
+    _prev_req_end_index += ret - 1;
+    std::cout << header_index << std::endl;
     if (header_index != std::string::npos) {
         bool chuncked = isChunked();
         if (!chuncked || (chuncked && isFinalChunked())) {
@@ -224,7 +227,7 @@ int WebserverProcess::writeResponse(void) {
     std::string	str = _res.substr(_write_ret_sum, RECV_SIZE); //0406 수정
     int ret = write(_connected_fd, str.c_str(), str.size()); //0406 수정
     // int ret = write(_connected_fd, _res.c_str(), _res.size());
-    // std::cout << "write result : " << ret << std::endl; //0406 임시삭제 속도저하
+    std::cout << "write result : " << _write_ret_sum << std::endl; //0406 임시삭제 속도저하
 
 
 
@@ -255,6 +258,7 @@ int WebserverProcess::writeResponse(void) {
 
             _res = "";
             _req = "";
+            _prev_req_end_index = 0;
             _ready_to_response = false;
             _write_ret_sum = 0;
             _request.initBody();
@@ -337,6 +341,16 @@ void WebserverProcess::decodeChunk() {
     std::string body = "";
     size_t chunk_size = 0;
     size_t read_size = 1;
+            
+        // 타임 로그
+        std::string filename("response.txt");
+		std::ofstream file_out;
+		file_out.open(filename, std::ios_base::app);
+        clock_t start, finish;
+        double duration;
+    
+        start = clock();
+        file_out << "시작 시간: " << start << std::endl;
 
     while (chunk != "" && read_size != 0) {
         std::string chunk_size_str = chunk.substr(0, chunk.find("\r\n"));
@@ -351,10 +365,12 @@ void WebserverProcess::decodeChunk() {
 
         std::string chunk_body = "";
         size_t sub_read_size = 0;
+
         while (chunk_size > chunk_body.length()) {
             // std::cout << "chunk_size" << chunk_size << std::endl; //0406 임시삭제 속도저하
             // std::cout << "chunk_body.length()" << chunk_body.length() << std::endl; //0406 임시삭제 속도저하
             std::string sub_chunk_body = chunk.substr(0, chunk.find("\r\n"));
+
 
             // std::cout << "~~~> sub_chunk_body: " << sub_chunk_body << std::endl; //0406 임시삭제 속도저하
             chunk = chunk.substr(sub_chunk_body.length() + 2);
@@ -365,6 +381,13 @@ void WebserverProcess::decodeChunk() {
         read_size = chunk_body.length();
         body += chunk_body;
     }
+        //출력
+        finish = clock();
+    
+        duration = (double)(finish - start) / CLOCKS_PER_SEC;
+        file_out << "끝난 시간: " << finish << std::endl;
+        file_out << "걸린 시간: " << duration << std::endl;
+		file_out.close();
 
     // std::cout << "==========>decoded body: [" << body << "]" << std::endl;  //0406 임시삭제 속도저하
     if (chunk_size == 0 && chunk != "\r\n") {
@@ -428,6 +451,7 @@ WebserverProcess::WebserverProcess(t_listen const &listen, Config &config) {
     _socket_fd = -1;
     _connected_fd = -1;
     _sent = -1;
+    _prev_req_end_index = 0;
     _listen_info = listen;
     _ready_to_response = false;
     _config = &config;
@@ -448,6 +472,7 @@ WebserverProcess &WebserverProcess::operator=(WebserverProcess const &src) {
     _res = src._res;
     _response = src._response;
     _sent = src._sent;
+    _prev_req_end_index = 0;
 
     _write_ret_sum = src._write_ret_sum; //0406 추가
 

@@ -6,7 +6,7 @@ Request::Request() : _method(""), _target_path(""), _query(""), _version(""), _b
 	initValidMethod();
 }
 
-Request::Request(std::string request_value) : _method(""), _target_path(""), _query(""), _version(""), _body(""), _status_code(200)
+Request::Request(std::string &request_value) : _method(""), _target_path(""), _query(""), _version(""), _body(""), _status_code(200)
 {
 	initHeaders();
 	initBody(); //0408추가
@@ -79,7 +79,7 @@ std::string Request::formatHeaderForCGI(std::string &key)
 	return "HTTP_" + key;
 }
 
-void Request::parseProcess(std::string request_value)
+void Request::parseProcess(std::string &request_value)
 {
 
 	std::string key;

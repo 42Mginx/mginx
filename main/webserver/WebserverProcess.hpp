@@ -21,6 +21,7 @@ class WebserverProcess {
     int _sent;
 
     std::string _req;
+    int         _prev_req_end_index;
     Request _request;
     std::string _res;
     Response _response;
