@@ -34,7 +34,7 @@ public:
 
 	Response & operator=(const Response & src);
 
-	std::string		getResponse(void);
+	std::string&		getResponse(void);
 
 	//response setting
 	void	responseSet(Request &request,GetConf &getconf);
