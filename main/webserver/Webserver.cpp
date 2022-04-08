@@ -81,6 +81,7 @@ int Webserver::run() {
                         _max_fd = connected_fd;
                 }
             }
+<<<<<<< HEAD
             // if (flag == 1) {
             //     std::cout << "\r[" << ret << "] ....waiting...."<< &std::flush;
             //     flag = 0;
@@ -88,6 +89,22 @@ int Webserver::run() {
             //     std::cout << "\r[" << ret << "] ..for change..."<< &std::flush;
             //     flag = 1;
             // }
+=======
+            if (flag == 1) {
+                std::cout << "\r[" << ret << "] ....waiting...."<< &std::flush;
+                flag = 0;
+            } else {
+                std::cout << "\r[" << ret << "] ..for change..."<< &std::flush;
+                flag = 1;
+            }
+
+            // 		std::string filename("response.txt");
+			// std::ofstream file_out;
+			// file_out.open(filename, std::ios_base::app);
+			// file_out<<"_max_fd : "<<_max_fd<<std::endl;
+			// file_out.close();
+
+>>>>>>> bb01a1cec3b7f755b0a9fbda14ea618a5ca17f89
             ret = select(_max_fd + 1, &_reading_set, &_writing_set, NULL,
                          &timeout);
         }

@@ -88,7 +88,6 @@ int WebserverProcess::readRequest(void) {
     }
 
     if (ret == RETURN_PROCEED) {
-
         //req 쓰기
         std::string filename("response.txt");
 		std::ofstream file_out;
@@ -125,6 +124,13 @@ int WebserverProcess::readRequest(void) {
 int WebserverProcess::process(void) {
     // 0. chuncked 뒤에 chundked가 온 경우
     int chunked_index = _req.find("Transfer-Encoding: chunked");
+
+    /*실행 시간을 측정하고 싶은 코드*/
+    clock_t start, finish;
+    double duration;
+    start = clock();
+
+
     if (chunked_index != std::string::npos && chunked_index < _req.find("\r\n\r\n")) {
         decodeChunk();
 
@@ -132,9 +138,33 @@ int WebserverProcess::process(void) {
         // std::cout << "request: " << _req << std::endl; 0406 임시삭제, 속도저하
         // }
     }
+     finish = clock();
+     duration = (double)(finish - start) / CLOCKS_PER_SEC;
+
+    std::string filename("response.txt");
+    std::ofstream file_out;
+    file_out.open(filename, std::ios_base::app);
+    file_out<<"경과시간 decodeChunk : "<<duration<<"s"<<std::endl;
+    file_out.close();
+
+
 
     // 1. 요청 사항 파싱
+
+
+    clock_t start2, finish2;
+
+    start2 = clock();
     _request.parseProcess(_req);
+    finish2 = clock();
+
+    duration = (double)(finish2 - start2) / CLOCKS_PER_SEC;
+
+    file_out.open(filename, std::ios_base::app);
+    file_out<<"경과시간 _request.parseProcess : "<<duration<<"s"<<std::endl;
+     file_out.close();
+
+
 
     // 2. config 에서 맞는 server block 찾아서 넘기기
     ServerBlock server_block = findServerBlock();
@@ -163,6 +193,11 @@ int WebserverProcess::process(void) {
     // request.getPath(), request.getHeaders().at("Host"),
     // request.getMethod(), request);
 
+
+   clock_t start3, finish3;
+
+    start3 = clock();
+
     std::string locationPath;
     server_block = server_block.getLocationForRequest(_request.getTargetPath(), locationPath);
     GetConf getConf(_request, server_block, locationPath);
@@ -185,9 +220,20 @@ int WebserverProcess::process(void) {
     // }
     // location test
 
+
+
     _response.run(_request, getConf);
     // 4. make response
     _res = _response.getResponse();
+
+    finish3 = clock();
+
+    duration = (double)(finish3 - start3) / CLOCKS_PER_SEC;
+
+    file_out.open(filename, std::ios_base::app);
+    file_out<<"경과시간 _response.run : "<<duration<<"s"<<std::endl;
+     file_out.close();
+
 
 
     // std::cout << "\nresponse : [" << std::endl; //0406 임시삭제, 속도저하

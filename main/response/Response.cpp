@@ -243,7 +243,7 @@ void			Response::checkClientError(Request &request,GetConf &getconf)
 }
 
 //getter
-std::string		Response::getResponse(void)
+std::string&		Response::getResponse(void)
 {
 	return (_response);
 }
