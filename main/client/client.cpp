@@ -98,7 +98,7 @@ void send(int port, std::string filename) {
     file.open(filename);
     request_string.assign(std::istreambuf_iterator<char>(file), std::istreambuf_iterator<char>());
     file.close();
-    request_string += "\r\n";
+    request_string += "\r\n\r\n";
     std::cout << "req: [" << request_string << "]" << std::endl;
 
     sock = socket(AF_INET, SOCK_STREAM, 0);
@@ -119,7 +119,6 @@ void send(int port, std::string filename) {
 
     send(sock, request_string.c_str(), request_string.length(), 0);
     std::cout << "=> send" << std::endl;
-
     ret = read(sock, buffer, BUF_SIZE - 1);
     std::cout << ret << std::endl;
 
@@ -148,15 +147,15 @@ int main(int argc, char** argv) {
     int method;
     std::string option;
 
-    while (1) {
-        std::string filename = "test/request_examples/";
-        port = choose_port();
-        method = choose_method();
-        option = choose_option(method);
-        filename += get_filename(method, option);
-        std::cout << "filename: " << filename << std::endl;
-        send(port, filename);
-    }
+    // while (1) {
+    std::string filename = "test/request_examples/";
+    // port = choose_port();
+    // method = choose_method();
+    // option = choose_option(method);
+    // filename += get_filename(method, option);
+    // send(port, filename);
+    send(8000, "test/request_examples/post/POST_normal");
+    // }
 
     return (0);
 }

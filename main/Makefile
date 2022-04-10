@@ -72,6 +72,7 @@ clean:
 
 fclean: clean
 	@rm -rf $(NAME)
+	@rm -rf $(LOG_FILE)
 	@$(MAKE) -C $(CLIENT_DIR) fclean
 
 re: fclean all

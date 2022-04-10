@@ -66,9 +66,10 @@ class Webserver {
     // 멤버변수
     long _max_fd;
     fd_set _fd_set;
-    std::vector<int> _socket_fd_v;
-    std::vector<int> _connected_fd_v;
-    std::vector<WebserverProcess> _process_v;
+    // std::vector<int> _socket_fd_v;
+    // std::vector<int> _connected_fd_v;
+    std::vector<WebserverProcess> _process_v;  // process 별 생성(connected fd 기준), run할때 생성
+    std::vector<WebserverProcess> _socket_v;   // base (초기화시 생성 port별 생성)
     std::vector<t_listen> _listens_v;
     fd_set _reading_set;
     fd_set _writing_set;

@@ -53,7 +53,6 @@ int WebserverProcess::readRequest(void) {
     }
     _req += std::string(buffer);
 
-    // size_t header_index = _req.find("\r\n"); 0406 삭제
     size_t header_index = _req.find("\r\n\r\n");  //*수정
     std::cout << "read now: " << _prev_req_end_index << std::endl;
     _prev_req_end_index += ret - 1;
@@ -383,75 +382,6 @@ void WebserverProcess::decodeChunk() {
     _req = head + "\r\n\r\n" + body + "\r\n\r\n";
     std::cout << "process chunk 이후 ~~> " << _req << std::endl;
 }
-
-// void WebserverProcess::decodeChunk() {
-//     std::string chunk = _req;
-//     std::string head = chunk.substr(0, chunk.find("\r\n\r\n"));
-//     // std::cout << "~~~> head: " << head << std::endl; //0406 임시삭제 속도저하
-//     chunk = chunk.substr(head.length() + 4);
-//     // std::cout << "~~~> chunks: " << chunk << std::endl; //0406 임시삭제 속도저하
-
-//     std::string body = "";
-//     size_t chunk_size = 0;
-//     size_t read_size = 1;
-
-//     // 타임 로그
-//     std::string filename("response.txt");
-//     std::ofstream file_out;
-//     file_out.open(filename, std::ios_base::app);
-//     clock_t start, finish;
-//     double duration;
-
-//     start = clock();
-//     file_out << "시작 시간: " << start << std::endl;
-
-//     while (chunk != "" && read_size != 0) {
-//         std::string chunk_size_str = chunk.substr(0, chunk.find("\r\n"));
-//         chunk_size = strtol(chunk_size_str.c_str(), NULL, 16);
-//         // std::cout << "~~~> chunk_size: " << chunk_size << std::endl; //0406 임시삭제 속도저하
-//         chunk = chunk.substr(chunk_size_str.length() + 2);
-
-//         if (chunk_size == 0) {
-//             std::cout << chunk_size_str.length() << std::endl;
-//             break;
-//         }
-
-//         std::string chunk_body = "";
-//         size_t sub_read_size = 0;
-
-//         while (chunk_size > chunk_body.length()) {
-//             // std::cout << "chunk_size" << chunk_size << std::endl; //0406 임시삭제 속도저하
-//             // std::cout << "chunk_body.length()" << chunk_body.length() << std::endl; //0406 임시삭제 속도저하
-//             std::string sub_chunk_body = chunk.substr(0, chunk.find("\r\n"));
-
-//             // std::cout << "~~~> sub_chunk_body: " << sub_chunk_body << std::endl; //0406 임시삭제 속도저하
-//             chunk = chunk.substr(sub_chunk_body.length() + 2);
-//             // std::cout << "~~~> 남은 chunks: " << chunk << std::endl; //0406 임시삭제 속도저하
-//             chunk_body += sub_chunk_body;
-//         }
-//         // std::cout << "~~~> chunk_body: " << chunk_body << std::endl; //0406 임시삭제 속도저하
-//         read_size = chunk_body.length();
-//         body += chunk_body;
-//     }
-//     //출력
-//     finish = clock();
-
-//     duration = (double)(finish - start) / CLOCKS_PER_SEC;
-//     file_out << "끝난 시간: " << finish << std::endl;
-//     file_out << "걸린 시간: " << duration << std::endl;
-//     file_out.close();
-
-//     // std::cout << "==========>decoded body: [" << body << "]" << std::endl;  //0406 임시삭제 속도저하
-//     if (chunk_size == 0 && chunk != "\r\n") {
-//         std::cerr << "There is body to read => [" << chunk << "]" << std::endl;
-//     }
-//     if (body == "") {
-//         _req = head + "\r\n\r\n";
-
-//     } else {
-//         _req = head + "\r\n\r\n" + body + "\r\n\r\n";
-//     }
-// };
 
 ServerBlock WebserverProcess::findServerBlock() {
     // 1. getHeaders에서 host가져오기(request)
