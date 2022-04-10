@@ -3,12 +3,15 @@
 #include <time.h>
 
 // 소켓 fd 생성부터 listen까지
-int WebserverProcess::setup(void) {
+int WebserverProcess::setup(void)
+{
     // 소켓 fd 만듦
     _socket_fd = socket(AF_INET, SOCK_STREAM, 0);
-    if (_socket_fd != -1) {
+    if (_socket_fd != -1)
+    {
         // fcntl(_socket_fd, F_SETFL, O_NONBLOCK);
-        if (bind(_socket_fd, (struct sockaddr *)&_addr, sizeof(_addr)) == -1) {
+        if (bind(_socket_fd, (struct sockaddr *)&_addr, sizeof(_addr)) == -1)
+        {
             return -1;
         }
         // fd 소켓 열어줌.
@@ -18,93 +21,87 @@ int WebserverProcess::setup(void) {
     return _socket_fd;
 };
 
-int WebserverProcess::accept(void) {
+int WebserverProcess::accept(void)
+{
     _connected_fd = ::accept(_socket_fd, NULL, NULL);
     std::cout << "===> accept(WebserverProcess) " << _socket_fd << ":" << _connected_fd << std::endl;
-    if (_connected_fd != -1) {
+    if (_connected_fd != -1)
+    {
         fcntl(_connected_fd, F_SETFL, O_NONBLOCK);
     }
-    return _connected_fd;  // success: fd, fail: -1
+    return _connected_fd; // success: fd, fail: -1
 };
 
-int WebserverProcess::readRequest(void) {
+int WebserverProcess::readRequest(void)
+{
     char buffer[BUF_SIZE] = {
         0,
     };
     int ret = recv(_connected_fd, buffer, BUF_SIZE - 1, 0);
-
-    // std::cout << "===> read(WebserverProcess) " << ret << std::endl;//임시삭제
-
-    //추가
-    if (ret == 0 || ret == -1) {
-        // close(_connected_fd);
-        if (!ret)
+    if (ret <= 0)
+    {
+        if (ret == 0)
             std::cout << "\rConnection was closed by client.\n"
                       << std::endl;
-        else
+        else if (ret == -1)
             std::cout << "\rRead error, closing connection.\n"
                       << std::endl;
-        return (-1);
-    }
-
-    if (ret <= 0) {
-        // std::cout << "read error!" << std::endl;
+        else
+            std::cout << "read error!" << std::endl;
         return -1;
     }
     _req += std::string(buffer);
 
-    size_t header_index = _req.find("\r\n\r\n");  //*수정
+    if (_header_index == 0 || _header_index == std::string::npos)
+        _header_index = _req.find("\r\n\r\n"); //*수정
     std::cout << "read now: " << _prev_req_end_index << std::endl;
     _prev_req_end_index += ret - 1;
-    std::cout << header_index << std::endl;
-    if (header_index != std::string::npos) {
+    std::cout << _header_index << std::endl;
+    if (_header_index != std::string::npos)
+    {
         bool chuncked = isChunked();
-        if (!chuncked || (chuncked && isFinalChunked())) {
+        if (!chuncked || (chuncked && isFinalChunked()))
+        {
             // chuncked 인데 다 받았거나, chuncked가 아니면 0 => PROCEED
             // std::cout << "this is not chunked, or it's final one"
-            //   << isFinalChunked() << std::endl; //임시삭제, 속도저하
             ret = RETURN_PROCEED;
-        } else {
+        }
+        else
+        {
             // chuncked 인데 아직 덜 받았으면 return 1 => WAIT
             // std::cout << "this is chunked, and it's not final one" << std::endl; // 임시삭제, 속도저하
             ret = RETURN_WAIT;
         }
         std::string key = "Content-Length: ";
         int content_len_index = findKeyIndex(key);
-        if (content_len_index != -1) {
+        if (content_len_index != -1)
+        {
             size_t body_size = std::atoi(_req.substr(content_len_index + key.size(), 10).c_str());
-            size_t total_size = body_size + header_index + 4;
-            if (_req.size() >= total_size) {
+            size_t total_size = body_size + _header_index + 4;
+            if (_req.size() >= total_size)
+            {
                 std::cout << "prepared to proceed" << std::endl;
                 ret = RETURN_PROCEED;
-            } else {
+            }
+            else
+            {
                 std::cout << "need to wait more req" << std::endl;
                 ret = RETURN_WAIT;
             }
         }
-    } else {
-        ret = RETURN_WAIT;  // 0406
-        // std::cerr << "// header not found //" << std::endl;
     }
+    else
+        ret = RETURN_WAIT; // 0406
+    // std::cerr << "// header not found //" << std::endl;
 
-    if (ret == RETURN_PROCEED) {
-        // req 쓰기
-        std::string filename("response.txt");
-        std::ofstream file_out;
-        file_out.open(filename, std::ios_base::app);
-        std::string req_str;
-        req_str = _req.substr(0, 5000);
-        file_out << "request: " << req_str << std::endl;
-        file_out.close();
-
+    if (ret == RETURN_PROCEED)
         ret = process();
-    }
-    // std::cout << YELLOW << "request is [" << _req << "]" << RESET << std::endl; 0406 임시삭제, 속도저하
 
-    if (ret == RETURN_ERROR) {
+    if (ret == RETURN_ERROR)
+    {
         std::cerr << "// empty response error //" << std::endl;
         _ready_to_response = false;
-        return RETURN_ERROR;  // -1
+        return RETURN_ERROR; // -1
     }
 
     //*추가 0406
@@ -112,53 +109,23 @@ int WebserverProcess::readRequest(void) {
         _ready_to_response = false;
 
     //*
-    if (ret == RETURN_PROCEED) {
+    if (ret == RETURN_PROCEED)
+    {
         std::cout << "// res is ready... //" << std::endl;
-        // std::cout << YELLOW << "res: [" << _res << "]" << RESET << std::endl; 0406 임시삭제, 속도저하
-
         _ready_to_response = true;
     }
-    return ret;  // success: 1(RETURN_WAIT)/0(RETURN_PROCEED)
+    return ret; // success: 1(RETURN_WAIT)/0(RETURN_PROCEED)
 };
 
-int WebserverProcess::process(void) {
+int WebserverProcess::process(void)
+{
     // 0. chuncked 뒤에 chundked가 온 경우
     int chunked_index = _req.find("Transfer-Encoding: chunked");
-
-    /*실행 시간을 측정하고 싶은 코드*/
-    clock_t start, finish;
-    double duration;
-    start = clock();
-
-    if (chunked_index != std::string::npos && chunked_index < _req.find("\r\n\r\n")) {
+    if (chunked_index != std::string::npos && chunked_index < _req.find("\r\n\r\n"))
         decodeChunk();
 
-        // if (chunked_body != "") {
-        // std::cout << "request: " << _req << std::endl; 0406 임시삭제, 속도저하
-        // }
-    }
-    finish = clock();
-    duration = (double)(finish - start) / CLOCKS_PER_SEC;
-
-    std::string filename("response.txt");
-    std::ofstream file_out;
-    file_out.open(filename, std::ios_base::app);
-    file_out << "경과시간 decodeChunk : " << duration << "s" << std::endl;
-    file_out.close();
-
     // 1. 요청 사항 파싱
-
-    clock_t start2, finish2;
-
-    start2 = clock();
     _request.parseProcess(_req);
-    finish2 = clock();
-
-    duration = (double)(finish2 - start2) / CLOCKS_PER_SEC;
-
-    file_out.open(filename, std::ios_base::app);
-    file_out << "경과시간 _request.parseProcess : " << duration << "s" << std::endl;
-    file_out.close();
 
     // 2. config 에서 맞는 server block 찾아서 넘기기
     ServerBlock server_block = findServerBlock();
@@ -167,86 +134,41 @@ int WebserverProcess::process(void) {
     std::cout << "check server block" << std::endl;
     std::vector<std::string> server_name = server_block.getServerName();
     std::vector<std::string>::iterator server_name_it = server_name.begin();
-    if (server_name_it == server_name.end()) {
+    if (server_name_it == server_name.end())
+    {
         std::cout << "??????" << std::endl;
     }
-    for (; server_name_it != server_name.end(); server_name_it++) {
+    for (; server_name_it != server_name.end(); server_name_it++)
+    {
         std::cout << "==> server names: " << *server_name_it << std::endl;
     }
     std::vector<t_listen> listens = server_block.getListen();
     std::vector<t_listen>::iterator listen_it = listens.begin();
-    for (; listen_it != listens.end(); listen_it++) {
+    for (; listen_it != listens.end(); listen_it++)
+    {
         std::cout << "==> listnes: " << listen_it->host << "," << listen_it->port << std::endl;
     }
 
     std::cout << "webserver process request_target_path : " << _request.getTargetPath() << std::endl;
 
-    // 3. getConf 세팅
-
-    // requestConf = conf.getConfigForRequest(this->_listen,
-    // request.getPath(), request.getHeaders().at("Host"),
-    // request.getMethod(), request);
-
-    clock_t start3, finish3;
-
-    start3 = clock();
-
     std::string locationPath;
     server_block = server_block.getLocationForRequest(_request.getTargetPath(), locationPath);
     GetConf getConf(_request, server_block, locationPath);
-
-    //   @@location test
-    // std::map<std::string, ServerBlock> location_test = server_block.getLocation();
-
-    // std::map<std::string, ServerBlock>::iterator iter_location = location_test.begin();
-
-    // while (iter_location != location_test.end()) {
-    //     std::cout << "[" << iter_location->first <<" ]\n";
-    //     ++iter_location;
-    // }
-    // iter_location = location_test.begin();
-    // for(;iter_location != location_test.end(); iter_location++)
-    // {
-    // std::cout<<"client body size : "<<iter_location->first<<std::endl;
-    // std::cout<<"client body size : "<<iter_location->second.getClientBodyBufferSize()<<std::endl;
-
-    // }
-    // location test
-
     _response.run(_request, getConf);
     // 4. make response
     _res = _response.getResponse();
-
-    finish3 = clock();
-
-    duration = (double)(finish3 - start3) / CLOCKS_PER_SEC;
-
-    file_out.open(filename, std::ios_base::app);
-    file_out << "경과시간 _response.run : " << duration << "s" << std::endl;
-    file_out.close();
-
-    // std::cout << "\nresponse : [" << std::endl; //0406 임시삭제, 속도저하
-    // std::cout << PURPLE << _res << std::endl;
-    // std::cout << "]\n"
-    //   << RESET << std::endl;
-
-    //  _res = "HTTP/1.1 405 Method Not Allowed\r\n\
-    // Allow: GET\r\n\
-    // Content-Length: 0\r\n\
-    // Content-Location: /\r\n\
-    // Content-Type: text/plain\r\n\
-    // Date: Fri, 01 Apr 2022 08:26:22 GMT\r\n\
-    // Last-Modified: Sat, 26 Feb 2022 07:05:07 GMT\r\n\
-    // Server: Weebserv/1.0.0 (Unix)\r\n\
-    // \r\n\r\n";
-    if (_res.empty()) {
+    if (_res.empty())
+    {
         return RETURN_ERROR;
-    } else {
+    }
+    else
+    {
         return RETURN_PROCEED;
     }
 }
 
-int WebserverProcess::writeResponse(void) {
+int WebserverProcess::writeResponse(void)
+{
     // std::cout << "===> write" << std::endl;
     //         _res =
     //             "HTTP/1.1 405 Method Not Allowed\r\n\
@@ -259,16 +181,18 @@ int WebserverProcess::writeResponse(void) {
 // \r\n";
 
     // std::cout << "this is odd:" << _res << std::endl; //0406 임시삭제 속도저하
-    std::string str = _res.substr(_write_ret_sum, RECV_SIZE);  // 0406 수정
-    int ret = write(_connected_fd, str.c_str(), str.size());   // 0406 수정
+    std::string str = _res.substr(_write_ret_sum, RECV_SIZE); // 0406 수정
+    int ret = write(_connected_fd, str.c_str(), str.size());  // 0406 수정
     // int ret = write(_connected_fd, _res.c_str(), _res.size());
-    std::cout << "write result : " << _write_ret_sum << std::endl;  // 0406 임시삭제 속도저하
+    std::cout << "write result : " << _write_ret_sum << std::endl; // 0406 임시삭제 속도저하
 
-    if (ret == -1) {
+    if (ret == -1)
+    {
         clear();
     }
     // wirte과정에서 body가 많을 때 모아서 써줘야 함
-    else {
+    else
+    {
         _write_ret_sum += ret;
         // std::cout<<"ret_sum : "<<_sum<<" _res.size"<<_res.size()<<std::endl;
 
@@ -278,7 +202,8 @@ int WebserverProcess::writeResponse(void) {
         // file_out<<"response : "<<_res<<std::endl;
         // file_out.close();
 
-        if (_write_ret_sum >= _res.size()) {
+        if (_write_ret_sum >= _res.size())
+        {
             std::cout << "\n===> write" << std::endl;
 
             // res 쓰기
@@ -290,23 +215,28 @@ int WebserverProcess::writeResponse(void) {
 
             _res = "";
             _req = "";
+
+            _header_index = 0;
             _prev_req_end_index = 0;
             _ready_to_response = false;
             _write_ret_sum = 0;
             _request.initBody();
-            _response.initResponse();  //초기화까지는 맞는데 res를 지우면 쓸게 없구나
+            _response.initResponse(); //초기화까지는 맞는데 res를 지우면 쓸게 없구나
         }
         ret = 0;
     }
-    return ret;  // success: 양수, fail: -1
+    return ret; // success: 양수, fail: -1
 };
 
-void WebserverProcess::clear(void) {
+void WebserverProcess::clear(void)
+{
     std::cout << "===> clear (webserver process)" << std::endl;
-    if (_socket_fd > 0) {
+    if (_socket_fd > 0)
+    {
         close(_socket_fd);
     }
-    if (_connected_fd > -0) {
+    if (_connected_fd > -0)
+    {
         close(_connected_fd);
     }
     _socket_fd = -1;
@@ -314,7 +244,8 @@ void WebserverProcess::clear(void) {
 }
 
 // util
-void WebserverProcess::setAddr(void) {
+void WebserverProcess::setAddr(void)
+{
     int addrlen;
 
     addrlen = sizeof(_addr);
@@ -323,14 +254,16 @@ void WebserverProcess::setAddr(void) {
     _addr.sin_port = htons(_listen_info.port);
 };
 
-int WebserverProcess::findKeyIndex(std::string key) {
+int WebserverProcess::findKeyIndex(std::string key)
+{
     int index = _req.find(key);
     if (index == std::string::npos)
         return -1;
     return index;
 }
 
-bool WebserverProcess::isChunked(void) {
+bool WebserverProcess::isChunked(void)
+{
     if (_req.find("Content-Length: ") != std::string::npos)
         return false;
     if (_req.find("Transfer-Encoding: chunked") == std::string::npos)
@@ -338,7 +271,8 @@ bool WebserverProcess::isChunked(void) {
     return true;
 }
 
-bool WebserverProcess::isFinalChunked(void) {
+bool WebserverProcess::isFinalChunked(void)
+{
     int endOfFile = _req.find("0\r\n\r\n");
     if (endOfFile == std::string::npos)
         return false;
@@ -352,10 +286,13 @@ bool WebserverProcess::isFinalChunked(void) {
     return true;
 };
 
-bool WebserverProcess::listenMatched(std::vector<t_listen> listens) {
+bool WebserverProcess::listenMatched(std::vector<t_listen> listens)
+{
     std::vector<t_listen>::iterator it = listens.begin();
-    for (; it != listens.end(); it++) {
-        if (it->port == _listen_info.port && it->host == _listen_info.host) {
+    for (; it != listens.end(); it++)
+    {
+        if (it->port == _listen_info.port && it->host == _listen_info.host)
+        {
             std::cout << "listen matched!!(" << _listen_info.port << "," << _listen_info.host << ")" << std::endl;
             return true;
         }
@@ -363,7 +300,8 @@ bool WebserverProcess::listenMatched(std::vector<t_listen> listens) {
     return false;
 }
 
-void WebserverProcess::decodeChunk() {
+void WebserverProcess::decodeChunk()
+{
     std::string head = _req.substr(0, _req.find("\r\n\r\n"));
     std::string chunks = _req.substr(_req.find("\r\n\r\n") + 4, _req.size() - 1);
     std::string subchunk = chunks.substr(0, 100);
@@ -371,19 +309,20 @@ void WebserverProcess::decodeChunk() {
     int chunksize = strtol(subchunk.c_str(), NULL, 16);
     size_t i = 0;
 
-    while (chunksize) {
+    while (chunksize)
+    {
         i = chunks.find("\r\n", i) + 2;
         body += chunks.substr(i, chunksize);
         i += chunksize + 2;
         subchunk = chunks.substr(i, 100);
         chunksize = strtol(subchunk.c_str(), NULL, 16);
+        std::cout << " ... process chunked ... " << i << std::endl;
     }
-
     _req = head + "\r\n\r\n" + body + "\r\n\r\n";
-    std::cout << "process chunk 이후 ~~> " << _req << std::endl;
 }
 
-ServerBlock WebserverProcess::findServerBlock() {
+ServerBlock WebserverProcess::findServerBlock()
+{
     // 1. getHeaders에서 host가져오기(request)
     std::map<std::string, std::string> const &header = _request.getHeaders();
     std::string req_host = header.find("Host")->second;
@@ -398,11 +337,14 @@ ServerBlock WebserverProcess::findServerBlock() {
         << req_host
         << std::endl;
     std::vector<ServerBlock>::iterator it = server_blocks.begin();
-    for (; it != server_blocks.end(); it++) {
+    for (; it != server_blocks.end(); it++)
+    {
         std::vector<std::string> server_name = it->getServerName();
         std::vector<std::string>::iterator server_name_it = server_name.begin();
-        for (; server_name_it != server_name.end(); server_name_it++) {
-            if (*server_name_it == req_host && listenMatched(it->getListen())) {
+        for (; server_name_it != server_name.end(); server_name_it++)
+        {
+            if (*server_name_it == req_host && listenMatched(it->getListen()))
+            {
                 std::cout << "=> find by servername " << *server_name_it << std::endl;
                 return *it;
             }
@@ -410,8 +352,10 @@ ServerBlock WebserverProcess::findServerBlock() {
     }
     // 2. 없으면 listen으로 찾아봄(가장 첫번째 일치하는 것으로 결정함-default)
     it = server_blocks.begin();
-    for (; it != server_blocks.end(); it++) {
-        if (listenMatched(it->getListen())) {
+    for (; it != server_blocks.end(); it++)
+    {
+        if (listenMatched(it->getListen()))
+        {
             std::cout << "=> find by ip address - the first one be a default" << std::endl;
             ret = &(*it);
             break;
@@ -429,20 +373,23 @@ bool WebserverProcess::getReadyToResponse(void) { return _ready_to_response; };
 WebserverProcess::WebserverProcess(void) {}
 
 // 값들 초기화 하고, 받은 listen과 config 받음, 받은 listen 구조체로 addr설정
-WebserverProcess::WebserverProcess(t_listen const &listen, Config &config) {
+WebserverProcess::WebserverProcess(t_listen const &listen, Config &config)
+{
     _socket_fd = -1;
     _connected_fd = -1;
     _sent = -1;
+    _header_index = 0;
     _prev_req_end_index = 0;
     _listen_info = listen;
     _ready_to_response = false;
     _config = &config;
-    _write_ret_sum = 0;  // 0406 추가
+    _write_ret_sum = 0; // 0406 추가
     this->setAddr();
 }
 WebserverProcess::WebserverProcess(WebserverProcess const &src) { *this = src; }
 WebserverProcess::~WebserverProcess(void) {}
-WebserverProcess &WebserverProcess::operator=(WebserverProcess const &src) {
+WebserverProcess &WebserverProcess::operator=(WebserverProcess const &src)
+{
     _socket_fd = src._socket_fd;
     _connected_fd = src._connected_fd;
     _listen_info = src._listen_info;
@@ -454,10 +401,9 @@ WebserverProcess &WebserverProcess::operator=(WebserverProcess const &src) {
     _res = src._res;
     _response = src._response;
     _sent = src._sent;
+    _header_index = 0;
     _prev_req_end_index = 0;
-
-    _write_ret_sum = src._write_ret_sum;  // 0406 추가
-
+    _write_ret_sum = src._write_ret_sum; // 0406 추가
     _config = src._config;
     return (*this);
 }

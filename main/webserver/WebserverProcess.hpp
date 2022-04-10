@@ -11,13 +11,15 @@
 #define RETURN_WAIT 1
 #define RETURN_ERROR -1
 
-class WebserverProcess {
-   private:
+class WebserverProcess
+{
+private:
     int _socket_fd;
     int _connected_fd;
     t_listen _listen_info;
     struct sockaddr_in _addr;
-    bool _ready_to_response;  // flag to indicate ready state
+    size_t _header_index;
+    bool _ready_to_response; // flag to indicate ready state
     int _sent;
 
     std::string _req;
@@ -32,7 +34,7 @@ class WebserverProcess {
 
     WebserverProcess(void);
 
-   public:
+public:
     size_t _write_ret_sum;
 
     WebserverProcess(t_listen const &listen, Config &config);
