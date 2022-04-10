@@ -46,6 +46,10 @@ OBJS = $(addprefix $(OBJ_DIR)/, $(SRCS:.cpp=.o))
 
 CLIENT_DIR = client
 
+LOG_FILE = response.txt
+
+TESTER_DIR = $(PWD)/test/42_tester
+
 all: $(NAME)
 
 $(NAME): $(CLIENT) $(OBJ_DIR) $(OBJS)
@@ -75,6 +79,14 @@ re: fclean all
 test: re
 	@osascript -e 'tell application "Terminal" to do script "cd $(PWD) && clear && ./client/client"'
 	@osascript -e 'tell application "Terminal" to activate'
+	@./webserv ./test/conf/mac_test.conf
+
+tester: re
+	@rm -rf $(LOG_FILE)
+	@touch $(LOG_FILE)
+	@osascript -e 'tell application "Terminal" to do script "cd $(TESTER_DIR) && clear "'
+	@osascript -e 'tell application "Terminal" to activate'
+	@osascript -e 'tell application "System Events" to keystroke "./tester http://localhost:8000" '
 	@./webserv ./test/conf/mac_test.conf
 
 run: re
