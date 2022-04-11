@@ -53,25 +53,32 @@ int WebserverProcess::readRequest(void)
     _req += std::string(buffer);
 
     if (_header_index == 0 || _header_index == std::string::npos)
+    {
         _header_index = _req.find("\r\n\r\n"); //*수정
-    std::cout << "read now: " << _prev_req_end_index << std::endl;
+    }
     _prev_req_end_index += ret - 1;
-    std::cout << _header_index << std::endl;
+    std::cout << "read now: " << _prev_req_end_index << std::endl;
     if (_header_index != std::string::npos)
     {
-        bool chuncked = isChunked();
-        if (!chuncked || (chuncked && isFinalChunked()))
+        if (_req.find("Content-Length: ") == std::string::npos)
         {
-            // chuncked 인데 다 받았거나, chuncked가 아니면 0 => PROCEED
-            // std::cout << "this is not chunked, or it's final one"
-            ret = RETURN_PROCEED;
+            if (_req.find("Transfer-Encoding: chunked") != std::string::npos)
+            {
+                // chuncked 인데 다 받았거나, chuncked가 아니면 0 => PROCEED
+                // std::cout << "this is not chunked, or it's final one"
+                if (isFinalChunked())
+                {
+                    ret = RETURN_PROCEED;
+                }
+                else
+                    return (RETURN_WAIT);
+            }
+            else
+            {
+                ret = RETURN_PROCEED;
+            }
         }
-        else
-        {
-            // chuncked 인데 아직 덜 받았으면 return 1 => WAIT
-            // std::cout << "this is chunked, and it's not final one" << std::endl; // 임시삭제, 속도저하
-            ret = RETURN_WAIT;
-        }
+
         std::string key = "Content-Length: ";
         int content_len_index = findKeyIndex(key);
         if (content_len_index != -1)
@@ -86,34 +93,32 @@ int WebserverProcess::readRequest(void)
             else
             {
                 std::cout << "need to wait more req" << std::endl;
-                ret = RETURN_WAIT;
+                return (RETURN_WAIT);
             }
         }
     }
     else
-        ret = RETURN_WAIT; // 0406
+        return (RETURN_WAIT); // 0406
     // std::cerr << "// header not found //" << std::endl;
 
     if (ret == RETURN_PROCEED)
         ret = process();
-
     if (ret == RETURN_ERROR)
     {
         std::cerr << "// empty response error //" << std::endl;
         _ready_to_response = false;
         return RETURN_ERROR; // -1
     }
-
-    //*추가 0406
-    if (ret == RETURN_WAIT)
-        _ready_to_response = false;
-
-    //*
-    if (ret == RETURN_PROCEED)
+    else if (ret == RETURN_PROCEED)
     {
         std::cout << "// res is ready... //" << std::endl;
         _ready_to_response = true;
     }
+    // //*추가 0406
+    // if (ret == RETURN_WAIT)
+    //     _ready_to_response = false;
+
+    //*
     return ret; // success: 1(RETURN_WAIT)/0(RETURN_PROCEED)
 };
 
@@ -172,13 +177,13 @@ int WebserverProcess::writeResponse(void)
     // std::cout << "===> write" << std::endl;
     //         _res =
     //             "HTTP/1.1 405 Method Not Allowed\r\n\
-// Date: Fri, 01 Apr 2022 07:05:38 GMT\r\n\
-// Server: Mginx/1.0.0\r\n\
-// Content-Length: 0\r\n\
-// Content-Location: /\r\n\
-// Content-Type: text/plain\r\n\
-// Last-Modified: Tue, 19 Oct 2021 05:22:24 GMT\r\n\
-// \r\n";
+    // Date: Fri, 01 Apr 2022 07:05:38 GMT\r\n\
+    // Server: Mginx/1.0.0\r\n\
+    // Content-Length: 0\r\n\
+    // Content-Location: /\r\n\
+    // Content-Type: text/plain\r\n\
+    // Last-Modified: Tue, 19 Oct 2021 05:22:24 GMT\r\n\
+    // \r\n";
 
     // std::cout << "this is odd:" << _res << std::endl; //0406 임시삭제 속도저하
     std::string str = _res.substr(_write_ret_sum, RECV_SIZE); // 0406 수정
@@ -216,8 +221,8 @@ int WebserverProcess::writeResponse(void)
             _res = "";
             _req = "";
 
-            _header_index = 0;
             _prev_req_end_index = 0;
+            _header_index = 0;
             _ready_to_response = false;
             _write_ret_sum = 0;
             _request.initBody();
@@ -262,15 +267,6 @@ int WebserverProcess::findKeyIndex(std::string key)
     return index;
 }
 
-bool WebserverProcess::isChunked(void)
-{
-    if (_req.find("Content-Length: ") != std::string::npos)
-        return false;
-    if (_req.find("Transfer-Encoding: chunked") == std::string::npos)
-        return false;
-    return true;
-}
-
 bool WebserverProcess::isFinalChunked(void)
 {
     int endOfFile = _req.find("0\r\n\r\n");
@@ -279,6 +275,7 @@ bool WebserverProcess::isFinalChunked(void)
     int request_size = _req.size();
     if (request_size != endOfFile + 5)
         return false;
+    // 이거 왜 하는 거지?
     std::string substr = _req.substr(request_size - 5, 5);
     std::cout << "substr:: " << substr << std::endl;
     if (substr != "0\r\n\r\n")
@@ -378,8 +375,8 @@ WebserverProcess::WebserverProcess(t_listen const &listen, Config &config)
     _socket_fd = -1;
     _connected_fd = -1;
     _sent = -1;
-    _header_index = 0;
     _prev_req_end_index = 0;
+    _header_index = 0;
     _listen_info = listen;
     _ready_to_response = false;
     _config = &config;
@@ -401,8 +398,8 @@ WebserverProcess &WebserverProcess::operator=(WebserverProcess const &src)
     _res = src._res;
     _response = src._response;
     _sent = src._sent;
-    _header_index = 0;
     _prev_req_end_index = 0;
+    _header_index = 0;
     _write_ret_sum = src._write_ret_sum; // 0406 추가
     _config = src._config;
     return (*this);
