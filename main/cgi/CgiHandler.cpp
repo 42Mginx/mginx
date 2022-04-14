@@ -106,7 +106,6 @@ std::string		CgiHandler::executeCgi(const std::string& scriptName) {
 
 	write(fdIn, _body.c_str(), _body.size());
 	lseek(fdIn, 0, SEEK_SET);
-			std::cout<<"debug #2"<<std::endl;
 	pid = fork();
 
 	if (pid == -1)
@@ -116,7 +115,6 @@ std::string		CgiHandler::executeCgi(const std::string& scriptName) {
 	}
 	else if (pid == 0)
 	{
-		std::cout<<"debug #3"<<std::endl;
 		char * const * nll = NULL;
 
 		dup2(fdIn, STDIN_FILENO);

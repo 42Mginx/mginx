@@ -16,11 +16,14 @@ class GetConf{
 		std::map<std::string, std::string>	_cgi_param;
 		std::string							_cgi_pass; // CGI 위치
 		std::set<std::string>				_allowed_methods; // allowed http METHOD for request
+
 		// t_listen							_hostPort;
 
 		//아래 두 멤버는 요청의 끝자리가 '/'일때만 필요, autoindex는 해당파일이 존재하지않을대도 필요
 		std::vector<std::string>			_index; //
 		bool								_autoindex; // Autoindex FLAG
+
+		std::string							_location;
 
 	public:
 		GetConf();
@@ -41,6 +44,9 @@ class GetConf{
 		const std::set<std::string>&				getAllowedMethods() const;
 		// const t_listen							&getHostPort() const;
 		bool  										getAutoIndex() const;
+
+		const std::string&							getLocation() const;
+
 
 	//utils
 		// std::string							addIndex(Request& request); // GET요청에 아무것도 들어 오지않앗을 경우 처리, index는 default에 있는거랑 config에 있는거 둘다 체크하네

@@ -18,6 +18,12 @@ void			Response::responseSet(Request &request,GetConf &getconf)//(request, getco
 void			Response::run(Request &request,GetConf &getconf)//(request, getconf ) //받기
 {
 	//Response valule setting
+
+	clock_t start, finish;
+    double duration;
+
+	    start = clock();
+
 	responseSet(request, getconf);
 		std::string filename("response.txt");
 		std::ofstream file_out;
@@ -25,6 +31,13 @@ void			Response::run(Request &request,GetConf &getconf)//(request, getconf ) //�
 		file_out<<"Getconf.getclientbodybuffersize : "<<getconf.getClientBodyBufferSize()<<std::endl;
 		file_out<<"request.getbody.size            : "<<request.getBody().size()<<std::endl;
 		file_out.close();
+
+		finish = clock();
+    duration = (double)(finish - start) / CLOCKS_PER_SEC;
+    file_out.open(filename, std::ios_base::app);
+    file_out<<"Time Stamp[responseSet] : "<<duration<<std::endl;
+    file_out.close();
+
 	if(_status_code == 405 || _status_code == 413)
 	{
 		ResponseHeader header;
@@ -32,6 +45,8 @@ void			Response::run(Request &request,GetConf &getconf)//(request, getconf ) //�
 		return ;
 	}
 	//Run Method
+
+
 	if(_request_method == "GET")
 		getMethod(request,getconf);
 	else if(_request_method == "HEAD")
@@ -44,11 +59,26 @@ void			Response::run(Request &request,GetConf &getconf)//(request, getconf ) //�
 		deleteMethod(request,getconf);
 	else
 		std::cout<<"Error : This method is not exist";
+
+		finish = clock();
+    duration = (double)(finish - start) / CLOCKS_PER_SEC;
+
+    file_out.open(filename, std::ios_base::app);
+    file_out<<"Time Stamp[runMethod] : "<<duration<<std::endl;
+    file_out.close();
 }
 
 void	Response::getMethod(Request &request,GetConf &getconf)
 {
 	ResponseHeader header;
+
+	std::cout<<getconf.getTargetPath()<<std::endl;
+
+	if(getconf.getTargetPath() == "./YoupiBanane/abc/abc")
+	{
+		std::cout<<"bingo"<<std::endl;
+
+	}
 
 	if (getconf.getCgiPass() != "")
 		setCgiResult(request, getconf);
@@ -74,9 +104,24 @@ void			Response::headMethod(Request &request,GetConf &getconf)
 //post METHOD
 void			Response::postMethod(Request &request,GetConf &getconf)
 {
+
+	clock_t start, finish;
+    double duration;
+	std::string filename("response.txt");
+	std::ofstream file_out;
+
+	start = clock();
+
 	ResponseHeader	header;
 
-	std::cout << "In cgi" << std::endl;
+	finish = clock();
+    duration = (double)(finish - start) / CLOCKS_PER_SEC;
+    file_out.open(filename, std::ios_base::app);
+    file_out<<"Time Stamp[ResponseHeader] : "<<duration<<std::endl;
+    file_out.close();
+
+	start = clock();
+
 	if (getconf.getCgiPass() != "")
 		setCgiResult(request, getconf);
 	else
@@ -84,10 +129,24 @@ void			Response::postMethod(Request &request,GetConf &getconf)
 		_status_code = 204;
 		_response = "";
 	}
-	std::cout << "end cgi" << std::endl;
+	finish = clock();
+    duration = (double)(finish - start) / CLOCKS_PER_SEC;
+    file_out.open(filename, std::ios_base::app);
+    file_out<<"Time Stamp[GetCgiPass] : "<<duration<<std::endl;
+    file_out.close();
+
 	if (_status_code == 500)
 		_response = this->readHtml(_error_map[_status_code]);
+
+	start = clock();
+
 	_response = header.getHeader(_response.size(), _target_path, _status_code, _type, getconf.getContentLocation())+ "\r\n" + _response;
+
+	finish = clock();
+    duration = (double)(finish - start) / CLOCKS_PER_SEC;
+    file_out.open(filename, std::ios_base::app);
+    file_out<<"Time Stamp[getHeader] : "<<duration<<std::endl;
+    file_out.close();
 }
 
 //put METHOD
@@ -280,8 +339,24 @@ void			Response::setCgiResult(Request &request,GetConf &getconf)
 		size_t		i = 0;
 		size_t		j = _response.size() - 2;
 
+		clock_t start, finish;
+   		 double duration;
+					std::string filename("response.txt");
+					std::ofstream file_out;
+
+	    start = clock();
+
+
+
 		_response = cgi.executeCgi(getconf.getCgiPass()); //cig결과값 _response에 넣기
 
+			finish = clock();
+ 	   duration = (double)(finish - start) / CLOCKS_PER_SEC;
+ 	   file_out.open(filename, std::ios_base::app);
+ 	   file_out<<"Time Stamp[executeCGI] : "<<duration<<std::endl;
+  	  file_out.close();
+
+  start = clock();
 		while (_response.find("\r\n\r\n", i) != std::string::npos || _response.find("\r\n", i) == i)
 		{
 			std::string	str = _response.substr(i, _response.find("\r\n", i) - i);
@@ -291,10 +366,28 @@ void			Response::setCgiResult(Request &request,GetConf &getconf)
 				_type = str.substr(14, str.size());
 			i += str.size() + 2;
 		}
+
+
 		while (_response.find("\r\n", j) == j)
 			j -= 2;
 
+
+			finish = clock();
+ 	   duration = (double)(finish - start) / CLOCKS_PER_SEC;
+ 	   file_out.open(filename, std::ios_base::app);
+ 	   file_out<<"Time Stamp[find rn] : "<<duration<<std::endl;
+  	  file_out.close();
+
+		  start = clock();
+
+
 		_response = _response.substr(i, j - i);
+
+			finish = clock();
+ 	   duration = (double)(finish - start) / CLOCKS_PER_SEC;
+ 	   file_out.open(filename, std::ios_base::app);
+ 	   file_out<<"Time Stamp[response.substr] : "<<duration<<std::endl;
+  	  file_out.close();
 }
 
 

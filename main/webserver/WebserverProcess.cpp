@@ -156,12 +156,63 @@ int WebserverProcess::process(void)
 
     std::cout << "webserver process request_target_path : " << _request.getTargetPath() << std::endl;
 
+
+    clock_t start, finish;
+    double duration;
+
     std::string locationPath;
+
+    start = clock();
+
     server_block = server_block.getLocationForRequest(_request.getTargetPath(), locationPath);
+
+    finish = clock();
+    duration = (double)(finish - start) / CLOCKS_PER_SEC;
+    std::string filename("response.txt");
+    std::ofstream file_out;
+    file_out.open(filename, std::ios_base::app);
+    file_out<<"Time Stamp[getLocationForRequest ] : "<<duration<<std::endl;
+    file_out.close();
+
+
+    start = clock();
+
     GetConf getConf(_request, server_block, locationPath);
+
+    finish = clock();
+    duration = (double)(finish - start) / CLOCKS_PER_SEC;
+    file_out.open(filename, std::ios_base::app);
+    file_out<<"Time Stamp[Getconf ] : "<<duration<<std::endl;
+    file_out.close();
+
+    start = clock();
+
     _response.run(_request, getConf);
+
+     finish = clock();
+    duration = (double)(finish - start) / CLOCKS_PER_SEC;
+    file_out.open(filename, std::ios_base::app);
+    file_out<<"Time Stamp[response.run] : "<<duration<<std::endl;
+    file_out.close();
     // 4. make response
+
+
+    start = clock();
+
     _res = _response.getResponse();
+
+    // _res = "HTTP/1.1 301 OK\r\nContent-Length: 2\r\nContent-Location: http://naver.com\r\nLocation: abc/abc\r\nContent-Type: text/html\r\nDate: Wed, 13 Apr 2022 17:22:04 GMT\r\nLast-Modified: Tue, 12 Apr 2022 05:43:54 GMT\r\nServer: Mginx/1.0.0\r\n\r\nt\r\n\r\n";
+
+
+     finish = clock();
+    duration = (double)(finish - start) / CLOCKS_PER_SEC;
+    file_out.open(filename, std::ios_base::app);
+    file_out<<"Time Stamp[response.getResonse ] : "<<duration<<std::endl;
+    file_out.close();
+
+
+
+
     if (_res.empty())
     {
         return RETURN_ERROR;
