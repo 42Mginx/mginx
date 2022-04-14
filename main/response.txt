@@ -1,307 +1,44 @@
-Time Stamp[getLocationForRequest ] : 0.001213
-Time Stamp[Getconf ] : 0.000378
-Getconf.getclientbodybuffersize : 1000000000
-request.getbody.size            : 0
-Time Stamp[responseSet] : 0.000154
-Time Stamp[response.run] : 0.006621
-Time Stamp[response.getResonse ] : 9e-06
-response: HTTP/1.1 301 OK
-Content-Length: 2
-Content-Location: http://naver.com
-Location: abc/abc
-Content-Type: text/html
-Date: Wed, 13 Apr 2022 17:22:04 GMT
-Last-Modified: Tue, 12 Apr 2022 05:43:54 GMT
-Server: Mginx/1.0.0
-
-t
-
-
-Time Stamp[getLocationForRequest ] : 0.000419
-Time Stamp[Getconf ] : 0.000116
-Getconf.getclientbodybuffersize : 1000000000
-request.getbody.size            : 0
-Time Stamp[responseSet] : 9.2e-05
-Time Stamp[runMethod] : 0.000925
-Time Stamp[response.run] : 0.001029
-Time Stamp[response.getResonse ] : 3e-06
-response: HTTP/1.1 301 OK
-Content-Length: 2
-Content-Location: http://naver.com
-Location: abc/abc
-Content-Type: text/html
-Date: Wed, 13 Apr 2022 17:22:04 GMT
-Last-Modified: Tue, 12 Apr 2022 05:43:54 GMT
-Server: Mginx/1.0.0
-
-t
-
-
-Time Stamp[getLocationForRequest ] : 0.000484
-Time Stamp[Getconf ] : 0.000188
-Getconf.getclientbodybuffersize : 1000000000
-request.getbody.size            : 0
-Time Stamp[responseSet] : 9.6e-05
-Time Stamp[runMethod] : 0.000526
-Time Stamp[response.run] : 0.000618
-Time Stamp[response.getResonse ] : 2e-06
-response: HTTP/1.1 301 OK
-Content-Length: 2
-Content-Location: http://naver.com
-Location: abc/abc
-Content-Type: text/html
-Date: Wed, 13 Apr 2022 17:22:04 GMT
-Last-Modified: Tue, 12 Apr 2022 05:43:54 GMT
-Server: Mginx/1.0.0
-
-t
-
-
-Time Stamp[getLocationForRequest ] : 0.000491
-Time Stamp[Getconf ] : 0.000114
-Getconf.getclientbodybuffersize : 1000000000
-request.getbody.size            : 0
-Time Stamp[responseSet] : 7.6e-05
-Time Stamp[runMethod] : 0.000294
-Time Stamp[response.run] : 0.000338
-Time Stamp[response.getResonse ] : 2e-06
-response: HTTP/1.1 301 OK
-Content-Length: 2
-Content-Location: http://naver.com
-Location: abc/abc
-Content-Type: text/html
-Date: Wed, 13 Apr 2022 17:22:04 GMT
-Last-Modified: Tue, 12 Apr 2022 05:43:54 GMT
-Server: Mginx/1.0.0
-
-t
-
-
-Time Stamp[getLocationForRequest ] : 0.000538
-Time Stamp[Getconf ] : 0.000131
-Getconf.getclientbodybuffersize : 1000000000
-request.getbody.size            : 0
-Time Stamp[responseSet] : 7.7e-05
-Time Stamp[runMethod] : 0.000292
-Time Stamp[response.run] : 0.000334
-Time Stamp[response.getResonse ] : 3e-06
-response: HTTP/1.1 301 OK
-Content-Length: 2
-Content-Location: http://naver.com
-Location: abc/abc
-Content-Type: text/html
-Date: Wed, 13 Apr 2022 17:22:04 GMT
-Last-Modified: Tue, 12 Apr 2022 05:43:54 GMT
-Server: Mginx/1.0.0
-
-t
-
-
-Time Stamp[getLocationForRequest ] : 0.000504
-Time Stamp[Getconf ] : 0.000113
-Getconf.getclientbodybuffersize : 1000000000
-request.getbody.size            : 0
-Time Stamp[responseSet] : 0.000106
-Time Stamp[runMethod] : 0.000319
-Time Stamp[response.run] : 0.000362
-Time Stamp[response.getResonse ] : 3e-06
-response: HTTP/1.1 301 OK
-Content-Length: 2
-Content-Location: http://naver.com
-Location: abc/abc
-Content-Type: text/html
-Date: Wed, 13 Apr 2022 17:22:04 GMT
-Last-Modified: Tue, 12 Apr 2022 05:43:54 GMT
-Server: Mginx/1.0.0
-
-t
-
-
-Time Stamp[getLocationForRequest ] : 0.00086
-Time Stamp[Getconf ] : 0.000115
-Getconf.getclientbodybuffersize : 1000000000
-request.getbody.size            : 0
-Time Stamp[responseSet] : 0.000146
-Time Stamp[runMethod] : 0.000367
-Time Stamp[response.run] : 0.000414
-Time Stamp[response.getResonse ] : 3e-06
-response: HTTP/1.1 301 OK
-Content-Length: 2
-Content-Location: http://naver.com
-Location: abc/abc
-Content-Type: text/html
-Date: Wed, 13 Apr 2022 17:22:04 GMT
-Last-Modified: Tue, 12 Apr 2022 05:43:54 GMT
-Server: Mginx/1.0.0
-
-t
-
-
-Time Stamp[getLocationForRequest ] : 0.000493
+Time Stamp[getLocationForRequest ] : 0.000254
 Time Stamp[Getconf ] : 0.000136
-Getconf.getclientbodybuffersize : 1000000000
-request.getbody.size            : 0
-Time Stamp[responseSet] : 9.5e-05
-Time Stamp[runMethod] : 0.000339
-Time Stamp[response.run] : 0.000386
-Time Stamp[response.getResonse ] : 3e-06
-response: HTTP/1.1 301 OK
-Content-Length: 2
-Content-Location: http://naver.com
-Location: abc/abc
-Content-Type: text/html
-Date: Wed, 13 Apr 2022 17:22:04 GMT
-Last-Modified: Tue, 12 Apr 2022 05:43:54 GMT
-Server: Mginx/1.0.0
-
-t
-
-
-Time Stamp[getLocationForRequest ] : 0.000468
-Time Stamp[Getconf ] : 0.000123
-Getconf.getclientbodybuffersize : 1000000000
-request.getbody.size            : 0
-Time Stamp[responseSet] : 0.000221
-Time Stamp[runMethod] : 0.000476
-Time Stamp[response.run] : 0.00056
-Time Stamp[response.getResonse ] : 2e-06
-response: HTTP/1.1 301 OK
-Content-Length: 2
-Content-Location: http://naver.com
-Location: abc/abc
-Content-Type: text/html
-Date: Wed, 13 Apr 2022 17:22:04 GMT
-Last-Modified: Tue, 12 Apr 2022 05:43:54 GMT
-Server: Mginx/1.0.0
-
-t
-
-
-Time Stamp[getLocationForRequest ] : 0.000466
-Time Stamp[Getconf ] : 0.000342
-Getconf.getclientbodybuffersize : 1000000000
-request.getbody.size            : 0
-Time Stamp[responseSet] : 0.000234
-Time Stamp[runMethod] : 0.000546
-Time Stamp[response.run] : 0.000623
-Time Stamp[response.getResonse ] : 8e-06
-response: HTTP/1.1 301 OK
-Content-Length: 2
-Content-Location: http://naver.com
-Location: abc/abc
-Content-Type: text/html
-Date: Wed, 13 Apr 2022 17:22:04 GMT
-Last-Modified: Tue, 12 Apr 2022 05:43:54 GMT
-Server: Mginx/1.0.0
-
-t
-
-
-Time Stamp[getLocationForRequest ] : 0.000496
-Time Stamp[Getconf ] : 0.000125
-Getconf.getclientbodybuffersize : 1000000000
-request.getbody.size            : 0
-Time Stamp[responseSet] : 0.000106
-Time Stamp[runMethod] : 0.000593
-Time Stamp[response.run] : 0.000653
-Time Stamp[response.getResonse ] : 1e-05
-response: HTTP/1.1 301 OK
-Content-Length: 2
-Content-Location: http://naver.com
-Location: abc/abc
-Content-Type: text/html
-Date: Wed, 13 Apr 2022 17:22:04 GMT
-Last-Modified: Tue, 12 Apr 2022 05:43:54 GMT
-Server: Mginx/1.0.0
-
-t
-
-
-Time Stamp[getLocationForRequest ] : 0.002467
-Time Stamp[Getconf ] : 0.000675
-Getconf.getclientbodybuffersize : 1000000000
-request.getbody.size            : 0
-Time Stamp[responseSet] : 0.000647
-Time Stamp[response.run] : 0.003685
-Time Stamp[response.getResonse ] : 5e-06
-response: HTTP/1.1 405 Method Not Allowed
-Allow: GET
-Content-Length: 0
-Content-Location: /abc/abc
-Content-Type: text/plain
-Date: Thu, 14 Apr 2022 01:35:15 GMT
-Server: Mginx/1.0.0
-
-
-Time Stamp[getLocationForRequest ] : 0.000943
-Time Stamp[Getconf ] : 0.000249
-Getconf.getclientbodybuffersize : 1000000000
-request.getbody.size            : 0
-Time Stamp[responseSet] : 0.000192
-Time Stamp[runMethod] : 0.000835
-Time Stamp[response.run] : 0.001091
-Time Stamp[response.getResonse ] : 1.1e-05
-response: HTTP/1.1 200 OK
-Content-Length: 4
-Content-Location: /abc/abc
-Content-Type: text/plain
-Date: Thu, 14 Apr 2022 01:35:21 GMT
-Last-Modified: Wed, 13 Apr 2022 17:51:30 GMT
-Server: Mginx/1.0.0
-
-aaa
-
-Time Stamp[getLocationForRequest ] : 0.000759
-Time Stamp[Getconf ] : 0.000511
-Getconf.getclientbodybuffersize : 1000000000
-request.getbody.size            : 0
-Time Stamp[responseSet] : 0.000276
-Time Stamp[runMethod] : 0.003057
-Time Stamp[response.run] : 0.003403
-Time Stamp[response.getResonse ] : 1.6e-05
-response: HTTP/1.1 200 OK
-Content-Length: 4
-Content-Location: /abc/abc
-Content-Type: text/plain
-Date: Thu, 14 Apr 2022 01:38:00 GMT
-Last-Modified: Wed, 13 Apr 2022 17:51:30 GMT
-Server: Mginx/1.0.0
-
-aaa
-
-Time Stamp[getLocationForRequest ] : 0.000723
-Time Stamp[Getconf ] : 0.000469
 Getconf.getclientbodybuffersize : 2556
 request.getbody.size            : 0
-Time Stamp[responseSet] : 0.000461
-Time Stamp[response.run] : 0.003556
-Time Stamp[response.getResonse ] : 7e-06
-response: HTTP/1.1 405 Method Not Allowed
-Allow: return, test
-Content-Length: 0
-Content-Location: /abc/abc
-Content-Type: text/plain
-Date: Thu, 14 Apr 2022 01:38:54 GMT
-Server: Mginx/1.0.0
-
-
-Time Stamp[getLocationForRequest ] : 0.00109
-Time Stamp[Getconf ] : 0.001253
-Getconf.getclientbodybuffersize : 2556
-request.getbody.size            : 0
-Time Stamp[responseSet] : 0.000596
-Time Stamp[executeCGI] : 1.84467e+13
-Time Stamp[find rn] : 1.1e-05
-Time Stamp[response.substr] : 1e-06
-Time Stamp[runMethod] : 1.84467e+13
-Time Stamp[response.run] : 1.84467e+13
+Time Stamp[responseSet] : 0.000109
+Time Stamp[runMethod] : 0.000966
+Time Stamp[response.run] : 0.001035
 Time Stamp[response.getResonse ] : 4e-06
 response: HTTP/1.1 200 OK
-Content-Length: 0
+Content-Length: 4
 Content-Location: /abc/abc
 Content-Type: text/plain
-Date: Thu, 14 Apr 2022 01:39:39 GMT
-Last-Modified: Wed, 13 Apr 2022 17:51:30 GMT
+Date: Thu, 14 Apr 2022 01:49:37 GMT
+Last-Modified: Thu, 14 Apr 2022 01:40:22 GMT
 Server: Mginx/1.0.0
 
+aaa
+
+Time Stamp[getLocationForRequest ] : 0.000428
+Time Stamp[Getconf ] : 8.2e-05
+Getconf.getclientbodybuffersize : 1000000000
+request.getbody.size            : 0
+Time Stamp[responseSet] : 0.000104
+Time Stamp[runMethod] : 0.000383
+Time Stamp[response.run] : 0.000448
+Time Stamp[response.getResonse ] : 6e-06
+response: HTTP/1.1 404 Not Found
+Content-Length: 189
+Content-Location: /favicon.ico
+Content-Type: text/html
+Date: Thu, 14 Apr 2022 01:49:37 GMT
+Server: Mginx/1.0.0
+
+<!DOCTYPE html>
+<html>
+	<title>404 Not Found</title>
+	<body>
+		<div>
+			<H1>404 Not Found</H1>
+			<p>Unable to find a representation of the requested resource</p>
+		</div>
+	</body>
+</html>
 

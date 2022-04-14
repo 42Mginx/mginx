@@ -272,9 +272,9 @@ void ServerBlock::addAlias(std::vector<std::string> args)
 
 void ServerBlock::addRedirect(std::vector<std::string> args)
 {
-    if (args.size() != 1 || _cgi_pass != "")
+    if (args.size() != 1 || _redirect != "")
         throw ExceptionInvalidArguments();
-    _cgi_pass = args[0];
+    _redirect = args[0];
 }
 
 // get 함수들

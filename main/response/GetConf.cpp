@@ -39,7 +39,7 @@ GetConf::GetConf(Request &request, ServerBlock &server_block, std::string &locat
 		}
 		*/
 		std::cout<<"@@@@debug bodysize : "<<server_block.getClientBodyBufferSize()<<"@@"<<std::endl;
-		std::cout<<"@@@@debug redirect : "<<server_block.getRedirect()<<"@@"<<std::endl;
+		std::cout<<"@@@@debug redirect : "<< server_block.getRedirect() <<"@@"<<std::endl;
 
 		//index 체크
 		std::vector<std::string> temp_index = server_block.getIndex();

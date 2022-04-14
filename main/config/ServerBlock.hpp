@@ -13,7 +13,6 @@ private:
 	std::string _cgi_pass;					
 	std::vector<t_listen> _listen;			// 여러개일 수 있음
 	std::string _root;						// 얘는 한개
-	std::string _redirect;					// 얘도 한개
 	std::set<std::string> _allowed_methods; // 얘는 여러개
 	std::map<int, std::string> _error_page; // 얘도 여러개
 	int _client_body_buffer_size;			// 한 개
@@ -26,6 +25,7 @@ private:
 	bool _aliasSet;
 
 	std::map<std::string, ServerBlock> _location; // path, 해당 path location 클래스
+	std::string _redirect;					// 얘도 한개
 
 public:
 	ServerBlock();
