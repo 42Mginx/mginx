@@ -153,13 +153,19 @@ int Webserver::run() {
     return 0;
 }
 
+void Webserver::clear() {
+    std::cout << "clear" << std::endl;
+    std::vector<WebserverProcess>::iterator socket_v;
+    socket_v = _socket_v.begin();
+    for (; socket_v != _socket_v.end(); socket_v++) {
+        socket_v->clear();
+    }
+}
+
 void Webserver::handle_error(std::string const &error_message) {
     std::cout << error_message << " 에러" << std::endl;
     std::vector<WebserverProcess>::iterator process_it;
-    process_it = _process_v.begin();
-    for (; process_it != _process_v.end(); process_it++) {
-        process_it->clear();
-    }
+    clear();
     init();
     setup();
 }

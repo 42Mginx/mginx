@@ -87,7 +87,7 @@ tester: re
 	@touch $(LOG_FILE)
 	@osascript -e 'tell application "Terminal" to do script "cd $(TESTER_DIR) && clear "'
 	@osascript -e 'tell application "Terminal" to activate'
-	@osascript -e 'tell application "System Events" to keystroke "./tester http://localhost:8000" '
+	@#osascript -e 'tell application "System Events" to keystroke "./tester http://localhost:8000" '
 	@./webserv ./test/conf/mac_test.conf
 
 run: re

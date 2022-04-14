@@ -89,6 +89,7 @@ class Webserver {
     void init();
     int setup();
     int run();
+    void clear();
     void handle_error(std::string const &error_message);
 };
 
