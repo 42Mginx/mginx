@@ -28,7 +28,7 @@ ServerBlock &ServerBlock::operator=(ServerBlock const &src)
         _client_body_buffer_size = src._client_body_buffer_size;
         _auto_index = src._auto_index;
         _location = src._location;
-        _redirect = src.redirect;
+        _redirect = src._redirect;
         _index = src._index; //0406 추가
     }
     return *this;
@@ -322,7 +322,7 @@ std::string ServerBlock::getAlias() const { return this->_alias; }
 
 bool ServerBlock::getAliasSet() const { return this->_aliasSet; }
 
-std::map<std::string, std::string> ServerBlock::getCgiParam() const
+std::string ServerBlock::getRedirect() const
 {
     return this->_redirect;
 }
