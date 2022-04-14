@@ -38,16 +38,16 @@ int WebserverProcess::readRequest(void)
         0,
     };
     int ret = recv(_connected_fd, buffer, BUF_SIZE - 1, 0);
-    if (ret <= 0)
-    {
-        if (ret == 0)
-            std::cout << "\rConnection was closed by client.\n"
-                      << std::endl;
-        else if (ret == -1)
-            std::cout << "\rRead error, closing connection.\n"
-                      << std::endl;
-        else
+    if (ret <= 0) {
+        if (ret == 0) {
+            std::cout << "\rConnection was closed by client.\n" << std::endl;
+            return RETURN_CLOSE;
+        } else if (ret == -1) {
+
+            std::cout << "\rRead error, closing connection.\n" << std::endl;
+        } else {
             std::cout << "read error!" << std::endl;
+        }
         return -1;
     }
     _req += std::string(buffer);

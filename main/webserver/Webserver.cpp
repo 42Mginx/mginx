@@ -143,12 +143,16 @@ int Webserver::run()
                 {
                     // std::cout << "read 진입" << std::endl;
                     int result = process_it->readRequest();
-                    if (result == -1)
-                    {
-                        std::cout << "read 에러: " << strerror(errno) << std::endl;
+                   if (result == RETURN_CLOSE) {
+                        close(connected_fd);
                         FD_CLR(connected_fd, &_fd_set);
                         FD_CLR(connected_fd, &_reading_set);
-                        connected_fd = process_it->getConnectedFd();
+                    }
+                    if (result == RETURN_ERROR) {
+                        std::cout << "read 에러: " << strerror(errno)
+                                  << std::endl;
+                        FD_CLR(connected_fd, &_fd_set);
+                        FD_CLR(connected_fd, &_reading_set);
                         // return -1;
                     }
                     ret = 0;

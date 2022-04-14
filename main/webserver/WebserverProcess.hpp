@@ -7,9 +7,6 @@
 #include "Webserver.hpp"
 
 #define RECV_SIZE 65536
-#define RETURN_PROCEED 0
-#define RETURN_WAIT 1
-#define RETURN_ERROR -1
 
 class WebserverProcess
 {

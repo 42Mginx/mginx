@@ -56,6 +56,13 @@
 #define RESET "\033[0m"
 #define PURPLE "\033[34m"
 
+
+// return from webserver process
+#define RETURN_PROCEED 0
+#define RETURN_WAIT 1
+#define RETURN_ERROR -1
+#define RETURN_CLOSE 2
+
 class WebserverProcess;
 
 class Webserver {

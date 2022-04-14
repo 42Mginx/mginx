@@ -93,4 +93,4 @@ tester: re
 run: re
 	@./webserv ./test/conf/mac.conf
 
-.PHONY: all clean fclean re test run
+.PHONY: all clean fclean re test run tester
