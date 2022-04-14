@@ -61,6 +61,7 @@ fileVector readFile(std::string config_path_str) {
 
     //	read 에러 발생시 => 에러 출력 후 빈 file 리턴 출력
     if (ret == -1) {
+        close(fd);
         std::cerr << "Error while reading config file." << std::endl;
         return file;
     }
@@ -68,6 +69,7 @@ fileVector readFile(std::string config_path_str) {
     // line에서 띄어쓰기(' ') 엔터('\n')랑 탭('\t') 단위로 쪼개서 vector에
     // 넣어준 후 리턴해줌
     file = split(line, std::string(" \n\t"));
+    close(fd);
     return file;
 }
 
