@@ -174,7 +174,8 @@ int Response::writeContent(std::string content) {
         file.open(_target_path.c_str(),
                   std::ofstream::out | std::ofstream::trunc);
         if (file.is_open() == false)
-            return (403);
+                    return (403);
+    
 
         file << content;
         file.close();

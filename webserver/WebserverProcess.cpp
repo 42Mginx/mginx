@@ -80,7 +80,12 @@ int WebserverProcess::readRequest(void) {
     }
 
     if (ret == RETURN_PROCEED)
+    {
+        std::cout << "\n--- request ---" << std::endl;
+        std::cout << _req << std::endl;
+        std::cout << "---------------" << std::endl;
         ret = process();
+    }
     if (ret == RETURN_ERROR) {
         std::cerr << "// empty response error //" << std::endl;
         _ready_to_response = false;
@@ -139,7 +144,9 @@ int WebserverProcess::writeResponse(void) {
     } else {
         _write_ret_sum += ret;
         if (_write_ret_sum >= _res.size()) {
-            std::cout << "\n===> write" << std::endl;
+            std::cout << "\n --- response ---" << std::endl;
+            std::cout << _res << std::endl;
+            std::cout << "---------------" << std::endl;
             _res = "";
             _req = "";
             _prev_req_end_index = 0;
@@ -200,11 +207,8 @@ bool WebserverProcess::isFinalChunked(void) {
 bool WebserverProcess::listenMatched(std::vector<t_listen> listens) {
     std::vector<t_listen>::iterator it = listens.begin();
     for (; it != listens.end(); it++) {
-        if (it->port == _listen_info.port && it->host == _listen_info.host) {
-            std::cout << "listen matched!!(" << _listen_info.port << ","
-                      << _listen_info.host << ")" << std::endl;
+        if (it->port == _listen_info.port && it->host == _listen_info.host)
             return true;
-        }
     }
     return false;
 }
