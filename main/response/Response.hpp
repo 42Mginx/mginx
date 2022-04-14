@@ -26,6 +26,9 @@ private:
 	t_listen					_hostPort;
 	std::map<int, std::string>	_error_map;
 
+	std::string					_location;
+
+
 
 public:
 	Response(void);

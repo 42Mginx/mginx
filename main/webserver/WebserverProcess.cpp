@@ -199,6 +199,7 @@ int WebserverProcess::process(void)
 
     start = clock();
 
+    std::cout<<"debug3"<<std::endl;
     _res = _response.getResponse();
 
     // _res = "HTTP/1.1 301 OK\r\nContent-Length: 2\r\nContent-Location: http://naver.com\r\nLocation: abc/abc\r\nContent-Type: text/html\r\nDate: Wed, 13 Apr 2022 17:22:04 GMT\r\nLast-Modified: Tue, 12 Apr 2022 05:43:54 GMT\r\nServer: Mginx/1.0.0\r\n\r\nt\r\n\r\n";

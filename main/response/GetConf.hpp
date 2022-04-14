@@ -23,7 +23,7 @@ class GetConf{
 		std::vector<std::string>			_index; //
 		bool								_autoindex; // Autoindex FLAG
 
-		std::string							_location;
+		std::string							_redirect;
 
 	public:
 		GetConf();
@@ -45,7 +45,7 @@ class GetConf{
 		// const t_listen							&getHostPort() const;
 		bool  										getAutoIndex() const;
 
-		const std::string&							getLocation() const;
+		const std::string&							getRedirect() const;
 
 
 	//utils

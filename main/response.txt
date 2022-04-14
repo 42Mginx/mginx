@@ -1,34 +1,70 @@
-Time Stamp[getLocationForRequest ] : 0.000254
-Time Stamp[Getconf ] : 0.000136
-Getconf.getclientbodybuffersize : 2556
-request.getbody.size            : 0
-Time Stamp[responseSet] : 0.000109
-Time Stamp[runMethod] : 0.000966
-Time Stamp[response.run] : 0.001035
-Time Stamp[response.getResonse ] : 4e-06
-response: HTTP/1.1 200 OK
-Content-Length: 4
-Content-Location: /abc/abc
-Content-Type: text/plain
-Date: Thu, 14 Apr 2022 01:49:37 GMT
-Last-Modified: Thu, 14 Apr 2022 01:40:22 GMT
-Server: Mginx/1.0.0
-
-aaa
-
-Time Stamp[getLocationForRequest ] : 0.000428
-Time Stamp[Getconf ] : 8.2e-05
+Time Stamp[getLocationForRequest ] : 0.001703
+Time Stamp[Getconf ] : 0.000661
 Getconf.getclientbodybuffersize : 1000000000
 request.getbody.size            : 0
-Time Stamp[responseSet] : 0.000104
-Time Stamp[runMethod] : 0.000383
-Time Stamp[response.run] : 0.000448
-Time Stamp[response.getResonse ] : 6e-06
+Time Stamp[responseSet] : 0.000479
+Time Stamp[runMethod] : 0.00356
+Time Stamp[response.run] : 0.003834
+Time Stamp[response.getResonse ] : 1.5e-05
+response: HTTP/1.1 200 OK
+Content-Length: 13
+Content-Location: /abc/test
+Content-Type: text/plain
+Date: Thu, 14 Apr 2022 04:25:20 GMT
+Last-Modified: Thu, 14 Apr 2022 04:10:12 GMT
+Server: Mginx/1.0.0
+
+redirect ok!
+
+Time Stamp[getLocationForRequest ] : 0.001298
+Time Stamp[Getconf ] : 0.000326
+Getconf.getclientbodybuffersize : 1000000000
+request.getbody.size            : 0
+Time Stamp[responseSet] : 0.000222
+Time Stamp[runMethod] : 0.000771
+Time Stamp[response.run] : 0.001062
+Time Stamp[response.getResonse ] : 1.5e-05
+response: HTTP/1.1 200 OK
+Content-Length: 2
+Content-Location: /
+Content-Type: text/html
+Date: Thu, 14 Apr 2022 04:26:46 GMT
+Last-Modified: Tue, 12 Apr 2022 05:43:54 GMT
+Server: Mginx/1.0.0
+
+t
+
+Time Stamp[getLocationForRequest ] : 0.000481
+Time Stamp[Getconf ] : 0.000291
+Getconf.getclientbodybuffersize : 2556
+request.getbody.size            : 0
+Time Stamp[responseSet] : 0.000329
+Time Stamp[runMethod] : 0.000724
+Time Stamp[response.run] : 0.000841
+Time Stamp[response.getResonse ] : 1.6e-05
+response: HTTP/1.1 301 Moved Permanently
+Content-Length: 0
+Content-Location: /abc/abc
+Content-Type: text/plain
+Date: Thu, 14 Apr 2022 04:26:50 GMT
+Last-Modified: Wed, 13 Apr 2022 17:51:30 GMT
+Location: 127.0.0.1/aaaa
+Server: Mginx/1.0.0
+
+
+Time Stamp[getLocationForRequest ] : 0.001153
+Time Stamp[Getconf ] : 0.000309
+Getconf.getclientbodybuffersize : 1000000000
+request.getbody.size            : 0
+Time Stamp[responseSet] : 0.000203
+Time Stamp[runMethod] : 0.000947
+Time Stamp[response.run] : 0.001171
+Time Stamp[response.getResonse ] : 1.1e-05
 response: HTTP/1.1 404 Not Found
 Content-Length: 189
-Content-Location: /favicon.ico
+Content-Location: /abc/127.0.0.1/aaaa
 Content-Type: text/html
-Date: Thu, 14 Apr 2022 01:49:37 GMT
+Date: Thu, 14 Apr 2022 04:26:50 GMT
 Server: Mginx/1.0.0
 
 <!DOCTYPE html>
@@ -41,4 +77,453 @@ Server: Mginx/1.0.0
 		</div>
 	</body>
 </html>
+
+Time Stamp[getLocationForRequest ] : 0.001596
+Time Stamp[Getconf ] : 0.000711
+Getconf.getclientbodybuffersize : 1000000000
+request.getbody.size            : 0
+Time Stamp[responseSet] : 0.000377
+Time Stamp[runMethod] : 0.003866
+Time Stamp[response.run] : 0.004324
+Time Stamp[response.getResonse ] : 5.4e-05
+response: HTTP/1.1 404 Not Found
+Content-Length: 189
+Content-Location: /abc
+Content-Type: text/html
+Date: Thu, 14 Apr 2022 04:27:13 GMT
+Last-Modified: Thu, 14 Apr 2022 04:10:07 GMT
+Server: Mginx/1.0.0
+
+<!DOCTYPE html>
+<html>
+	<title>404 Not Found</title>
+	<body>
+		<div>
+			<H1>404 Not Found</H1>
+			<p>Unable to find a representation of the requested resource</p>
+		</div>
+	</body>
+</html>
+
+Time Stamp[getLocationForRequest ] : 0.000388
+Time Stamp[Getconf ] : 0.000345
+Getconf.getclientbodybuffersize : 2556
+request.getbody.size            : 0
+Time Stamp[responseSet] : 0.000257
+Time Stamp[runMethod] : 0.000676
+Time Stamp[response.run] : 0.000897
+Time Stamp[response.getResonse ] : 2.3e-05
+response: HTTP/1.1 301 Moved Permanently
+Content-Length: 0
+Content-Location: /abc/abc
+Content-Type: text/html
+Date: Thu, 14 Apr 2022 04:27:27 GMT
+Last-Modified: Wed, 13 Apr 2022 17:51:30 GMT
+Location: ./aaaa
+Server: Mginx/1.0.0
+
+
+Time Stamp[getLocationForRequest ] : 0.000968
+Time Stamp[Getconf ] : 0.000291
+Getconf.getclientbodybuffersize : 1000000000
+request.getbody.size            : 0
+Time Stamp[responseSet] : 0.000186
+Time Stamp[runMethod] : 0.000693
+Time Stamp[response.run] : 0.000875
+Time Stamp[response.getResonse ] : 9e-06
+response: HTTP/1.1 404 Not Found
+Content-Length: 189
+Content-Location: /abc/aaaa
+Content-Type: text/html
+Date: Thu, 14 Apr 2022 04:27:27 GMT
+Server: Mginx/1.0.0
+
+<!DOCTYPE html>
+<html>
+	<title>404 Not Found</title>
+	<body>
+		<div>
+			<H1>404 Not Found</H1>
+			<p>Unable to find a representation of the requested resource</p>
+		</div>
+	</body>
+</html>
+
+Time Stamp[getLocationForRequest ] : 0.001722
+Time Stamp[Getconf ] : 0.000779
+Getconf.getclientbodybuffersize : 1000000000
+request.getbody.size            : 0
+Time Stamp[responseSet] : 0.000304
+Time Stamp[runMethod] : 0.002802
+Time Stamp[response.run] : 0.003053
+Time Stamp[response.getResonse ] : 2.3e-05
+response: HTTP/1.1 404 Not Found
+Content-Length: 189
+Content-Location: /abc/127.0.0.1/aaaa
+Content-Type: text/html
+Date: Thu, 14 Apr 2022 04:29:02 GMT
+Server: Mginx/1.0.0
+
+<!DOCTYPE html>
+<html>
+	<title>404 Not Found</title>
+	<body>
+		<div>
+			<H1>404 Not Found</H1>
+			<p>Unable to find a representation of the requested resource</p>
+		</div>
+	</body>
+</html>
+
+Time Stamp[getLocationForRequest ] : 0.001265
+Time Stamp[Getconf ] : 0.000322
+Getconf.getclientbodybuffersize : 1000000000
+request.getbody.size            : 0
+Time Stamp[responseSet] : 0.000313
+Time Stamp[runMethod] : 0.001257
+Time Stamp[response.run] : 0.001527
+Time Stamp[response.getResonse ] : 2.6e-05
+response: HTTP/1.1 404 Not Found
+Content-Length: 189
+Content-Location: /abc/127.0.0.1/aaaa
+Content-Type: text/html
+Date: Thu, 14 Apr 2022 04:29:24 GMT
+Server: Mginx/1.0.0
+
+<!DOCTYPE html>
+<html>
+	<title>404 Not Found</title>
+	<body>
+		<div>
+			<H1>404 Not Found</H1>
+			<p>Unable to find a representation of the requested resource</p>
+		</div>
+	</body>
+</html>
+
+Time Stamp[getLocationForRequest ] : 0.001801
+Time Stamp[Getconf ] : 0.000601
+Getconf.getclientbodybuffersize : 1000000000
+request.getbody.size            : 0
+Time Stamp[responseSet] : 0.000246
+Time Stamp[runMethod] : 0.003234
+Time Stamp[response.run] : 0.003701
+Time Stamp[response.getResonse ] : 4.5e-05
+response: HTTP/1.1 404 Not Found
+Content-Length: 189
+Content-Location: /abc/aaaa
+Content-Type: text/html
+Date: Thu, 14 Apr 2022 04:29:41 GMT
+Server: Mginx/1.0.0
+
+<!DOCTYPE html>
+<html>
+	<title>404 Not Found</title>
+	<body>
+		<div>
+			<H1>404 Not Found</H1>
+			<p>Unable to find a representation of the requested resource</p>
+		</div>
+	</body>
+</html>
+
+Time Stamp[getLocationForRequest ] : 0.001566
+Time Stamp[Getconf ] : 0.000534
+Getconf.getclientbodybuffersize : 1000000000
+request.getbody.size            : 0
+Time Stamp[responseSet] : 0.000485
+Time Stamp[runMethod] : 0.001509
+Time Stamp[response.run] : 0.001785
+Time Stamp[response.getResonse ] : 1.9e-05
+response: HTTP/1.1 404 Not Found
+Content-Length: 189
+Content-Location: /abc/aaaa
+Content-Type: text/html
+Date: Thu, 14 Apr 2022 04:31:21 GMT
+Server: Mginx/1.0.0
+
+<!DOCTYPE html>
+<html>
+	<title>404 Not Found</title>
+	<body>
+		<div>
+			<H1>404 Not Found</H1>
+			<p>Unable to find a representation of the requested resource</p>
+		</div>
+	</body>
+</html>
+
+Time Stamp[getLocationForRequest ] : 0.001077
+Time Stamp[Getconf ] : 0.000278
+Getconf.getclientbodybuffersize : 1000000000
+request.getbody.size            : 0
+Time Stamp[responseSet] : 0.000166
+Time Stamp[runMethod] : 0.002109
+Time Stamp[response.run] : 0.00236
+Time Stamp[response.getResonse ] : 1.7e-05
+response: HTTP/1.1 404 Not Found
+Content-Length: 189
+Content-Location: /abc/127.0.0.1/aaaa
+Content-Type: text/html
+Date: Thu, 14 Apr 2022 04:32:15 GMT
+Server: Mginx/1.0.0
+
+<!DOCTYPE html>
+<html>
+	<title>404 Not Found</title>
+	<body>
+		<div>
+			<H1>404 Not Found</H1>
+			<p>Unable to find a representation of the requested resource</p>
+		</div>
+	</body>
+</html>
+
+Time Stamp[getLocationForRequest ] : 0.001217
+Time Stamp[Getconf ] : 0.000332
+Getconf.getclientbodybuffersize : 1000000000
+request.getbody.size            : 0
+Time Stamp[responseSet] : 0.000271
+Time Stamp[runMethod] : 0.000925
+Time Stamp[response.run] : 0.001185
+Time Stamp[response.getResonse ] : 2.6e-05
+response: HTTP/1.1 404 Not Found
+Content-Length: 189
+Content-Location: /abc/
+Content-Type: text/html
+Date: Thu, 14 Apr 2022 04:32:19 GMT
+Last-Modified: Thu, 14 Apr 2022 04:28:31 GMT
+Server: Mginx/1.0.0
+
+<!DOCTYPE html>
+<html>
+	<title>404 Not Found</title>
+	<body>
+		<div>
+			<H1>404 Not Found</H1>
+			<p>Unable to find a representation of the requested resource</p>
+		</div>
+	</body>
+</html>
+
+Time Stamp[getLocationForRequest ] : 0.001029
+Time Stamp[Getconf ] : 0.000263
+Getconf.getclientbodybuffersize : 1000000000
+request.getbody.size            : 0
+Time Stamp[responseSet] : 0.000249
+Time Stamp[runMethod] : 0.000709
+Time Stamp[response.run] : 0.000882
+Time Stamp[response.getResonse ] : 1.1e-05
+response: HTTP/1.1 404 Not Found
+Content-Length: 189
+Content-Location: /abcabc
+Content-Type: text/html
+Date: Thu, 14 Apr 2022 04:32:23 GMT
+Server: Mginx/1.0.0
+
+<!DOCTYPE html>
+<html>
+	<title>404 Not Found</title>
+	<body>
+		<div>
+			<H1>404 Not Found</H1>
+			<p>Unable to find a representation of the requested resource</p>
+		</div>
+	</body>
+</html>
+
+Time Stamp[getLocationForRequest ] : 0.001024
+Time Stamp[Getconf ] : 0.000293
+Getconf.getclientbodybuffersize : 1000000000
+request.getbody.size            : 0
+Time Stamp[responseSet] : 0.000384
+Time Stamp[runMethod] : 0.000916
+Time Stamp[response.run] : 0.001141
+Time Stamp[response.getResonse ] : 1.2e-05
+response: HTTP/1.1 404 Not Found
+Content-Length: 189
+Content-Location: /abc/127.0.0.1/aaaa
+Content-Type: text/html
+Date: Thu, 14 Apr 2022 04:32:26 GMT
+Server: Mginx/1.0.0
+
+<!DOCTYPE html>
+<html>
+	<title>404 Not Found</title>
+	<body>
+		<div>
+			<H1>404 Not Found</H1>
+			<p>Unable to find a representation of the requested resource</p>
+		</div>
+	</body>
+</html>
+
+Time Stamp[getLocationForRequest ] : 0.000915
+Time Stamp[Getconf ] : 0.00085
+Getconf.getclientbodybuffersize : 2556
+request.getbody.size            : 0
+Time Stamp[responseSet] : 0.000531
+Time Stamp[runMethod] : 0.004094
+Time Stamp[response.run] : 0.004485
+Time Stamp[response.getResonse ] : 2.4e-05
+response: HTTP/1.1 200 OK
+Content-Length: 4
+Content-Location: /abc/abc1
+Content-Type: text/plain
+Date: Thu, 14 Apr 2022 04:33:02 GMT
+Last-Modified: Thu, 14 Apr 2022 04:32:45 GMT
+Server: Mginx/1.0.0
+
+abc
+
+Time Stamp[getLocationForRequest ] : 0.000997
+Time Stamp[Getconf ] : 0.000518
+Getconf.getclientbodybuffersize : 2556
+request.getbody.size            : 0
+Time Stamp[responseSet] : 0.00032
+Time Stamp[runMethod] : 0.003321
+Time Stamp[response.run] : 0.003691
+Time Stamp[response.getResonse ] : 2.9e-05
+response: HTTP/1.1 301 Moved Permanently
+Content-Length: 0
+Content-Location: /abc/abc1
+Content-Type: text/plain
+Date: Thu, 14 Apr 2022 04:33:17 GMT
+Last-Modified: Thu, 14 Apr 2022 04:32:45 GMT
+Location: /redirect_test
+Server: Mginx/1.0.0
+
+
+Time Stamp[getLocationForRequest ] : 0.001533
+Time Stamp[Getconf ] : 0.000288
+Getconf.getclientbodybuffersize : 1000000000
+request.getbody.size            : 0
+Time Stamp[responseSet] : 0.0002
+Time Stamp[runMethod] : 0.000954
+Time Stamp[response.run] : 0.001151
+Time Stamp[response.getResonse ] : 3.9e-05
+response: HTTP/1.1 404 Not Found
+Content-Length: 189
+Content-Location: /redirect_test
+Content-Type: text/html
+Date: Thu, 14 Apr 2022 04:33:17 GMT
+Server: Mginx/1.0.0
+
+<!DOCTYPE html>
+<html>
+	<title>404 Not Found</title>
+	<body>
+		<div>
+			<H1>404 Not Found</H1>
+			<p>Unable to find a representation of the requested resource</p>
+		</div>
+	</body>
+</html>
+
+Time Stamp[getLocationForRequest ] : 0.000679
+Time Stamp[Getconf ] : 0.000468
+Getconf.getclientbodybuffersize : 2556
+request.getbody.size            : 0
+Time Stamp[responseSet] : 0.00029
+Time Stamp[runMethod] : 0.002753
+Time Stamp[response.run] : 0.003132
+Time Stamp[response.getResonse ] : 1.8e-05
+response: HTTP/1.1 301 Moved Permanently
+Content-Length: 0
+Content-Location: /abc/abc1
+Content-Type: text/plain
+Date: Thu, 14 Apr 2022 04:34:03 GMT
+Last-Modified: Thu, 14 Apr 2022 04:32:45 GMT
+Location: redirect_test
+Server: Mginx/1.0.0
+
+
+Time Stamp[getLocationForRequest ] : 0.001415
+Time Stamp[Getconf ] : 0.000334
+Getconf.getclientbodybuffersize : 1000000000
+request.getbody.size            : 0
+Time Stamp[responseSet] : 0.000409
+Time Stamp[runMethod] : 0.001102
+Time Stamp[response.run] : 0.001354
+Time Stamp[response.getResonse ] : 1.2e-05
+response: HTTP/1.1 200 OK
+Content-Length: 13
+Content-Location: /abc/redirect_test
+Content-Type: text/plain
+Date: Thu, 14 Apr 2022 04:34:03 GMT
+Last-Modified: Thu, 14 Apr 2022 04:10:12 GMT
+Server: Mginx/1.0.0
+
+redirect ok!
+
+Time Stamp[getLocationForRequest ] : 0.001016
+Time Stamp[Getconf ] : 0.000635
+Getconf.getclientbodybuffersize : 2556
+request.getbody.size            : 0
+Time Stamp[responseSet] : 0.000427
+Time Stamp[runMethod] : 0.003271
+Time Stamp[response.run] : 0.003569
+Time Stamp[response.getResonse ] : 1.5e-05
+response: HTTP/1.1 301 Moved Permanently
+Content-Length: 0
+Content-Location: /abc/abc1
+Content-Type: text/plain
+Date: Thu, 14 Apr 2022 04:35:24 GMT
+Last-Modified: Thu, 14 Apr 2022 04:32:45 GMT
+Location: /redirect_test
+Server: Mginx/1.0.0
+
+
+Time Stamp[getLocationForRequest ] : 0.001533
+Time Stamp[Getconf ] : 0.000345
+Getconf.getclientbodybuffersize : 1000000000
+request.getbody.size            : 0
+Time Stamp[responseSet] : 0.000386
+Time Stamp[runMethod] : 0.001137
+Time Stamp[response.run] : 0.001518
+Time Stamp[response.getResonse ] : 1.7e-05
+response: HTTP/1.1 200 OK
+Content-Length: 18
+Content-Location: /redirect_test
+Content-Type: text/plain
+Date: Thu, 14 Apr 2022 04:35:24 GMT
+Last-Modified: Thu, 14 Apr 2022 04:34:33 GMT
+Server: Mginx/1.0.0
+
+redirect ok root!
+
+Time Stamp[getLocationForRequest ] : 0.001092
+Time Stamp[Getconf ] : 0.000672
+Getconf.getclientbodybuffersize : 2556
+request.getbody.size            : 0
+Time Stamp[responseSet] : 0.000244
+Time Stamp[runMethod] : 0.00264
+Time Stamp[response.run] : 0.002992
+Time Stamp[response.getResonse ] : 6.1e-05
+response: HTTP/1.1 301 Moved Permanently
+Content-Length: 0
+Content-Location: /abc123/abc1234
+Content-Type: text/plain
+Date: Thu, 14 Apr 2022 04:36:38 GMT
+Location: /redirect_test
+Server: Mginx/1.0.0
+
+
+Time Stamp[getLocationForRequest ] : 0.001444
+Time Stamp[Getconf ] : 0.00019
+Getconf.getclientbodybuffersize : 1000000000
+request.getbody.size            : 0
+Time Stamp[responseSet] : 0.000158
+Time Stamp[runMethod] : 0.000902
+Time Stamp[response.run] : 0.001041
+Time Stamp[response.getResonse ] : 5.3e-05
+response: HTTP/1.1 200 OK
+Content-Length: 18
+Content-Location: /redirect_test
+Content-Type: text/plain
+Date: Thu, 14 Apr 2022 04:36:38 GMT
+Last-Modified: Thu, 14 Apr 2022 04:34:33 GMT
+Server: Mginx/1.0.0
+
+redirect ok root!
 

@@ -40,6 +40,11 @@ GetConf::GetConf(Request &request, ServerBlock &server_block, std::string &locat
 		*/
 		std::cout<<"@@@@debug bodysize : "<<server_block.getClientBodyBufferSize()<<"@@"<<std::endl;
 		std::cout<<"@@@@debug redirect : "<< server_block.getRedirect() <<"@@"<<std::endl;
+		_redirect = server_block.getRedirect();
+
+		std::cout<<"@@@@debug redirect : "<< _redirect<<"@@"<<std::endl;
+		std::cout<<"@@@@debug redirect2 : "<< getRedirect()<<"@@"<<std::endl;
+
 
 		//index 체크
 		std::vector<std::string> temp_index = server_block.getIndex();
@@ -181,8 +186,8 @@ bool  									GetConf::getAutoIndex() const {
 	return this->_autoindex;
 }
 
-const std::string&  									GetConf::getLocation() const {
-	return this->_location;
+const std::string 						&GetConf::getRedirect() const {
+	return this->_redirect;
 }
 
 

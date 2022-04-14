@@ -16,14 +16,19 @@
 
 // Member functions
 
-std::string		ResponseHeader::getHeader(size_t size, const std::string& path, int statusCode, std::string type, const std::string& contentLocation)
+std::string		ResponseHeader::getHeader(size_t size, const std::string& path, const std::string& redirect , int statusCode, std::string type, const std::string& contentLocation)
 {
 	std::string	header;
 
+	std::cout<<"debug1"<<std::endl;
+
 	initValues();
-	setValues(size, path, statusCode, type, contentLocation);
+	setValues(size, path,redirect, statusCode, type, contentLocation);
 	header = "HTTP/1.1 " + toString(statusCode) + " " + getStatusMessage(statusCode) + "\r\n";
+	std::cout<<"debug2"<<std::endl;
 	header += writeHeader();
+
+	std::cout<<header<<std::endl;
 
 	return (header);
 }
@@ -34,7 +39,7 @@ std::string		ResponseHeader::notAllowedMethod(GetConf &getConf, int statusCode)
 {
 	std::string	header;
 	initValues();
-	setValues(0, getConf.getContentLocation(), statusCode, "", getConf.getContentLocation());
+	setValues(0, getConf.getContentLocation(),"", statusCode, "", getConf.getContentLocation());
 	setAllow(getConf.getAllowedMethods());
 
 	if (statusCode == 405)
@@ -62,6 +67,8 @@ std::string		ResponseHeader::writeHeader(void)
 		header += "Date: " + _date + "\r\n";
 	if (_lastModified != "")
 		header += "Last-Modified: " + _lastModified + "\r\n";
+	if (_location != "")
+		header += "Location: " + _location + "\r\n";
 	if (_server != "")
 		header += "Server: " + _server + "\r\n";
 
@@ -75,7 +82,7 @@ std::string		ResponseHeader::writeHeader(void)
 
 	return (header);
 }
-void		ResponseHeader::setValues(size_t size, const std::string& path,int statusCode, std::string type, const std::string& contentLocation)
+void		ResponseHeader::setValues(size_t size, const std::string& path, const std::string& redirect, int statusCode, std::string type, const std::string& contentLocation)
 {
 	setContentLength(size);
 	setContentLocation(contentLocation);
@@ -86,7 +93,7 @@ void		ResponseHeader::setValues(size_t size, const std::string& path,int statusC
 	setTransferEncoding();
 	setAllow();
 	// setContentLanguage(lang);
-	// setLocation(statusCode, path);
+	setLocation(statusCode, redirect);
 	// setRetryAfter(code, 3);
 	// setWwwAuthenticate(code);
 }
@@ -103,7 +110,7 @@ void			ResponseHeader::initValues(void)
 	_transferEncoding = "";
 	// _contentLanguage = "";
 	// _allow = "";
-	// _location = "";
+	_location = "";
 	// _retryAfter = "";
 	// _wwwAuthenticate = "";
 	initErrorMap();
@@ -122,6 +129,7 @@ void			ResponseHeader::initErrorMap()
 	_errors[200] = "OK";
 	_errors[201] = "Created";
 	_errors[204] = "No Content";
+	_errors[301] = "Moved Permanently";
 	_errors[400] = "Bad Request";
 	_errors[403] = "Forbidden";
 	_errors[404] = "Not Found";
@@ -210,6 +218,15 @@ void			ResponseHeader::setLastModified(const std::string& path)
 	}
 }
 
+
+void			ResponseHeader::setLocation(int code, const std::string& redirect)
+{
+	if (code == 201 || code / 100 == 3)
+	{
+		_location = redirect;
+	}
+}
+
 //utils
 std::string	ResponseHeader::toString(size_t n)
 {
@@ -217,8 +234,6 @@ std::string	ResponseHeader::toString(size_t n)
 	tmp << n;
 	return tmp.str();
 }
-
-
 
 void			ResponseHeader::setServer(void)
 {

@@ -72,15 +72,14 @@ void	Response::getMethod(Request &request,GetConf &getconf)
 {
 	ResponseHeader header;
 
-	std::cout<<getconf.getTargetPath()<<std::endl;
-
-	if(getconf.getTargetPath() == "./YoupiBanane/abc/abc")
+	std::cout<<"@@location 출력1: "<<getconf.getRedirect()<<std::endl;
+	if (getconf.getRedirect() != "")
 	{
-		std::cout<<"bingo"<<std::endl;
-
+		_status_code = 301;
+		_location = getconf.getRedirect();
+		std::cout<<"@@location 출력:"<<_location<<std::endl;
 	}
-
-	if (getconf.getCgiPass() != "")
+	else if (getconf.getCgiPass() != "")
 		setCgiResult(request, getconf);
 	else if(_status_code == 200)
 		_status_code = readContent(); //_body 만 작성된 상태
@@ -88,7 +87,7 @@ void	Response::getMethod(Request &request,GetConf &getconf)
 		_response = this->readHtml(_error_map[_status_code]);
 	if (_status_code == 500) //예측하지 못한 서버에러
 		_response = this->readHtml(_error_map[_status_code]);
-	_response = header.getHeader(_response.size(), _target_path, _status_code, _type, getconf.getContentLocation()) + "\r\n" + _response;
+	_response = header.getHeader(_response.size(), _target_path, _location, _status_code, _type, getconf.getContentLocation()) + "\r\n" + _response;
 }
 
 
@@ -98,7 +97,7 @@ void			Response::headMethod(Request &request,GetConf &getconf)
 	ResponseHeader	header;
 
 	_status_code = readContent();
-	_response = header.getHeader(_response.size(), _target_path, _status_code, _type, getconf.getContentLocation())  + "\r\n" + _response;
+	_response = header.getHeader(_response.size(), _target_path,_location, _status_code, _type, getconf.getContentLocation())  + "\r\n" + _response;
 }
 
 //post METHOD
@@ -140,7 +139,7 @@ void			Response::postMethod(Request &request,GetConf &getconf)
 
 	start = clock();
 
-	_response = header.getHeader(_response.size(), _target_path, _status_code, _type, getconf.getContentLocation())+ "\r\n" + _response;
+	_response = header.getHeader(_response.size(), _target_path,_location, _status_code, _type, getconf.getContentLocation())+ "\r\n" + _response;
 
 	finish = clock();
     duration = (double)(finish - start) / CLOCKS_PER_SEC;
@@ -161,7 +160,7 @@ void			Response::putMethod(Request &request,GetConf &getconf)
 	_status_code = writeContent(content);
 	if (_status_code != 201 && _status_code != 204)
 		_response = this->readHtml(_error_map[_status_code]);
-	_response = header.getHeader(_response.size(), _target_path, _status_code, _type, getconf.getContentLocation()) + "\r\n" + _response;
+	_response = header.getHeader(_response.size(), _target_path,_location, _status_code, _type, getconf.getContentLocation()) + "\r\n" + _response;
 
 }
 
@@ -180,7 +179,7 @@ void			Response::deleteMethod(Request &request,GetConf &getconf)
 		_status_code = 404;
 	if (_status_code == 403 || _status_code == 404)
 		_response = this->readHtml(_error_map[_status_code]);
-	_response = header.getHeader(_response.size(), _target_path, _status_code, _type, getconf.getContentLocation()) + "\r\n" + _response;
+	_response = header.getHeader(_response.size(), _target_path,_location, _status_code, _type, getconf.getContentLocation()) + "\r\n" + _response;
 }
 
 

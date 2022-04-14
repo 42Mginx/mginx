@@ -20,6 +20,8 @@ private:
 	std::string					_transferEncoding;
 	std::map<int, std::string>	_errors;
 
+	std::string					_location;
+
 	void						initErrorMap();
 
 public:
@@ -30,11 +32,11 @@ public:
 	ResponseHeader & operator=(const ResponseHeader & src);
 
 		// Member functions
-	std::string		getHeader(size_t size, const std::string& path, int statusCode, std::string type, const std::string& contentLocation);
+	std::string		getHeader(size_t size, const std::string& path,const std::string& redirect , int statusCode, std::string type, const std::string& contentLocation);
 	// std::string		notAllowed(std::set<std::string> methods, const std::string& path, int code, const std::string& lang);
 	std::string		notAllowedMethod(GetConf &getConf, int statusCode);
 	std::string		writeHeader(void);
-	void			setValues(size_t size, const std::string& path,int statusCode, std::string type, const std::string& contentLocation);
+	void			setValues(size_t size, const std::string& path, const std::string& redirect,int statusCode, std::string type, const std::string& contentLocation);
 	void			initValues(void);
 	std::string		getStatusMessage(int code);
 
