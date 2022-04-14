@@ -56,7 +56,6 @@
 #define RESET "\033[0m"
 #define PURPLE "\033[34m"
 
-
 // return from webserver process
 #define RETURN_PROCEED 0
 #define RETURN_WAIT 1
@@ -66,25 +65,19 @@
 class WebserverProcess;
 
 class Webserver {
-   private:
-    // tmp
-    // std::vector<t_listen> getListens();
-
+  private:
     // 멤버변수
     long _max_fd;
     fd_set _fd_set;
-    // std::vector<int> _socket_fd_v;
-    // std::vector<int> _connected_fd_v;
-    std::vector<WebserverProcess> _process_v;  // process 별 생성(connected fd 기준), run할때 생성
-    std::vector<WebserverProcess> _socket_v;   // base (초기화시 생성 port별 생성)
+    std::vector<WebserverProcess> _process_v;
+    std::vector<WebserverProcess> _socket_v;
     std::vector<t_listen> _listens_v;
     fd_set _reading_set;
     fd_set _writing_set;
     Config _config;
 
     // private method
-
-   public:
+  public:
     // occf
     Webserver(void);
     Webserver(const Webserver &src);
