@@ -28,6 +28,7 @@ ServerBlock &ServerBlock::operator=(ServerBlock const &src)
         _client_body_buffer_size = src._client_body_buffer_size;
         _auto_index = src._auto_index;
         _location = src._location;
+        _redirect = src.redirect;
         _index = src._index; //0406 추가
     }
     return *this;
@@ -50,7 +51,7 @@ directivesMap ServerBlock::_initDirectivesMap()
     tmpMap["autoindex"] = &ServerBlock::addAutoIndex;
     tmpMap["index"] = &ServerBlock::addIndex;
     tmpMap["allow_methods"] = &ServerBlock::addAllowedMethods;
-
+    tmpMap["redirect"] = &ServerBlock::addRedirect;
     return (tmpMap);
 }
 
@@ -70,6 +71,7 @@ directivesMap ServerBlock::_initLocationDirectivesMap()
     tmpMap["cgi_pass"] = &ServerBlock::addCgiPass;
     tmpMap["index"] = &ServerBlock::addIndex;
     tmpMap["alias"] = &ServerBlock::addAlias;
+    tmpMap["redirect"] = &ServerBlock::addRedirect;
 
     return (tmpMap);
 }
@@ -268,6 +270,13 @@ void ServerBlock::addAlias(std::vector<std::string> args)
     this->_aliasSet = true;
 }
 
+void ServerBlock::addRedirect(std::vector<std::string> args)
+{
+    if (args.size() != 1 || _cgi_pass != "")
+        throw ExceptionInvalidArguments();
+    _cgi_pass = args[0];
+}
+
 // get 함수들
 std::vector<std::string> ServerBlock::getServerName() const
 {
@@ -312,6 +321,11 @@ std::vector<std::string> ServerBlock::getIndex() const { return this->_index; }
 std::string ServerBlock::getAlias() const { return this->_alias; }
 
 bool ServerBlock::getAliasSet() const { return this->_aliasSet; }
+
+std::map<std::string, std::string> ServerBlock::getCgiParam() const
+{
+    return this->_redirect;
+}
 
 // serverBlock 파싱
 int ServerBlock::parseServerBlock(unsigned int &index, fileVector &file)

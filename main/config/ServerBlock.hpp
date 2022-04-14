@@ -10,9 +10,10 @@ private:
 	static  ServerBlock				_default_conf;
 
 	std::vector<std::string> _server_name;	// 여러개일 수 있음
-	std::string _cgi_pass;
+	std::string _cgi_pass;					
 	std::vector<t_listen> _listen;			// 여러개일 수 있음
 	std::string _root;						// 얘는 한개
+	std::string _redirect;					// 얘도 한개
 	std::set<std::string> _allowed_methods; // 얘는 여러개
 	std::map<int, std::string> _error_page; // 얘도 여러개
 	int _client_body_buffer_size;			// 한 개
@@ -45,6 +46,8 @@ public:
 	std::string getCgiPass() const;
 	std::string getAlias() const;
 	bool getAliasSet() const;
+	std::string getRedirect() const;
+
 
 	// 지시어 파싱 함수
 	void addServerName(std::vector<std::string> args);
@@ -59,6 +62,7 @@ public:
 	void addCgiPass(std::vector<std::string> args);
 	void addIndex(std::vector<std::string> args);
 	void addAlias(std::vector<std::string> args);
+	void addRedirect(std::vector<std::string> args);
 
 	static void _initDefaultServer(const char *filename);
 
