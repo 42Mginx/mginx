@@ -8,15 +8,14 @@
 
 #define RECV_SIZE 65536
 
-class WebserverProcess
-{
-private:
+class WebserverProcess {
+  private:
     int _socket_fd;
     int _connected_fd;
     t_listen _listen_info;
     struct sockaddr_in _addr;
     size_t _header_index;
-    bool _ready_to_response; // flag to indicate ready state
+    bool _ready_to_response;
     int _sent;
 
     std::string _req;
@@ -25,15 +24,11 @@ private:
     Response _response;
 
     Config *_config;
-
-    // sub
     int _prev_req_end_index;
-
     WebserverProcess(void);
 
-public:
+  public:
     size_t _write_ret_sum;
-
     WebserverProcess(t_listen const &listen, Config &config);
     WebserverProcess(WebserverProcess const &src);
     ~WebserverProcess(void);

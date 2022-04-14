@@ -19,9 +19,8 @@ unsigned int strToIp(std::string strIp);
 fileVector readFile(std::string config_path_str);
 fileVector split(std::string str, std::string charset);
 
-class FileNotFoundException : public std::exception
-{
-	virtual const char *what() const throw();
+class FileNotFoundException : public std::exception {
+    virtual const char *what() const throw();
 };
 
 #include "ServerBlock.hpp"
