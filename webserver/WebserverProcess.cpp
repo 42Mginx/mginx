@@ -82,7 +82,7 @@ int WebserverProcess::readRequest(void) {
     if (ret == RETURN_PROCEED)
     {
         std::cout << "\n--- request ---" << std::endl;
-        std::cout << _req << std::endl;
+        std::cout << _req.substr(0, 250) << std::endl;
         std::cout << "---------------" << std::endl;
         ret = process();
     }
@@ -145,7 +145,7 @@ int WebserverProcess::writeResponse(void) {
         _write_ret_sum += ret;
         if (_write_ret_sum >= _res.size()) {
             std::cout << "\n --- response ---" << std::endl;
-            std::cout << _res << std::endl;
+            std::cout << _res.substr(0, 250) << std::endl;
             std::cout << "---------------" << std::endl;
             _res = "";
             _req = "";
