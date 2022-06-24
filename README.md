@@ -4,38 +4,73 @@
 <img src="https://user-images.githubusercontent.com/54441505/171986791-972d5370-8d19-4abc-b98c-4d90a0c3320e.png" width="400" />
 </div>
 
+# Directory structure
 
-# 주요 폴더
+* webserver: socket communication part
+* config: parsing config file   
+* request: parsing request   
+* response: generate response   
+* cgi: run cgi program   
+* autoindex: implement autoindex function   
+* utils: util functions, structures   
+* client: client program for test   
 
-### webserver
-- 웹 서버의 통신부
-### config
-- 웹 서버 설정 파일 파싱 및 구조화
-### request
-- 클라이언트로부터 온 요청을 파싱
-### response
-- 클라이언트에게 보낼 응답을 생성
-### cgi
-- cgi작업이 필요한 경우 프로그램을 작동시켜 응답에 변경을 가함
-### autoindex
-- 오토인덱스 구현
-### utils
-- 유틸함수 및 구조체
-### client
-- 테스트를 위한 클라이언트
+# How to run MGINX
+0. Clone this repo, and Open the terminal
+```shell
+> git clone https://github.com/42Mginx/mginx.git
+> cd mginx
+```
+1. Run with Makefile
+```shell
+> make
+> ./webserv ./test/conf/mac_test.conf
+```
+- or just type like this
+```shell
+> make run
+```
+- print example <Port information on successful binding>
+```shell
+0: 8000
+Bind success [8000/3]
+0: 8001
+Bind success [8001/4]
+0: 8002
+Bind success [8002/5]
+```
+- case1: All success
 
-# 실행방법
-* Makefile을 이용해 실행합니다.
+```shell
+0: 8000
+에러번호48: Address already in use
+Could not bind [8000]
+0: 8001
+Bind success [8001/4]
+0: 8002
+Bind success [8002/5]
+```
+- case2: One fail[8000]/ Two success[8001, 8002]
+
+2. Test with browser
+- You can test using the successfully bound port.
+- type: `localhost:${port}`
+```shell
+localhost:8000
+```
+ - You will see a page like this:
+<img width="1006" alt="Screen Shot 2022-06-24 at 6 35 39 PM" src="https://user-images.githubusercontent.com/54441505/175508270-7e1f4677-16d2-4e07-ba2c-cd65893d04ee.png">
 
 ## RUN COMMANDS
 ### make run
-- run webserv
-- 컴파일하여 웹 서브 프로그램을 만들고 동작시킵니다.
+- Compile to create webserver program
+- Run the programs
 
 ### make test
-- run webserv && run client
-- 웹 서브 프로그램을 만들고 동작시킵니다.
-- 클라이언트 또한 동작시켜 다른 터미널에서 띄웁니다.
+- Compile and Run webserver program
+- Compile and Run client program
+
+- You can test  
 
 ### make tester
 - run webserv && open new terminal window(for running 42tester)
