@@ -30,3 +30,11 @@
 *.exe
 *.out
 *.app
+
+# testfiles
+YoupiBanane/multiple_same
+
+# program file
+webserv
+obj/*
+client/client
