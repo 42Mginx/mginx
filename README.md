@@ -5,15 +5,16 @@
 </div>
 
 # Directory structure
-
-* webserver: socket communication part
-* config: parsing config file   
-* request: parsing request   
-* response: generate response   
-* cgi: run cgi program   
-* autoindex: implement autoindex function   
-* utils: util functions, structures   
-* client: client program for test   
+|diretory|description|
+|---|---|
+| **webserver** | socket communication part |
+| **config**    | parsing config file   |
+| **request**   | parsing request   |
+| **response**  | generate response  | 
+| **cgi**       | run cgi program   |
+| **autoindex** | implement autoindex function   |
+| **utils**     | util functions, structures   |
+| **client**    | client program for test   |
 
 # How to run MGINX
 0. Clone this repo, and Open the terminal
@@ -80,34 +81,38 @@ localhost:8000
    
 ### make tester
 - Run webserver program
-- Open a new terminal window to run tester(made by 42)
-- 웹 서브를 동작시킨 후에 테스터를 작동킬 수 있는 명령어가 타이핑된 터미널을 띄웁니다.
-- To run this command in VSC enviroment, you need to follow steps:
-   1. Open 
-   1. "System Preferences > 보안 및 개인 정보 보호 > 개인 정보 보호 > 손쉬운 사용" tab
-   <img width="273" alt="Screen Shot 2022-06-24 at 7 41 43 PM" src="https://user-images.githubusercontent.com/54441505/175518992-a00a6b4c-88aa-4ad8-a3db-1cb1ff07e0ac.png">
-
-   2. Check Code
+- Open a new terminal window to run tester
+- To run this command in VSC enviroment, you need to follow steps:   
+   - Open
+      * System Preferences(시스템 환경설정)       
+      * Security & Privacy(보안 및 개인 정보 보호)   
+      * Privacy(개인 정보 보호)   
+      * Accessibility(손쉬운 사용)   
+   - Check `Code`
    ![스크린샷 2022-06-04 오후 3 19 58](https://user-images.githubusercontent.com/54441505/171987290-dd6803c0-cef6-4188-b7ba-b597aab34adf.png)
-   - `@osascript -e 'tell application "System Events" to keystroke "./tester http://localhost:8000" '`가 동작하도록 하기 위해서 입니다.
-
-
+- This setting enables the operation of this command: `@osascript -e 'tell application "System Events" to keystroke "./tester http://localhost:8000" '`
+- If you cannot change the settings, follow steps:
+   - Open Terminal(location: root of this repo directory) and type:
+   ```shell
+   > make run
+   ```
+   - make sure the port(8000, 8001, 8002) you want to test is successfully bound
+   - Open another(location: root of this repo directory) Terminal and type:
+   ```shell
+   > cd test/42_tester
+   > ./tester http://localhost:8000
+   ```
 ---
 
-## 기본 Makefile 명령어 설명 | BASICS COMMANDS
+## BASIC Makefile COMMANDS
 ### make
-- compile server, client
-- 서버와 클라이언트를 컴파일합니다.
+- compile server program and client program
 
 ### make re
-- fclean && make again
-- make 명령어를 통해 생성된 모든 파일을 삭제하고 다시 make합니다.
+- `fclean` && `make` again
 
 ### make clean
 - remove object files
-- make 명령어를 통해 생성된 오브젝트 파일을 삭제합니다.
 
 ### make fclean
-- remove object files, log file and execute file
-- 오브젝트 파일, 실행파일, 로그 파일을 삭제합니다.
-- 내부적으로 make clean 명령을 사용합니다.
+- remove object files(`make clean`), log file and execute file
