@@ -118,7 +118,16 @@ localhost:8000
 - remove object files(`make clean`), log file and execute file
  
 ---
-* When all ports fail to bind, kill the port
+## When all ports fail to bind, kill the port
+* Check PID
+```shell
+> lsof -i :8000
+```
+* Kill the port using PID
+```shell
+> kill -9 28423
+```
+
 [Kill port](https://codinhood.com/nano/macos/find-kill-proccess-port-macos)
 
  
