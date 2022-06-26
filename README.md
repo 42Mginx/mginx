@@ -116,3 +116,9 @@ localhost:8000
 
 ### make fclean
 - remove object files(`make clean`), log file and execute file
+ 
+---
+* When all ports fail to bind, kill the port
+[Kill port](https://codinhood.com/nano/macos/find-kill-proccess-port-macos)
+
+ 
