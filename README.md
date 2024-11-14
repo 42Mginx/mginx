@@ -6,6 +6,7 @@
 
 ## Docs
 * We provide documentation in both English and Japanese.
+We used [translateme](https://github.com/marketplace/actions/readme-ai-translator), which detects changes to the README.md and automatically translates them.
 
 |Language|path|
 |---|---|
