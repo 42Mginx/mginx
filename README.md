@@ -5,6 +5,8 @@
 </div>
 
 ## Docs
+* We provide documentation in both English and Japanese.
+
 |Language|path|
 |---|---|
 | English  | [README.md](https://github.com/42Mginx/mginx/blob/main/README.md) |
