@@ -1,5 +1,7 @@
-edit readme to test workflow.
+以下のマークダウンコンテンツを日本語に翻訳してください：
 
+readmeを編集してワークフローをテストします。
+ハハハ。
 
 # mginx
 
@@ -7,44 +9,44 @@ edit readme to test workflow.
 <img src="https://user-images.githubusercontent.com/54441505/171986791-972d5370-8d19-4abc-b98c-4d90a0c3320e.png" width="400" />
 </div>
 
-## Docs
-* We provide documentation in both English and Japanese.
-* We used [translateme](https://github.com/marketplace/actions/readme-ai-translator), which detects changes to the README.md and automatically translates them.
+## ドキュメンテーション
+* 英語と日本語の両方でドキュメンテーションを提供しています。
+* [translateme](https://github.com/marketplace/actions/readme-ai-translator)を使用して、README.mdの変更を検出し、自動的に翻訳します。
 
-|Language|path|
+|言語|パス|
 |---|---|
-| English  | [README.md](https://github.com/42Mginx/mginx/blob/main/README.md) |
-| Japanese | [README.ja.md](https://github.com/42Mginx/mginx/blob/main/README.ja.md) |
+| 英語  | [README.md](https://github.com/42Mginx/mginx/blob/main/README.md) |
+| 日本語 | [README.ja.md](https://github.com/42Mginx/mginx/blob/main/README.ja.md) |
 
 
-## Directory structure
-|diretory|description|
+## ディレクトリ構造
+|ディレクトリ|説明|
 |---|---|
-| **webserver** | socket communication part |
-| **config**    | parsing config file   |
-| **request**   | parsing request   |
-| **response**  | generate response  | 
-| **cgi**       | run cgi program   |
-| **autoindex** | implement autoindex function   |
-| **utils**     | util functions, structures   |
-| **client**    | client program for test   |
+| **webserver** | ソケット通信部分 |
+| **config**    | 設定ファイルの解析   |
+| **request**   | リクエストの解析   |
+| **response**  | レスポンスの生成  | 
+| **cgi**       | cgiプログラムの実行   |
+| **autoindex** | autoindex機能の実装   |
+| **utils**     | ユーティリティ関数、構造体   |
+| **client**    | テスト用クライアントプログラム   |
 
-## How to run MGINX
-0. Clone this repo, and Open the terminal
+## MGINXの実行方法
+0. このリポジトリをクローンし、ターミナルを開きます
 ```shell
 > git clone https://github.com/42Mginx/mginx.git
 > cd mginx
 ```
-1. Run with Makefile
+1. Makefileで実行
 ```shell
 > make
 > ./webserv ./test/conf/mac_test.conf
 ```
-- or just type like this
+- または、このように入力します
 ```shell
 > make run
 ```
-- print example <Port information on successful binding>
+- 例を出力します <成功したバインドのポート情報>
 ```shell
 0: 8000
 Bind success [8000/3]
@@ -53,94 +55,92 @@ Bind success [8001/4]
 0: 8002
 Bind success [8002/5]
 ```
-- case1: All success
+- ケース1: すべて成功
 
 ```shell
 0: 8000
-에러번호48: Address already in use
+エラー番号48: Address already in use
 Could not bind [8000]
 0: 8001
 Bind success [8001/4]
 0: 8002
 Bind success [8002/5]
 ```
-- case2: One fail[8000]/ Two success[8001, 8002]
+- ケース2: 1つ失敗[8000]/ 2つ成功[8001, 8002]
 
-2. Test with browser
-- You can test using the successfully bound port.
-- type: `localhost:${port}`
+2. ブラウザでテスト
+- 成功したポートを使用してテストできます。
+- 入力します: `localhost:${port}`
 ```shell
 localhost:8000
 ```
- - You will see a page like this:
+ - このようなページが表示されます:
 <img width="1006" alt="Screen Shot 2022-06-24 at 6 35 39 PM" src="https://user-images.githubusercontent.com/54441505/175508270-7e1f4677-16d2-4e07-ba2c-cd65893d04ee.png">
 
-## RUN COMMANDS
+## 実行コマンド
 ### make run
-- Compile to create webserver program
-- Run the programs
+- webserverプログラムを作成するためにコンパイル
+- プログラムを実行
 
 ### make test
-- Compile and Run webserver program
-- Compile and Run client program
+- webserverプログラムをコンパイルして実行
+- クライアントプログラムをコンパイルして実行
 
-- You can test using client program we made:
+- 私たちが作成したクライアントプログラムを使用してテストできます:
 <img width="682" alt="Screen Shot 2022-06-24 at 7 06 13 PM" src="https://user-images.githubusercontent.com/54441505/175513539-4e9a0ef8-a4a2-4760-9d8d-4ef4db3cd8d0.png">
    
-   - you can make request by choosing the options
-   - method(GET/POST/DELETE)
-   - option(Simple/Bad request/CGI)
-   - port(8000/8001)
+   - オプションを選択してリクエストを作成できます
+   - メソッド(GET/POST/DELETE)
+   - オプション(シンプル/不正なリクエスト/CGI)
+   - ポート(8000/8001)
    
 ### make tester
-- Run webserver program
-- Open a new terminal window to run tester
-- To run this command in VSC enviroment, you need to follow steps:   
-   - Open
-      * System Preferences(시스템 환경설정)       
-      * Security & Privacy(보안 및 개인 정보 보호)   
-      * Privacy(개인 정보 보호)   
-      * Accessibility(손쉬운 사용)   
-   - Check `Code`
+- webserverプログラムを実行
+- 新しいターミナルウィンドウを開いてテスターを実行
+- VSC環境でこのコマンドを実行するには、次の手順を守る必要があります:   
+   - 開く
+      * システム環境設定       
+      * セキュリティとプライバシー   
+      * プライバシー   
+      * アクセシビリティ   
+   - `Code`にチェックを入れる
    ![스크린샷 2022-06-04 오후 3 19 58](https://user-images.githubusercontent.com/54441505/171987290-dd6803c0-cef6-4188-b7ba-b597aab34adf.png)
-- This setting enables the operation of this command: `@osascript -e 'tell application "System Events" to keystroke "./tester http://localhost:8000" '`
-- If you cannot change the settings, follow steps:
-   - Open Terminal(location: root of this repo directory) and type:
+- この設定により、このコマンドの操作が可能になります: `@osascript -e 'tell application "System Events" to keystroke "./tester http://localhost:8000" '`
+- 設定を変更できない場合は、次の手順に従います:
+   - ターミナルを開いて(場所: このリポジトリディレクトリのルート)、入力します:
    ```shell
    > make run
    ```
-   - make sure the port(8000, 8001, 8002) you want to test is successfully bound
-   - Open another(location: root of this repo directory) Terminal and type:
+   - テストしたいポート(8000, 8001, 8002)が正常にバインドされていることを確認します
+   - 別のターミナル(場所: このリポジトリディレクトリのルート)を開いて入力します:
    ```shell
    > cd test/42_tester
    > ./tester http://localhost:8000
    ```
 ---
 
-## BASIC Makefile COMMANDS
+## 基本的なMakefileコマンド
 ### make
-- compile server program and client program
+- サーバープログラムとクライアントプログラムをコンパイル
 
 ### make re
-- `fclean` && `make` again
+- `fclean` && 再度`make`
 
 ### make clean
-- remove object files
+- オブジェクトファイルを削除
 
 ### make fclean
-- remove object files(`make clean`), log file and execute file
+- オブジェクトファイル(`make clean`)、ログファイル、実行ファイルを削除
  
 ---
-## When all ports fail to bind, kill the port
-* Check PID
+## すべてのポートがバインドに失敗した場合、ポートをkillします
+* PIDを確認
 ```shell
 > lsof -i :8000
 ```
-* Kill the port using PID
+* PIDを使用してポートをkillします
 ```shell
 > kill -9 28423
 ```
 
-[Kill port](https://codinhood.com/nano/macos/find-kill-proccess-port-macos)
-
- 
+[ポートをkillする](https://codinhood.com/nano/macos/find-kill-proccess-port-macos)
