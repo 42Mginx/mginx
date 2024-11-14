@@ -12,7 +12,7 @@ jobs:
       - uses: actions/checkout@v2
 
       - name: Translate README
-        uses: humonnom/translateme@v1.0.0
+        uses: humonnom/translateme@v1
         with:
           api_key: ${{ secrets.OPENAI_API_KEY }}
           source_file: 'README.md'
