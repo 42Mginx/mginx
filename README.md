@@ -4,14 +4,14 @@
 <img src="https://user-images.githubusercontent.com/54441505/171986791-972d5370-8d19-4abc-b98c-4d90a0c3320e.png" width="400" />
 </div>
 
-# Docs
+## Docs
 |Language|path|
 |---|---|
 | English  | [README.md](https://github.com/42Mginx/mginx/blob/main/README.md) |
 | Japanese | [README.ja.md](https://github.com/42Mginx/mginx/blob/main/README.ja.md) |
 
 
-# Directory structure
+## Directory structure
 |diretory|description|
 |---|---|
 | **webserver** | socket communication part |
@@ -23,7 +23,7 @@
 | **utils**     | util functions, structures   |
 | **client**    | client program for test   |
 
-# How to run MGINX
+## How to run MGINX
 0. Clone this repo, and Open the terminal
 ```shell
 > git clone https://github.com/42Mginx/mginx.git
