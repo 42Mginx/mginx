@@ -1,0 +1,19 @@
+name: Translate README
+
+on:
+  push:
+    paths:
+      - 'README.md'
+
+jobs:
+  translate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Translate README
+        uses: humonnom/translateme@v1.0.0
+        with:
+          api_key: ${{ secrets.OPENAI_API_KEY }}
+          source_file: 'README.md'
+          # target_language: 'ja'
