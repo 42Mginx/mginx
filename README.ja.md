@@ -1,8 +1,5 @@
 以下のマークダウンコンテンツを日本語に翻訳してください：
 
-readmeを編集してワークフローをテストします。
-ハハハ。
-
 # mginx
 
 <div align="center">
@@ -26,7 +23,7 @@ readmeを編集してワークフローをテストします。
 | **config**    | 設定ファイルの解析   |
 | **request**   | リクエストの解析   |
 | **response**  | レスポンスの生成  | 
-| **cgi**       | cgiプログラムの実行   |
+| **cgi**       | CGIプログラムの実行   |
 | **autoindex** | autoindex機能の実装   |
 | **utils**     | ユーティリティ関数、構造体   |
 | **client**    | テスト用クライアントプログラム   |
@@ -37,7 +34,7 @@ readmeを編集してワークフローをテストします。
 > git clone https://github.com/42Mginx/mginx.git
 > cd mginx
 ```
-1. Makefileで実行
+1. Makefileで実行します
 ```shell
 > make
 > ./webserv ./test/conf/mac_test.conf
@@ -46,7 +43,7 @@ readmeを編集してワークフローをテストします。
 ```shell
 > make run
 ```
-- 例を出力します <成功したバインドのポート情報>
+- 例 <成功したバインドのポート情報を表示>
 ```shell
 0: 8000
 Bind success [8000/3]
@@ -55,11 +52,11 @@ Bind success [8001/4]
 0: 8002
 Bind success [8002/5]
 ```
-- ケース1: すべて成功
+- ケース1: 全て成功
 
 ```shell
 0: 8000
-エラー番号48: Address already in use
+エラーナンバー48: Address already in use
 Could not bind [8000]
 0: 8001
 Bind success [8001/4]
@@ -70,11 +67,11 @@ Bind success [8002/5]
 
 2. ブラウザでテスト
 - 成功したポートを使用してテストできます。
-- 入力します: `localhost:${port}`
+- 入力: `localhost:${port}`
 ```shell
 localhost:8000
 ```
- - このようなページが表示されます:
+ - このようなページが表示されます：
 <img width="1006" alt="Screen Shot 2022-06-24 at 6 35 39 PM" src="https://user-images.githubusercontent.com/54441505/175508270-7e1f4677-16d2-4e07-ba2c-cd65893d04ee.png">
 
 ## 実行コマンド
@@ -83,13 +80,11 @@ localhost:8000
 - プログラムを実行
 
 ### make test
-- webserverプログラムをコンパイルして実行
-- クライアントプログラムをコンパイルして実行
-
-- 私たちが作成したクライアントプログラムを使用してテストできます:
+- webserverプログラムとクライアントプログラムをコンパイルして実行
+- 私たちが作ったクライアントプログラムを使用してテストできます：
 <img width="682" alt="Screen Shot 2022-06-24 at 7 06 13 PM" src="https://user-images.githubusercontent.com/54441505/175513539-4e9a0ef8-a4a2-4760-9d8d-4ef4db3cd8d0.png">
    
-   - オプションを選択してリクエストを作成できます
+   - オプションを選んでリクエストを作成できます
    - メソッド(GET/POST/DELETE)
    - オプション(シンプル/不正なリクエスト/CGI)
    - ポート(8000/8001)
@@ -97,22 +92,22 @@ localhost:8000
 ### make tester
 - webserverプログラムを実行
 - 新しいターミナルウィンドウを開いてテスターを実行
-- VSC環境でこのコマンドを実行するには、次の手順を守る必要があります:   
+- このコマンドをVSC環境で実行するには、以下の手順を守る必要があります：   
    - 開く
       * システム環境設定       
       * セキュリティとプライバシー   
       * プライバシー   
       * アクセシビリティ   
-   - `Code`にチェックを入れる
+   - `Code`をチェック
    ![스크린샷 2022-06-04 오후 3 19 58](https://user-images.githubusercontent.com/54441505/171987290-dd6803c0-cef6-4188-b7ba-b597aab34adf.png)
-- この設定により、このコマンドの操作が可能になります: `@osascript -e 'tell application "System Events" to keystroke "./tester http://localhost:8000" '`
-- 設定を変更できない場合は、次の手順に従います:
-   - ターミナルを開いて(場所: このリポジトリディレクトリのルート)、入力します:
+- この設定により、このコマンドの操作が可能になります：`@osascript -e 'tell application "System Events" to keystroke "./tester http://localhost:8000" '`
+- 設定を変更できない場合は、以下の手順に従います：
+   - ターミナルを開き（場所：このリポジトリのルートディレクトリ）、入力します：
    ```shell
    > make run
    ```
-   - テストしたいポート(8000, 8001, 8002)が正常にバインドされていることを確認します
-   - 別のターミナル(場所: このリポジトリディレクトリのルート)を開いて入力します:
+   - テストしたいポート（8000、8001、8002）が正常にバインドされていることを確認します
+   - 別のターミナル（場所：このリポジトリのルートディレクトリ）を開き、入力します：
    ```shell
    > cd test/42_tester
    > ./tester http://localhost:8000
@@ -133,14 +128,15 @@ localhost:8000
 - オブジェクトファイル(`make clean`)、ログファイル、実行ファイルを削除
  
 ---
-## すべてのポートがバインドに失敗した場合、ポートをkillします
+## 全てのポートがバインドに失敗した場合、ポートをkillする
 * PIDを確認
 ```shell
 > lsof -i :8000
 ```
-* PIDを使用してポートをkillします
+* PIDを使用してポートをkill
 ```shell
 > kill -9 28423
 ```
 
 [ポートをkillする](https://codinhood.com/nano/macos/find-kill-proccess-port-macos)
+
